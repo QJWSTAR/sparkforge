@@ -1,18 +1,22 @@
 import Link from 'next/link'
 import { sourceLabels } from '@/data/mockSignals'
 import type { Signal } from '@/types/signal'
+import { supabaseAdmin } from '@/lib/supabase'
 
 async function getSignals(): Promise<Signal[]> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
-    const res = await fetch(`${baseUrl}/api/signals?sortBy=score&limit=3`, {
-      cache: 'no-store'
-    })
-    const data = await res.json()
-    if (data.success && data.data?.length > 0) {
-      return data.data
+    const { data, error } = await supabaseAdmin
+      .from('Signal')
+      .select('*')
+      .order('finalScore', { ascending: false, nullsFirst: false })
+      .limit(3)
+
+    if (error) {
+      console.error('Failed to fetch signals:', error)
+      return []
     }
-    return []
+
+    return data || []
   } catch (error) {
     console.error('Failed to fetch signals:', error)
     return []
@@ -149,7 +153,7 @@ export default async function Home() {
 
           {signals.length > 0 ? (
             <div className="grid gap-4">
-              {signals.slice(0, 3).map((signal, index) => (
+              {signals.map((signal, index) => (
                 <div key={signal.id} className="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-colors">
                   <div className="flex items-start gap-4">
                     <div className={`text-white text-sm font-bold px-3 py-1 rounded ${
