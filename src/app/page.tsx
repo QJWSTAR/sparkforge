@@ -3,35 +3,6 @@ import Link from 'next/link'
 export default function Home() {
   return (
     <main className="min-h-screen">
-      {/* Header */}
-      <header className="border-b border-white/10">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-[#FF6B35] to-[#FFB800] rounded-lg flex items-center justify-center font-bold">
-              S
-            </div>
-            <span className="text-xl font-bold">SparkForge</span>
-          </div>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/radar" className="text-gray-400 hover:text-white transition-colors">
-              创意雷达
-            </Link>
-            <Link href="/forge" className="text-gray-400 hover:text-white transition-colors">
-              复刻工坊
-            </Link>
-            <Link href="/canvas" className="text-gray-400 hover:text-white transition-colors">
-              商业画布
-            </Link>
-            <Link href="/stream" className="text-gray-400 hover:text-white transition-colors">
-              公开日志
-            </Link>
-          </nav>
-          <button className="bg-[#FF6B35] hover:bg-[#FF5722] text-white px-4 py-2 rounded-lg font-medium transition-colors">
-            开始使用
-          </button>
-        </div>
-      </header>
-
       {/* Hero Section */}
       <section className="py-20 px-4">
         <div className="container mx-auto text-center">

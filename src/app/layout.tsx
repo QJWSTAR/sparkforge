@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import Navbar from '@/components/Navbar'
 
 export const metadata: Metadata = {
   title: 'SparkForge - 创意信号雷达 + TRAE 自动化落地工坊',
@@ -14,6 +15,7 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body className="min-h-screen bg-[#0a0a0a] text-white antialiased">
+        <Navbar />
         {children}
       </body>
     </html>
