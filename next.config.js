@@ -4,6 +4,7 @@ const nextConfig = {
   images: {
     domains: ['images.unsplash.com', 'via.placeholder.com'],
   },
+  outputFileTracingRoot: '/Users/quanjiawei/Documents/sparkforge',
 }
 
 module.exports = nextConfig

@@ -1,6 +1,27 @@
 import Link from 'next/link'
+import { sourceLabels } from '@/data/mockSignals'
+import type { Signal } from '@/types/signal'
 
-export default function Home() {
+async function getSignals(): Promise<Signal[]> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+    const res = await fetch(`${baseUrl}/api/signals?sortBy=score&limit=3`, {
+      cache: 'no-store'
+    })
+    const data = await res.json()
+    if (data.success && data.data?.length > 0) {
+      return data.data
+    }
+    return []
+  } catch (error) {
+    console.error('Failed to fetch signals:', error)
+    return []
+  }
+}
+
+export default async function Home() {
+  const signals = await getSignals()
+
   return (
     <main className="min-h-screen">
       {/* Hero Section */}
@@ -24,12 +45,12 @@ export default function Home() {
             AI 评估商业可行性，30 秒生成可运行产品。
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button className="bg-[#FF6B35] hover:bg-[#FF5722] text-white px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 shadow-lg shadow-[#FF6B35]/25">
+            <Link href="/radar" className="bg-[#FF6B35] hover:bg-[#FF5722] text-white px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 shadow-lg shadow-[#FF6B35]/25">
               立即体验 Demo
-            </button>
-            <button className="border border-white/20 hover:border-white/40 text-white px-8 py-4 rounded-xl font-medium transition-colors">
+            </Link>
+            <a href="https://github.com/QJWSTAR/sparkforge" target="_blank" rel="noopener noreferrer" className="border border-white/20 hover:border-white/40 text-white px-8 py-4 rounded-xl font-medium transition-colors">
               查看 GitHub
-            </button>
+            </a>
           </div>
         </div>
       </section>
@@ -125,150 +146,73 @@ export default function Home() {
               查看全部 →
             </Link>
           </div>
-          
-          {/* Mock Signal Cards */}
-          <div className="grid gap-4">
-            {/* Signal 1 */}
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-colors">
-              <div className="flex items-start gap-4">
-                <div className="bg-[#FF6B35] text-white text-sm font-bold px-3 py-1 rounded">
-                  #1
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-bold">AI Code Review Agent</h3>
-                    <span className="text-xs bg-[#3B82F6]/20 text-[#3B82F6] px-2 py-0.5 rounded">Hacker News</span>
-                  </div>
-                  <p className="text-gray-400 text-sm mb-3">
-                    基于 GPT-4 的代码审查工具，支持自动修复和安全漏洞检测
-                  </p>
-                  <div className="flex items-center gap-4 text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-500">热度</span>
-                      <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#FF6B35] rounded-full" style={{ width: '85%' }}></div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-500">商业</span>
-                      <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#FFB800] rounded-full" style={{ width: '72%' }}></div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-500">创新</span>
-                      <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#3B82F6] rounded-full" style={{ width: '68%' }}></div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-500">本地化</span>
-                      <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#8B5CF6] rounded-full" style={{ width: '45%' }}></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <button className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                  复刻 →
-                </button>
-              </div>
-            </div>
 
-            {/* Signal 2 */}
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-colors">
-              <div className="flex items-start gap-4">
-                <div className="bg-[#FFB800] text-black text-sm font-bold px-3 py-1 rounded">
-                  #2
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-bold">Notion AI Workspace</h3>
-                    <span className="text-xs bg-[#FF6B35]/20 text-[#FF6B35] px-2 py-0.5 rounded">Product Hunt</span>
+          {signals.length > 0 ? (
+            <div className="grid gap-4">
+              {signals.slice(0, 3).map((signal, index) => (
+                <div key={signal.id} className="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-colors">
+                  <div className="flex items-start gap-4">
+                    <div className={`text-white text-sm font-bold px-3 py-1 rounded ${
+                      index === 0 ? 'bg-[#FF6B35]' :
+                      index === 1 ? 'bg-[#FFB800] text-black' :
+                      'bg-[#3B82F6]'
+                    }`}>
+                      #{index + 1}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-bold">{signal.title}</h3>
+                        <span className={`text-xs px-2 py-0.5 rounded ${
+                          signal.source === 'producthunt' ? 'bg-[#FF6B35]/20 text-[#FF6B35]' :
+                          signal.source === 'hackernews' ? 'bg-[#3B82F6]/20 text-[#3B82F6]' :
+                          'bg-white/10 text-gray-400'
+                        }`}>
+                          {sourceLabels[signal.source] || signal.source}
+                        </span>
+                      </div>
+                      <p className="text-gray-400 text-sm mb-3 line-clamp-1">
+                        {signal.description || '无描述'}
+                      </p>
+                      <div className="flex items-center gap-4 text-sm">
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-500">热度</span>
+                          <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
+                            <div className="h-full bg-[#FF6B35] rounded-full" style={{ width: `${signal.hotScore || 0}%` }}></div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-500">商业</span>
+                          <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
+                            <div className="h-full bg-[#FFB800] rounded-full" style={{ width: `${signal.businessScore || 0}%` }}></div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-500">创新</span>
+                          <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
+                            <div className="h-full bg-[#3B82F6] rounded-full" style={{ width: `${signal.noveltyScore || 0}%` }}></div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-500">本地化</span>
+                          <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
+                            <div className="h-full bg-[#8B5CF6] rounded-full" style={{ width: `${signal.localScore || 0}%` }}></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <Link href={`/radar/${signal.id}`} className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                      详情 →
+                    </Link>
                   </div>
-                  <p className="text-gray-400 text-sm mb-3">
-                    将 Notion 变成智能工作空间，自动整理笔记、生成任务、回答问题
-                  </p>
-                  <div className="flex items-center gap-4 text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-500">热度</span>
-                      <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#FF6B35] rounded-full" style={{ width: '78%' }}></div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-500">商业</span>
-                      <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#FFB800] rounded-full" style={{ width: '81%' }}></div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-500">创新</span>
-                      <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#3B82F6] rounded-full" style={{ width: '62%' }}></div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-500">本地化</span>
-                      <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#8B5CF6] rounded-full" style={{ width: '38%' }}></div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
-                <button className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                  复刻 →
-                </button>
-              </div>
+              ))}
             </div>
-
-            {/* Signal 3 */}
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-colors">
-              <div className="flex items-start gap-4">
-                <div className="bg-[#3B82F6] text-white text-sm font-bold px-3 py-1 rounded">
-                  #3
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-bold">Micro SaaS Boilerplate</h3>
-                    <span className="text-xs bg-[#8B5CF6]/20 text-[#8B5CF6] px-2 py-0.5 rounded">Twitter</span>
-                  </div>
-                  <p className="text-gray-400 text-sm mb-3">
-                    开源 SaaS 脚手架，集成支付、认证、邮件、Docker 一键部署
-                  </p>
-                  <div className="flex items-center gap-4 text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-500">热度</span>
-                      <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#FF6B35] rounded-full" style={{ width: '71%' }}></div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-500">商业</span>
-                      <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#FFB800] rounded-full" style={{ width: '65%' }}></div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-500">创新</span>
-                      <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#3B82F6] rounded-full" style={{ width: '55%' }}></div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-500">本地化</span>
-                      <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#8B5CF6] rounded-full" style={{ width: '82%' }}></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <button className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                  复刻 →
-                </button>
-              </div>
+          ) : (
+            <div className="text-center py-12 text-gray-500">
+              <p>暂无信号数据</p>
+              <p className="text-sm mt-2">调用 /api/crawl 抓取信号后即可显示</p>
             </div>
-          </div>
+          )}
         </div>
       </section>
 
@@ -282,9 +226,9 @@ export default function Home() {
             加入 1000+ 独立开发者，用 AI 发现下一个爆款创意
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button className="bg-gradient-to-r from-[#FF6B35] to-[#FFB800] hover:opacity-90 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105">
+            <Link href="/radar" className="bg-gradient-to-r from-[#FF6B35] to-[#FFB800] hover:opacity-90 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105">
               免费开始使用
-            </button>
+            </Link>
             <div className="text-gray-500 text-sm">
               无需信用卡 • 5 分钟上手
             </div>

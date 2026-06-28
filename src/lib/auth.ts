@@ -15,22 +15,19 @@ export function useAuth() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const session = supabase.auth.getSession()
-    if (session) {
-      supabase.auth.getSession().then(({ data }) => {
-        if (data.session?.user) {
-          setUser({
-            id: data.session.user.id,
-            email: data.session.user.email || '',
-            name: data.session.user.user_metadata?.name || undefined,
-            avatarUrl: data.session.user.user_metadata?.avatar_url || undefined,
-          })
-        }
-        setLoading(false)
-      })
-    } else {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session?.user) {
+        setUser({
+          id: data.session.user.id,
+          email: data.session.user.email || '',
+          name: data.session.user.user_metadata?.name || undefined,
+          avatarUrl: data.session.user.user_metadata?.avatar_url || undefined,
+        })
+      }
       setLoading(false)
-    }
+    }).catch(() => {
+      setLoading(false)
+    })
 
     const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN') {
@@ -66,7 +63,7 @@ export function useAuth() {
       })
     }
 
-    return { success: true, user }
+    return { success: true }
   }, [])
 
   const signUp = useCallback(async (email: string, password: string, name?: string) => {
@@ -91,7 +88,7 @@ export function useAuth() {
       })
     }
 
-    return { success: true, user }
+    return { success: true }
   }, [])
 
   const signOut = useCallback(async () => {
