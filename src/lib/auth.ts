@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { supabase } from '@/lib/supabase'
+import { getSupabase } from '@/lib/supabase'
 
 export interface User {
   id: string
@@ -15,6 +15,13 @@ export function useAuth() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    const supabase = getSupabase()
+    
+    if (!supabase) {
+      setLoading(false)
+      return
+    }
+
     supabase.auth.getSession().then(({ data }) => {
       if (data.session?.user) {
         setUser({
@@ -48,6 +55,12 @@ export function useAuth() {
   }, [])
 
   const signIn = useCallback(async (email: string, password: string) => {
+    const supabase = getSupabase()
+    
+    if (!supabase) {
+      return { success: false, error: 'Supabase not configured' }
+    }
+
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     
     if (error) {
@@ -67,6 +80,12 @@ export function useAuth() {
   }, [])
 
   const signUp = useCallback(async (email: string, password: string, name?: string) => {
+    const supabase = getSupabase()
+    
+    if (!supabase) {
+      return { success: false, error: 'Supabase not configured' }
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -92,6 +111,12 @@ export function useAuth() {
   }, [])
 
   const signOut = useCallback(async () => {
+    const supabase = getSupabase()
+    
+    if (!supabase) {
+      return { success: false, error: 'Supabase not configured' }
+    }
+
     const { error } = await supabase.auth.signOut()
     
     if (error) {

@@ -3,6 +3,13 @@ import { scoreSignal } from '@/lib/scoring'
 import { supabaseAdmin } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
+  if (!supabaseAdmin) {
+    return NextResponse.json(
+      { success: false, error: 'Supabase not configured' },
+      { status: 500 }
+    )
+  }
+
   try {
     const { signalId } = await request.json()
 

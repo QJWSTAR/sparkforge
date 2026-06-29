@@ -13,6 +13,10 @@ export interface SignalQuery {
 }
 
 export async function getSignals(query: SignalQuery = {}) {
+  if (!supabaseAdmin) {
+    return { signals: [], total: 0 }
+  }
+
   const {
     source,
     status,
@@ -68,6 +72,10 @@ export async function getSignals(query: SignalQuery = {}) {
 }
 
 export async function getSignalById(id: string) {
+  if (!supabaseAdmin) {
+    return null
+  }
+
   const { data, error } = await supabaseAdmin
     .from('Signal')
     .select('*')
@@ -83,6 +91,10 @@ export async function getSignalById(id: string) {
 }
 
 export async function crawlAllSources(): Promise<{ hn: number; ph: number; total: number }> {
+  if (!supabaseAdmin) {
+    return { hn: 0, ph: 0, total: 0 }
+  }
+
   const [hnItems, phPosts] = await Promise.all([
     fetchHackerNewsTop(30),
     fetchProductHuntToday(20),
@@ -114,6 +126,10 @@ export async function addLogEntry(entry: {
   forgeId?: string
   metadata?: any
 }) {
+  if (!supabaseAdmin) {
+    return
+  }
+
   try {
     const { error } = await supabaseAdmin
       .from('LogEntry')
@@ -135,6 +151,10 @@ export async function addLogEntry(entry: {
 }
 
 export async function getLogs(limit: number = 20, type?: string) {
+  if (!supabaseAdmin) {
+    return []
+  }
+
   let query = supabaseAdmin
     .from('LogEntry')
     .select('*')

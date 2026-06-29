@@ -11,22 +11,40 @@ export async function POST(request: NextRequest) {
     )
   }
 
+  if (!supabaseAdmin) {
+    return NextResponse.json(
+      { success: false, error: 'Supabase not configured' },
+      { status: 500 }
+    )
+  }
+
   try {
+    const { data: existing, error: fetchError } = await supabaseAdmin
+      .from('UserSetting')
+      .select('subscribedSignals')
+      .eq('userId', userId)
+      .single()
+
+    const currentSubscriptions = existing?.subscribedSignals || []
+    if (!currentSubscriptions.includes(signalId)) {
+      currentSubscriptions.push(signalId)
+    }
+
     const { error } = await supabaseAdmin
       .from('UserSetting')
       .upsert({
         userId,
-        subscribedSignals: supabaseAdmin.rpc('array_append', {
-          array: 'subscribedSignals',
-          value: signalId,
-        }),
+        subscribedSignals: currentSubscriptions,
       })
 
     if (error) {
       throw error
     }
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ 
+      success: true,
+      data: { subscribedSignals: currentSubscriptions }
+    })
   } catch (error) {
     console.error('Failed to subscribe:', error)
     return NextResponse.json(
@@ -46,22 +64,38 @@ export async function DELETE(request: NextRequest) {
     )
   }
 
+  if (!supabaseAdmin) {
+    return NextResponse.json(
+      { success: false, error: 'Supabase not configured' },
+      { status: 500 }
+    )
+  }
+
   try {
+    const { data: existing, error: fetchError } = await supabaseAdmin
+      .from('UserSetting')
+      .select('subscribedSignals')
+      .eq('userId', userId)
+      .single()
+
+    const currentSubscriptions = (existing?.subscribedSignals || []) as string[]
+    const updatedSubscriptions = currentSubscriptions.filter((id: string) => id !== signalId)
+
     const { error } = await supabaseAdmin
       .from('UserSetting')
       .upsert({
         userId,
-        subscribedSignals: supabaseAdmin.rpc('array_remove', {
-          array: 'subscribedSignals',
-          value: signalId,
-        }),
+        subscribedSignals: updatedSubscriptions,
       })
 
     if (error) {
       throw error
     }
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ 
+      success: true,
+      data: { subscribedSignals: updatedSubscriptions }
+    })
   } catch (error) {
     console.error('Failed to unsubscribe:', error)
     return NextResponse.json(
@@ -80,6 +114,13 @@ export async function GET(request: NextRequest) {
       { success: false, error: 'Missing userId' },
       { status: 400 }
     )
+  }
+
+  if (!supabaseAdmin) {
+    return NextResponse.json({
+      success: true,
+      data: { subscribedSignals: [] },
+    })
   }
 
   try {

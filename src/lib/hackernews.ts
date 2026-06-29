@@ -62,6 +62,10 @@ export async function fetchHNByQuery(query: string, limit: number = 20): Promise
 }
 
 export async function saveHNSignals(items: RawHNItem[]): Promise<number> {
+  if (!supabaseAdmin) {
+    return 0
+  }
+
   let savedCount = 0
 
   for (const item of items) {

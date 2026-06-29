@@ -1,77 +1,125 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
-const mockLogs = [
+interface LogEntry {
+  id: string
+  type: string
+  title: string
+  content: string
+  createdAt: string
+  source?: string
+}
+
+const mockLogs: LogEntry[] = [
   {
-    id: 1,
+    id: '1',
     type: 'SIGNAL_DISCOVERED',
     title: '发现新信号：AI Code Review Agent',
     content: '在 Hacker News 发现一个高热度 AI 代码审查项目，当前热度 85 分。',
-    time: '2 分钟前',
+    createdAt: new Date(Date.now() - 2 * 60 * 1000).toISOString(),
     source: 'Hacker News',
   },
   {
-    id: 2,
+    id: '2',
     type: 'SIGNAL_SCORED',
     title: 'AI 评分完成：综合 78 分',
     content: '热度 85 | 创新 72 | 商业 78 | 本地化 45',
-    time: '5 分钟前',
+    createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
     source: 'DeepSeek',
   },
   {
-    id: 3,
+    id: '3',
     type: 'SIGNAL_TOP10',
     title: '入选今日 Top 10',
     content: 'AI Code Review Agent 以 78 分入选今日 Top 10 榜单，排名第 1。',
-    time: '8 分钟前',
+    createdAt: new Date(Date.now() - 8 * 60 * 1000).toISOString(),
     source: 'SparkForge',
   },
   {
-    id: 4,
+    id: '4',
     type: 'FORGE_STARTED',
     title: '开始复刻：Notion AI Workspace',
     content: '用户发起复刻任务，目标语言：简体中文，预计耗时 30-60 秒。',
-    time: '12 分钟前',
+    createdAt: new Date(Date.now() - 12 * 60 * 1000).toISOString(),
     source: 'TRAE IDE',
   },
   {
-    id: 5,
+    id: '5',
     type: 'FORGE_PROGRESS',
     title: '复刻进度 45%',
     content: '正在编写核心代码...',
-    time: '15 分钟前',
+    createdAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
     source: 'TRAE IDE',
   },
   {
-    id: 6,
+    id: '6',
     type: 'FORGE_COMPLETED',
     title: '复刻完成！',
     content: 'Notion AI Workspace 本地版已生成，本地化改造度 85%，耗时 47 秒。',
-    time: '18 分钟前',
+    createdAt: new Date(Date.now() - 18 * 60 * 1000).toISOString(),
     source: 'TRAE IDE',
   },
   {
-    id: 7,
+    id: '7',
     type: 'CANVAS_GENERATED',
     title: '商业画布生成完成',
     content: '已为 Micro SaaS Boilerplate 生成完整商业画布，包含 SWOT 分析和 30 天行动清单。',
-    time: '25 分钟前',
+    createdAt: new Date(Date.now() - 25 * 60 * 1000).toISOString(),
     source: 'GPT-4',
   },
   {
-    id: 8,
+    id: '8',
     type: 'SYSTEM',
     title: '每日抓取完成',
     content: '今日共抓取 247 条新信号，其中 12 条通过粗筛进入评分队列。',
-    time: '1 小时前',
+    createdAt: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
     source: '系统',
   },
 ]
 
 export default function StreamPage() {
   const [filter, setFilter] = useState('all')
+  const [logs, setLogs] = useState<LogEntry[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchLogs = async () => {
+      setLoading(true)
+      try {
+        const res = await fetch('/api/logs?limit=50')
+        const data = await res.json()
+
+        if (data.success && data.data?.length > 0) {
+          setLogs(data.data)
+        } else {
+          setLogs(mockLogs)
+        }
+      } catch (error) {
+        console.error('Failed to fetch logs:', error)
+        setLogs(mockLogs)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchLogs()
+  }, [])
+
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffMs = now.getTime() - date.getTime()
+    const diffMins = Math.floor(diffMs / 60000)
+    const diffHours = Math.floor(diffMins / 60)
+    const diffDays = Math.floor(diffHours / 24)
+
+    if (diffMins < 1) return '刚刚'
+    if (diffMins < 60) return `${diffMins} 分钟前`
+    if (diffHours < 24) return `${diffHours} 小时前`
+    return `${diffDays} 天前`
+  }
 
   const typeIcons: Record<string, string> = {
     SIGNAL_DISCOVERED: '📡',
@@ -103,7 +151,7 @@ export default function StreamPage() {
     { value: 'SYSTEM', label: '系统消息' },
   ]
 
-  const filteredLogs = mockLogs.filter(log => {
+  const filteredLogs = logs.filter(log => {
     if (filter === 'all') return true
     return log.type.startsWith(filter)
   })
@@ -161,33 +209,40 @@ export default function StreamPage() {
           ))}
         </div>
 
-        <div className="relative">
-          <div className="absolute left-6 top-0 bottom-0 w-px bg-white/10" />
-
-          <div className="space-y-4">
-            {filteredLogs.map((log) => (
-              <div key={log.id} className="relative pl-16">
-                <div className="absolute left-0 top-4 w-12 h-12 rounded-full bg-[#0a0a0a] border-2 border-white/10 flex items-center justify-center text-xl z-10">
-                  {typeIcons[log.type]}
-                </div>
-
-                <div className={`border rounded-xl p-4 ${typeColors[log.type] || 'border-white/10 bg-white/5'}`}>
-                  <div className="flex items-start justify-between gap-4 mb-2">
-                    <h3 className="font-semibold">{log.title}</h3>
-                    <span className="text-xs text-gray-500 flex-shrink-0">{log.time}</span>
-                  </div>
-                  <p className="text-sm text-gray-400 mb-3">{log.content}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500">来源：{log.source}</span>
-                    <button className="text-xs text-[#FF6B35] hover:underline">
-                      分享 →
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+        {loading ? (
+          <div className="text-center py-16 text-gray-500">
+            <div className="animate-spin w-8 h-8 border-2 border-[#FF6B35] border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p>加载中...</p>
           </div>
-        </div>
+        ) : (
+          <div className="relative">
+            <div className="absolute left-6 top-0 bottom-0 w-px bg-white/10" />
+
+            <div className="space-y-4">
+              {filteredLogs.map((log) => (
+                <div key={log.id} className="relative pl-16">
+                  <div className="absolute left-0 top-4 w-12 h-12 rounded-full bg-[#0a0a0a] border-2 border-white/10 flex items-center justify-center text-xl z-10">
+                    {typeIcons[log.type] || '📌'}
+                  </div>
+
+                  <div className={`border rounded-xl p-4 ${typeColors[log.type] || 'border-white/10 bg-white/5'}`}>
+                    <div className="flex items-start justify-between gap-4 mb-2">
+                      <h3 className="font-semibold">{log.title}</h3>
+                      <span className="text-xs text-gray-500 flex-shrink-0">{formatTime(log.createdAt)}</span>
+                    </div>
+                    <p className="text-sm text-gray-400 mb-3">{log.content}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-gray-500">来源：{log.source || '系统'}</span>
+                      <button className="text-xs text-[#FF6B35] hover:underline">
+                        分享 →
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="mt-12 text-center">
           <div className="inline-flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-5">

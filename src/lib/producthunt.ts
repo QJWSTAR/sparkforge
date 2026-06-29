@@ -100,6 +100,10 @@ export async function fetchProductHuntToday(limit: number = 20): Promise<RawPHPo
 }
 
 export async function savePHSignals(posts: RawPHPost[]): Promise<number> {
+  if (!supabaseAdmin) {
+    return 0
+  }
+
   let savedCount = 0
 
   for (const post of posts) {

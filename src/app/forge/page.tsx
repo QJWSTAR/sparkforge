@@ -1,11 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { mockSignals } from '@/data/mockSignals'
+import type { Signal } from '@/types/signal'
 
 export default function ForgePage() {
-  const [selectedSignal, setSelectedSignal] = useState(mockSignals[0])
+  const [signals, setSignals] = useState<Signal[]>([])
+  const [selectedSignal, setSelectedSignal] = useState<Signal>(mockSignals[0])
   const [targetLanguage, setTargetLanguage] = useState('zh-CN')
   const [customPrompt, setCustomPrompt] = useState('')
   const [isForging, setIsForging] = useState(false)
@@ -16,6 +18,24 @@ export default function ForgePage() {
     outputSummary: '',
     localScore: 85,
   })
+
+  useEffect(() => {
+    const fetchSignals = async () => {
+      try {
+        const res = await fetch('/api/signals?limit=20&sortBy=score')
+        const data = await res.json()
+
+        if (data.success && data.data?.length > 0) {
+          setSignals(data.data)
+          setSelectedSignal(data.data[0])
+        }
+      } catch (error) {
+        console.error('Failed to fetch signals:', error)
+      }
+    }
+
+    fetchSignals()
+  }, [])
 
   const handleStartForge = () => {
     setIsForging(true)
@@ -105,16 +125,16 @@ export default function ForgePage() {
                   <h3 className="font-bold text-lg mb-1">{selectedSignal.title}</h3>
                   <p className="text-gray-400 text-sm mb-3">{selectedSignal.description}</p>
                   <div className="flex flex-wrap gap-2">
-                    {selectedSignal.tags.map((tag) => (
+                    {selectedSignal.tags?.map((tag) => (
                       <span key={tag} className="text-xs bg-white/10 text-gray-300 px-2 py-0.5 rounded">
                         {tag}
                       </span>
                     ))}
                   </div>
                 </div>
-                <button className="text-gray-500 hover:text-white">
+                <Link href="/radar" className="text-gray-500 hover:text-white">
                   更换
-                </button>
+                </Link>
               </div>
             </div>
           </div>

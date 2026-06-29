@@ -13,6 +13,13 @@ export async function POST(request: NextRequest) {
     )
   }
 
+  if (!supabaseAdmin) {
+    return NextResponse.json(
+      { success: false, error: 'Supabase not configured' },
+      { status: 500 }
+    )
+  }
+
   try {
     const { limit = 10 } = await request.json()
 

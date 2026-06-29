@@ -4,6 +4,10 @@ import type { Signal } from '@/types/signal'
 import { supabaseAdmin } from '@/lib/supabase'
 
 async function getSignals(): Promise<Signal[]> {
+  if (!supabaseAdmin) {
+    return []
+  }
+
   try {
     const { data, error } = await supabaseAdmin
       .from('Signal')

@@ -1,11 +1,33 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { mockSignals } from '@/data/mockSignals'
+import type { Signal } from '@/types/signal'
 
 export default function CanvasPage() {
+  const [signals, setSignals] = useState<Signal[]>([])
+  const [selectedSignal, setSelectedSignal] = useState<Signal>(mockSignals[0])
   const [isGenerating, setIsGenerating] = useState(false)
   const [generated, setGenerated] = useState(true)
+
+  useEffect(() => {
+    const fetchSignals = async () => {
+      try {
+        const res = await fetch('/api/signals?limit=20&sortBy=score')
+        const data = await res.json()
+
+        if (data.success && data.data?.length > 0) {
+          setSignals(data.data)
+          setSelectedSignal(data.data[0])
+        }
+      } catch (error) {
+        console.error('Failed to fetch signals:', error)
+      }
+    }
+
+    fetchSignals()
+  }, [])
 
   const handleGenerate = () => {
     setIsGenerating(true)
@@ -55,7 +77,7 @@ export default function CanvasPage() {
                   <button className="px-3 py-1.5 text-sm bg-white/10 hover:bg-white/20 rounded-lg transition-colors">
                     导出 Notion
                   </button>
-                  <button className="px-3 py-1.5 text-sm bg-white/10 hover:bg-white/20 rounded-lg transition-colors">
+                  <button onClick={handleGenerate} className="px-3 py-1.5 text-sm bg-white/10 hover:bg-white/20 rounded-lg transition-colors">
                     重新生成
                   </button>
                 </div>
@@ -66,8 +88,8 @@ export default function CanvasPage() {
                   <div className="bg-[#FF6B35]/10 border border-[#FF6B35]/20 rounded-xl p-4">
                     <h3 className="font-bold text-[#FF6B35] mb-2">🎯 一句话定位</h3>
                     <p className="text-sm text-gray-300">
-                      AI Code Review Agent 是一个基于 GPT-4 的智能代码审查工具，
-                      帮助开发团队自动发现代码缺陷、安全漏洞和性能问题。
+                      {selectedSignal.title} 是一个{selectedSignal.description || '创新的产品'}，
+                      帮助目标用户解决特定问题，提供独特价值。
                     </p>
                   </div>
                   <div className="bg-[#3B82F6]/10 border border-[#3B82F6]/20 rounded-xl p-4">
@@ -200,12 +222,12 @@ export default function CanvasPage() {
             <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
               <h3 className="font-bold mb-4">🎯 当前信号</h3>
               <div className="bg-white/5 rounded-xl p-4">
-                <h4 className="font-semibold mb-2">AI Code Review Agent</h4>
-                <p className="text-sm text-gray-400 mb-3">基于 GPT-4 的代码审查工具</p>
+                <h4 className="font-semibold mb-2">{selectedSignal.title}</h4>
+                <p className="text-sm text-gray-400 mb-3">{selectedSignal.description || '暂无描述'}</p>
                 <div className="flex items-center gap-2 text-sm">
-                  <span className="text-[#FF6B35] font-bold">综合评分 78</span>
+                  <span className="text-[#FF6B35] font-bold">综合评分 {selectedSignal.finalScore || '-'}</span>
                   <span className="text-gray-500">|</span>
-                  <span className="text-gray-500">Hacker News</span>
+                  <span className="text-gray-500">{selectedSignal.source?.toUpperCase()}</span>
                 </div>
               </div>
             </div>
