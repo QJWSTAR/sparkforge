@@ -1,0 +1,55 @@
+{
+  "data": [
+    {
+      "id": "page-dashboard",
+      "title": "信号仪表板",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1782812100000,
+      "canvasData": {
+        "x": -96,
+        "y": -84,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/dashboard.html",
+        "interactions": [
+          {
+            "domId": "signal-card-link",
+            "targetPageId": "page-signal-detail",
+            "transitionLabel": "查看信号详情"
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-signal-detail",
+      "title": "信号详情",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1782812100000,
+      "canvasData": {
+        "x": 620,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/signal-detail.html",
+        "interactions": [
+          {
+            "domId": "back-to-dashboard",
+            "targetPageId": "page-dashboard",
+            "hideEdge": true,
+            "transitionLabel": "返回仪表板"
+          }
+        ]
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": false,
+    "deviceType": "desktop",
+    "projectName": "SparkForge 信号仪表板",
+    "designLibrary": null
+  }
+}

@@ -33,111 +33,205 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen">
-      {/* Hero Section */}
       <section className="py-20 px-4">
         <div className="container mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-[#FF6B35]/10 text-[#FF6B35] px-4 py-2 rounded-full text-sm font-medium mb-6">
-            <span className="w-2 h-2 bg-[#FF6B35] rounded-full animate-pulse"></span>
+          <div
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6"
+            style={{
+              backgroundColor: 'var(--color-primary-muted)',
+              color: 'var(--color-primary)',
+            }}
+          >
+            <span
+              className="w-2 h-2 rounded-full animate-pulse"
+              style={{ backgroundColor: 'var(--color-primary)' }}
+            ></span>
             全网创意信号实时监控
           </div>
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-            <span className="bg-gradient-to-r from-[#FF6B35] via-[#FFB800] to-[#FF6B35] bg-clip-text text-transparent">
+            <span
+              className="bg-gradient-to-r via-[var(--color-primary)] via-[var(--state-warning)] to-[var(--color-primary)] bg-clip-text text-transparent"
+            >
               创意信号雷达
             </span>
             <br />
-            <span className="text-white">+</span>
+            <span style={{ color: 'var(--color-text)' }}>+</span>
             <br />
-            <span className="text-white">TRAE 自动化落地工坊</span>
+            <span style={{ color: 'var(--color-text)' }}>TRAE 自动化落地工坊</span>
           </h1>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-10">
+          <p
+            className="text-xl max-w-2xl mx-auto mb-10"
+            style={{ color: 'var(--color-text-secondary)' }}
+          >
             从创意发现到 MVP 交付，一站式完成。7×24 小时抓取全网优质信号，
             AI 评估商业可行性，30 秒生成可运行产品。
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/radar" className="bg-[#FF6B35] hover:bg-[#FF5722] text-white px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 shadow-lg shadow-[#FF6B35]/25">
+            <Link
+              href="/radar"
+              className="px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105"
+              style={{
+                backgroundColor: 'var(--color-primary)',
+                color: 'var(--color-text-inverse)',
+                boxShadow: '0 10px 30px var(--color-primary-muted)',
+              }}
+            >
               立即体验 Demo
             </Link>
-            <a href="https://github.com/QJWSTAR/sparkforge" target="_blank" rel="noopener noreferrer" className="border border-white/20 hover:border-white/40 text-white px-8 py-4 rounded-xl font-medium transition-colors">
+            <a
+              href="https://github.com/QJWSTAR/sparkforge"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-8 py-4 rounded-xl font-medium transition-colors"
+              style={{
+                border: '1px solid var(--color-border)',
+                color: 'var(--color-text)',
+              }}
+            >
               查看 GitHub
             </a>
           </div>
         </div>
       </section>
 
-      {/* KPI Section */}
-      <section className="py-16 px-4 border-y border-white/10">
+      <section
+        className="py-16 px-4 border-y"
+        style={{ borderColor: 'var(--color-border)' }}
+      >
         <div className="container mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-[#FF6B35] mb-2">9+</div>
-              <div className="text-gray-400">信号源</div>
+              <div
+                className="text-4xl md:text-5xl font-bold mb-2"
+                style={{ color: 'var(--color-primary)' }}
+              >
+                9+
+              </div>
+              <div style={{ color: 'var(--color-text-secondary)' }}>信号源</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-[#FFB800] mb-2">200+</div>
-              <div className="text-gray-400">每日新信号</div>
+              <div
+                className="text-4xl md:text-5xl font-bold mb-2"
+                style={{ color: 'var(--state-warning)' }}
+              >
+                200+
+              </div>
+              <div style={{ color: 'var(--color-text-secondary)' }}>每日新信号</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-[#3B82F6] mb-2">30s</div>
-              <div className="text-gray-400">MVP 生成</div>
+              <div
+                className="text-4xl md:text-5xl font-bold mb-2"
+                style={{ color: 'var(--state-info)' }}
+              >
+                30s
+              </div>
+              <div style={{ color: 'var(--color-text-secondary)' }}>MVP 生成</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-[#8B5CF6] mb-2">70%</div>
-              <div className="text-gray-400">Top 10 入选率</div>
+              <div
+                className="text-4xl md:text-5xl font-bold mb-2"
+                style={{ color: 'var(--color-dim-novelty)' }}
+              >
+                70%
+              </div>
+              <div style={{ color: 'var(--color-text-secondary)' }}>Top 10 入选率</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
       <section className="py-20 px-4">
         <div className="container mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
+          <h2
+            className="text-3xl md:text-4xl font-bold text-center mb-16"
+            style={{ color: 'var(--color-text)' }}
+          >
             核心功能
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Feature 1 */}
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-colors">
-              <div className="w-12 h-12 bg-[#FF6B35]/20 rounded-xl flex items-center justify-center mb-4">
+            <div
+              className="rounded-2xl p-6 transition-colors"
+              style={{
+                backgroundColor: 'var(--color-bg-surface)',
+                border: '1px solid var(--color-border)',
+              }}
+            >
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
+                style={{ backgroundColor: 'var(--color-primary-muted)' }}
+              >
                 <span className="text-2xl">📡</span>
               </div>
-              <h3 className="text-xl font-bold mb-2">创意雷达</h3>
-              <p className="text-gray-400 text-sm">
+              <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
+                创意雷达
+              </h3>
+              <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                 7×24 小时抓取 Product Hunt、Hacker News 等 9 个信号源，
                 AI 自动评分排序，发现下一个爆款创意。
               </p>
             </div>
 
-            {/* Feature 2 */}
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-colors">
-              <div className="w-12 h-12 bg-[#FFB800]/20 rounded-xl flex items-center justify-center mb-4">
+            <div
+              className="rounded-2xl p-6 transition-colors"
+              style={{
+                backgroundColor: 'var(--color-bg-surface)',
+                border: '1px solid var(--color-border)',
+              }}
+            >
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
+                style={{ backgroundColor: 'rgba(251, 191, 36, 0.12)' }}
+              >
                 <span className="text-2xl">🔥</span>
               </div>
-              <h3 className="text-xl font-bold mb-2">复刻工坊</h3>
-              <p className="text-gray-400 text-sm">
+              <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
+                复刻工坊
+              </h3>
+              <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                 一键调用 TRAE IDE 生成可运行 MVP。
                 配置复刻语言、改造点、自定义 Prompt，30 秒出结果。
               </p>
             </div>
 
-            {/* Feature 3 */}
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-colors">
-              <div className="w-12 h-12 bg-[#3B82F6]/20 rounded-xl flex items-center justify-center mb-4">
+            <div
+              className="rounded-2xl p-6 transition-colors"
+              style={{
+                backgroundColor: 'var(--color-bg-surface)',
+                border: '1px solid var(--color-border)',
+              }}
+            >
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
+                style={{ backgroundColor: 'rgba(59, 130, 246, 0.12)' }}
+              >
                 <span className="text-2xl">📋</span>
               </div>
-              <h3 className="text-xl font-bold mb-2">商业画布</h3>
-              <p className="text-gray-400 text-sm">
+              <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
+                商业画布
+              </h3>
+              <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                 基于信号生成完整商业画布。一句话定位、用户画像、
                 竞品图谱、30 天行动清单，一键导出 Notion。
               </p>
             </div>
 
-            {/* Feature 4 */}
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-colors">
-              <div className="w-12 h-12 bg-[#8B5CF6]/20 rounded-xl flex items-center justify-center mb-4">
+            <div
+              className="rounded-2xl p-6 transition-colors"
+              style={{
+                backgroundColor: 'var(--color-bg-surface)',
+                border: '1px solid var(--color-border)',
+              }}
+            >
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
+                style={{ backgroundColor: 'rgba(139, 92, 246, 0.12)' }}
+              >
                 <span className="text-2xl">📺</span>
               </div>
-              <h3 className="text-xl font-bold mb-2">公开日志</h3>
-              <p className="text-gray-400 text-sm">
+              <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
+                公开日志
+              </h3>
+              <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                 Build in Public 实时流。记录从信号发现到商业变现的全过程，
                 自动生成 Twitter 推文草稿。
               </p>
@@ -146,12 +240,17 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Signal List Preview */}
-      <section className="py-20 px-4 bg-gradient-to-b from-[#FF6B35]/5 to-transparent">
+      <section className="py-20 px-4">
         <div className="container mx-auto">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold">实时信号</h2>
-            <Link href="/radar" className="text-[#FF6B35] hover:underline">
+            <h2 className="text-3xl font-bold" style={{ color: 'var(--color-text)' }}>
+              实时信号
+            </h2>
+            <Link
+              href="/radar"
+              style={{ color: 'var(--color-primary)' }}
+              className="hover:underline"
+            >
               查看全部 →
             </Link>
           </div>
@@ -159,57 +258,132 @@ export default async function Home() {
           {signals.length > 0 ? (
             <div className="grid gap-4">
               {signals.map((signal, index) => (
-                <div key={signal.id} className="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-colors">
+                <div
+                  key={signal.id}
+                  className="rounded-xl p-4 transition-colors"
+                  style={{
+                    backgroundColor: 'var(--color-bg-surface)',
+                    border: '1px solid var(--color-border)',
+                  }}
+                >
                   <div className="flex items-start gap-4">
-                    <div className={`text-white text-sm font-bold px-3 py-1 rounded ${
-                      index === 0 ? 'bg-[#FF6B35]' :
-                      index === 1 ? 'bg-[#FFB800] text-black' :
-                      'bg-[#3B82F6]'
-                    }`}>
+                    <div
+                      className="text-sm font-bold px-3 py-1 rounded"
+                      style={{
+                        backgroundColor:
+                          index === 0
+                            ? 'var(--color-primary)'
+                            : index === 1
+                              ? 'var(--state-warning)'
+                              : 'var(--state-info)',
+                        color:
+                          index === 1 ? 'var(--color-text-inverse)' : 'var(--color-text-inverse)',
+                      }}
+                    >
                       #{index + 1}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-bold">{signal.title}</h3>
-                        <span className={`text-xs px-2 py-0.5 rounded ${
-                          signal.source === 'producthunt' ? 'bg-[#FF6B35]/20 text-[#FF6B35]' :
-                          signal.source === 'hackernews' ? 'bg-[#3B82F6]/20 text-[#3B82F6]' :
-                          'bg-white/10 text-gray-400'
-                        }`}>
+                        <h3 className="font-bold" style={{ color: 'var(--color-text)' }}>
+                          {signal.title}
+                        </h3>
+                        <span
+                          className="text-xs px-2 py-0.5 rounded"
+                          style={{
+                            backgroundColor:
+                              signal.source === 'producthunt'
+                                ? 'var(--color-primary-muted)'
+                                : signal.source === 'hackernews'
+                                  ? 'rgba(59, 130, 246, 0.12)'
+                                  : 'var(--color-bg-hover)',
+                            color:
+                              signal.source === 'producthunt'
+                                ? 'var(--color-primary)'
+                                : signal.source === 'hackernews'
+                                  ? 'var(--state-info)'
+                                  : 'var(--color-text-secondary)',
+                          }}
+                        >
                           {sourceLabels[signal.source] || signal.source}
                         </span>
                       </div>
-                      <p className="text-gray-400 text-sm mb-3 line-clamp-1">
+                      <p
+                        className="text-sm mb-3 line-clamp-1"
+                        style={{ color: 'var(--color-text-secondary)' }}
+                      >
                         {signal.description || '无描述'}
                       </p>
                       <div className="flex items-center gap-4 text-sm">
                         <div className="flex items-center gap-2">
-                          <span className="text-gray-500">热度</span>
-                          <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
-                            <div className="h-full bg-[#FF6B35] rounded-full" style={{ width: `${signal.hotScore || 0}%` }}></div>
+                          <span style={{ color: 'var(--color-text-muted)' }}>热度</span>
+                          <div
+                            className="w-20 h-2 rounded-full overflow-hidden"
+                            style={{ backgroundColor: 'var(--color-bg-active)' }}
+                          >
+                            <div
+                              className="h-full rounded-full"
+                              style={{
+                                width: `${signal.hotScore || 0}%`,
+                                backgroundColor: 'var(--color-dim-hot)',
+                              }}
+                            ></div>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-gray-500">商业</span>
-                          <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
-                            <div className="h-full bg-[#FFB800] rounded-full" style={{ width: `${signal.businessScore || 0}%` }}></div>
+                          <span style={{ color: 'var(--color-text-muted)' }}>商业</span>
+                          <div
+                            className="w-20 h-2 rounded-full overflow-hidden"
+                            style={{ backgroundColor: 'var(--color-bg-active)' }}
+                          >
+                            <div
+                              className="h-full rounded-full"
+                              style={{
+                                width: `${signal.businessScore || 0}%`,
+                                backgroundColor: 'var(--color-dim-business)',
+                              }}
+                            ></div>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-gray-500">创新</span>
-                          <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
-                            <div className="h-full bg-[#3B82F6] rounded-full" style={{ width: `${signal.noveltyScore || 0}%` }}></div>
+                          <span style={{ color: 'var(--color-text-muted)' }}>创新</span>
+                          <div
+                            className="w-20 h-2 rounded-full overflow-hidden"
+                            style={{ backgroundColor: 'var(--color-bg-active)' }}
+                          >
+                            <div
+                              className="h-full rounded-full"
+                              style={{
+                                width: `${signal.noveltyScore || 0}%`,
+                                backgroundColor: 'var(--color-dim-novelty)',
+                              }}
+                            ></div>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-gray-500">本地化</span>
-                          <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
-                            <div className="h-full bg-[#8B5CF6] rounded-full" style={{ width: `${signal.localScore || 0}%` }}></div>
+                          <span style={{ color: 'var(--color-text-muted)' }}>本地化</span>
+                          <div
+                            className="w-20 h-2 rounded-full overflow-hidden"
+                            style={{ backgroundColor: 'var(--color-bg-active)' }}
+                          >
+                            <div
+                              className="h-full rounded-full"
+                              style={{
+                                width: `${signal.localScore || 0}%`,
+                                backgroundColor: 'var(--color-dim-local)',
+                              }}
+                            ></div>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <Link href={`/radar/${signal.id}`} className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                    <Link
+                      href={`/radar/${signal.id}`}
+                      className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                      style={{
+                        backgroundColor: 'var(--color-bg-hover)',
+                        color: 'var(--color-text)',
+                      }}
+                    >
                       详情 →
                     </Link>
                   </div>
@@ -217,7 +391,10 @@ export default async function Home() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 text-gray-500">
+            <div
+              className="text-center py-12"
+              style={{ color: 'var(--color-text-muted)' }}
+            >
               <p>暂无信号数据</p>
               <p className="text-sm mt-2">调用 /api/crawl 抓取信号后即可显示</p>
             </div>
@@ -225,40 +402,71 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="py-20 px-4">
         <div className="container mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+          <h2
+            className="text-3xl md:text-4xl font-bold mb-6"
+            style={{ color: 'var(--color-text)' }}
+          >
             准备好开始了吗？
           </h2>
-          <p className="text-gray-400 mb-10 max-w-xl mx-auto">
+          <p
+            className="mb-10 max-w-xl mx-auto"
+            style={{ color: 'var(--color-text-secondary)' }}
+          >
             加入 1000+ 独立开发者，用 AI 发现下一个爆款创意
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/radar" className="bg-gradient-to-r from-[#FF6B35] to-[#FFB800] hover:opacity-90 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105">
+            <Link
+              href="/radar"
+              className="px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105"
+              style={{
+                background: 'linear-gradient(90deg, var(--color-primary), var(--state-warning))',
+                color: 'var(--color-text-inverse)',
+              }}
+            >
               免费开始使用
             </Link>
-            <div className="text-gray-500 text-sm">
+            <div className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
               无需信用卡 • 5 分钟上手
             </div>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-white/10 py-8 px-4">
+      <footer
+        className="py-8 px-4 border-t"
+        style={{ borderColor: 'var(--color-border)' }}
+      >
         <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-gradient-to-br from-[#FF6B35] to-[#FFB800] rounded flex items-center justify-center text-sm font-bold">
+            <div
+              className="w-6 h-6 rounded flex items-center justify-center text-sm font-bold"
+              style={{
+                background:
+                  'linear-gradient(135deg, var(--color-primary), var(--state-warning))',
+                color: 'var(--color-text-inverse)',
+              }}
+            >
               S
             </div>
-            <span className="font-bold">SparkForge</span>
-            <span className="text-gray-500 text-sm">© 2026</span>
+            <span className="font-bold" style={{ color: 'var(--color-text)' }}>
+              SparkForge
+            </span>
+            <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+              © 2026
+            </span>
           </div>
-          <div className="flex items-center gap-6 text-sm text-gray-500">
-            <a href="#" className="hover:text-white transition-colors">隐私政策</a>
-            <a href="#" className="hover:text-white transition-colors">服务条款</a>
-            <a href="#" className="hover:text-white transition-colors">联系我们</a>
+          <div className="flex items-center gap-6 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+            <a href="#" className="hover:text-white transition-colors">
+              隐私政策
+            </a>
+            <a href="#" className="hover:text-white transition-colors">
+              服务条款
+            </a>
+            <a href="#" className="hover:text-white transition-colors">
+              联系我们
+            </a>
           </div>
         </div>
       </footer>

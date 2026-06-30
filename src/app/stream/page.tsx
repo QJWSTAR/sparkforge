@@ -1,195 +1,151 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
 
 interface LogEntry {
   id: string
-  type: string
+  timestamp: string
+  type: 'signal' | 'forge' | 'canvas' | 'deploy' | 'twitter'
   title: string
-  content: string
-  createdAt: string
-  source?: string
+  description: string
+  metadata: {
+    score?: number
+    signalId?: string
+    action?: string
+  }
 }
 
-const mockLogs: LogEntry[] = [
-  {
-    id: '1',
-    type: 'SIGNAL_DISCOVERED',
-    title: '发现新信号：AI Code Review Agent',
-    content: '在 Hacker News 发现一个高热度 AI 代码审查项目，当前热度 85 分。',
-    createdAt: new Date(Date.now() - 2 * 60 * 1000).toISOString(),
-    source: 'Hacker News',
-  },
-  {
-    id: '2',
-    type: 'SIGNAL_SCORED',
-    title: 'AI 评分完成：综合 78 分',
-    content: '热度 85 | 创新 72 | 商业 78 | 本地化 45',
-    createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-    source: 'DeepSeek',
-  },
-  {
-    id: '3',
-    type: 'SIGNAL_TOP10',
-    title: '入选今日 Top 10',
-    content: 'AI Code Review Agent 以 78 分入选今日 Top 10 榜单，排名第 1。',
-    createdAt: new Date(Date.now() - 8 * 60 * 1000).toISOString(),
-    source: 'SparkForge',
-  },
-  {
-    id: '4',
-    type: 'FORGE_STARTED',
-    title: '开始复刻：Notion AI Workspace',
-    content: '用户发起复刻任务，目标语言：简体中文，预计耗时 30-60 秒。',
-    createdAt: new Date(Date.now() - 12 * 60 * 1000).toISOString(),
-    source: 'TRAE IDE',
-  },
-  {
-    id: '5',
-    type: 'FORGE_PROGRESS',
-    title: '复刻进度 45%',
-    content: '正在编写核心代码...',
-    createdAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-    source: 'TRAE IDE',
-  },
-  {
-    id: '6',
-    type: 'FORGE_COMPLETED',
-    title: '复刻完成！',
-    content: 'Notion AI Workspace 本地版已生成，本地化改造度 85%，耗时 47 秒。',
-    createdAt: new Date(Date.now() - 18 * 60 * 1000).toISOString(),
-    source: 'TRAE IDE',
-  },
-  {
-    id: '7',
-    type: 'CANVAS_GENERATED',
-    title: '商业画布生成完成',
-    content: '已为 Micro SaaS Boilerplate 生成完整商业画布，包含 SWOT 分析和 30 天行动清单。',
-    createdAt: new Date(Date.now() - 25 * 60 * 1000).toISOString(),
-    source: 'GPT-4',
-  },
-  {
-    id: '8',
-    type: 'SYSTEM',
-    title: '每日抓取完成',
-    content: '今日共抓取 247 条新信号，其中 12 条通过粗筛进入评分队列。',
-    createdAt: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
-    source: '系统',
-  },
-]
-
 export default function StreamPage() {
-  const [filter, setFilter] = useState('all')
   const [logs, setLogs] = useState<LogEntry[]>([])
-  const [loading, setLoading] = useState(true)
+  const [filter, setFilter] = useState<string>('all')
 
   useEffect(() => {
     const fetchLogs = async () => {
-      setLoading(true)
       try {
         const res = await fetch('/api/logs?limit=50')
         const data = await res.json()
-
         if (data.success && data.data?.length > 0) {
           setLogs(data.data)
-        } else {
-          setLogs(mockLogs)
         }
       } catch (error) {
         console.error('Failed to fetch logs:', error)
-        setLogs(mockLogs)
-      } finally {
-        setLoading(false)
       }
     }
 
     fetchLogs()
   }, [])
 
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString)
+  const mockLogs: LogEntry[] = [
+    {
+      id: '1',
+      timestamp: '2026-06-30T10:30:00Z',
+      type: 'signal',
+      title: '发现新信号：AI 代码审查工具',
+      description: '来自 Product Hunt，热度 92，综合评分 85',
+      metadata: { score: 85, signalId: 'sig-001' },
+    },
+    {
+      id: '2',
+      timestamp: '2026-06-30T09:15:00Z',
+      type: 'forge',
+      title: '复刻完成：AI Code Review MVP',
+      description: '基于信号 sig-001 生成，本地化改造度 88%',
+      metadata: { action: 'generated' },
+    },
+    {
+      id: '3',
+      timestamp: '2026-06-30T08:45:00Z',
+      type: 'canvas',
+      title: '商业画布已生成',
+      description: '完成 SWOT 分析和 30 天行动清单',
+      metadata: { action: 'canvas_generated' },
+    },
+    {
+      id: '4',
+      timestamp: '2026-06-30T08:00:00Z',
+      type: 'twitter',
+      title: '推文草稿已生成',
+      description: '"Just launched my AI code review tool! 🚀 #buildinpublic"',
+      metadata: { action: 'tweet_generated' },
+    },
+    {
+      id: '5',
+      timestamp: '2026-06-29T22:00:00Z',
+      type: 'signal',
+      title: '发现新信号：AI 视频生成',
+      description: '来自 Hacker News，热度 120，综合评分 78',
+      metadata: { score: 78, signalId: 'sig-002' },
+    },
+    {
+      id: '6',
+      timestamp: '2026-06-29T20:30:00Z',
+      type: 'deploy',
+      title: '部署成功：AI Code Review Demo',
+      description: '已部署到 Vercel，访问地址：xxx.vercel.app',
+      metadata: { action: 'deployed' },
+    },
+    {
+      id: '7',
+      timestamp: '2026-06-29T19:00:00Z',
+      type: 'forge',
+      title: '复刻失败：资源不足',
+      description: '当前队列繁忙，请稍后重试',
+      metadata: { action: 'failed' },
+    },
+    {
+      id: '8',
+      timestamp: '2026-06-29T18:00:00Z',
+      type: 'signal',
+      title: '发现新信号：AI 写作助手',
+      description: '来自 Product Hunt，热度 85，综合评分 82',
+      metadata: { score: 82, signalId: 'sig-003' },
+    },
+  ]
+
+  const displayLogs = logs.length > 0 ? logs : mockLogs
+
+  const filteredLogs = filter === 'all' 
+    ? displayLogs 
+    : displayLogs.filter(log => log.type === filter)
+
+  const formatTime = (timestamp: string) => {
+    const date = new Date(timestamp)
     const now = new Date()
-    const diffMs = now.getTime() - date.getTime()
-    const diffMins = Math.floor(diffMs / 60000)
-    const diffHours = Math.floor(diffMins / 60)
-    const diffDays = Math.floor(diffHours / 24)
+    const diff = now.getTime() - date.getTime()
+    const hours = Math.floor(diff / (1000 * 60 * 60))
+    const days = Math.floor(hours / 24)
 
-    if (diffMins < 1) return '刚刚'
-    if (diffMins < 60) return `${diffMins} 分钟前`
-    if (diffHours < 24) return `${diffHours} 小时前`
-    return `${diffDays} 天前`
+    if (hours < 1) return '刚刚'
+    if (hours < 24) return `${hours} 小时前`
+    if (days < 7) return `${days} 天前`
+    return date.toLocaleDateString('zh-CN')
   }
 
-  const typeIcons: Record<string, string> = {
-    SIGNAL_DISCOVERED: '📡',
-    SIGNAL_SCORED: '🔍',
-    SIGNAL_TOP10: '🏆',
-    FORGE_STARTED: '🔨',
-    FORGE_PROGRESS: '⚙️',
-    FORGE_COMPLETED: '✅',
-    CANVAS_GENERATED: '📋',
-    SYSTEM: '🤖',
-  }
-
-  const typeColors: Record<string, string> = {
-    SIGNAL_DISCOVERED: 'border-blue-500/30 bg-blue-500/5',
-    SIGNAL_SCORED: 'border-purple-500/30 bg-purple-500/5',
-    SIGNAL_TOP10: 'border-yellow-500/30 bg-yellow-500/5',
-    FORGE_STARTED: 'border-orange-500/30 bg-orange-500/5',
-    FORGE_PROGRESS: 'border-orange-500/30 bg-orange-500/5',
-    FORGE_COMPLETED: 'border-green-500/30 bg-green-500/5',
-    CANVAS_GENERATED: 'border-pink-500/30 bg-pink-500/5',
-    SYSTEM: 'border-gray-500/30 bg-gray-500/5',
+  const typeConfig = {
+    signal: { icon: '📡', color: 'var(--color-primary)', label: '信号' },
+    forge: { icon: '🔨', color: 'var(--state-warning)', label: '复刻' },
+    canvas: { icon: '📋', color: 'var(--state-info)', label: '画布' },
+    deploy: { icon: '🚀', color: 'var(--state-success)', label: '部署' },
+    twitter: { icon: '🐦', color: '#1DA1F2', label: '推文' },
   }
 
   const filters = [
     { value: 'all', label: '全部' },
-    { value: 'SIGNAL', label: '信号发现' },
-    { value: 'FORGE', label: '复刻记录' },
-    { value: 'CANVAS', label: '画布生成' },
-    { value: 'SYSTEM', label: '系统消息' },
+    { value: 'signal', label: '信号' },
+    { value: 'forge', label: '复刻' },
+    { value: 'canvas', label: '画布' },
+    { value: 'deploy', label: '部署' },
   ]
-
-  const filteredLogs = logs.filter(log => {
-    if (filter === 'all') return true
-    return log.type.startsWith(filter)
-  })
 
   return (
     <div className="min-h-screen">
-      <header className="border-b border-white/10 sticky top-0 z-10 bg-[#0a0a0a]/80 backdrop-blur-xl">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-[#FF6B35] to-[#FFB800] rounded-lg flex items-center justify-center font-bold">
-              S
-            </div>
-            <span className="text-xl font-bold">SparkForge</span>
-          </div>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/" className="text-gray-400 hover:text-white transition-colors">首页</Link>
-            <Link href="/radar" className="text-gray-400 hover:text-white transition-colors">创意雷达</Link>
-            <Link href="/forge" className="text-gray-400 hover:text-white transition-colors">复刻工坊</Link>
-            <Link href="/canvas" className="text-gray-400 hover:text-white transition-colors">商业画布</Link>
-            <Link href="/stream" className="text-[#FF6B35] font-medium">公开日志</Link>
-          </nav>
-          <button className="bg-[#FF6B35] hover:bg-[#FF5722] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
-            关注我们
-          </button>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8 max-w-3xl">
+      <main className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-3xl font-bold">公开日志</h1>
-            <span className="flex items-center gap-1.5 text-sm text-green-400 bg-green-500/10 px-2.5 py-1 rounded-full">
-              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-              实时更新
-            </span>
-          </div>
-          <p className="text-gray-400">
-            Build in Public — 记录 SparkForge 从 0 到 1 的全过程
+          <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
+            公开日志
+          </h1>
+          <p style={{ color: 'var(--color-text-secondary)' }}>
+            Build in Public 实时流，记录从信号发现到商业变现的全过程
           </p>
         </div>
 
@@ -198,64 +154,124 @@ export default function StreamPage() {
             <button
               key={f.value}
               onClick={() => setFilter(f.value)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                filter === f.value
-                  ? 'bg-[#FF6B35] text-white'
-                  : 'bg-white/5 text-gray-400 hover:bg-white/10'
-              }`}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors`}
+              style={{
+                backgroundColor:
+                  filter === f.value
+                    ? 'var(--color-primary)'
+                    : 'var(--color-bg-surface)',
+                color:
+                  filter === f.value
+                    ? 'var(--color-text-inverse)'
+                    : 'var(--color-text-secondary)',
+                border: filter === f.value ? 'none' : '1px solid var(--color-border)',
+              }}
             >
               {f.label}
             </button>
           ))}
         </div>
 
-        {loading ? (
-          <div className="text-center py-16 text-gray-500">
-            <div className="animate-spin w-8 h-8 border-2 border-[#FF6B35] border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p>加载中...</p>
-          </div>
-        ) : (
-          <div className="relative">
-            <div className="absolute left-6 top-0 bottom-0 w-px bg-white/10" />
-
-            <div className="space-y-4">
-              {filteredLogs.map((log) => (
-                <div key={log.id} className="relative pl-16">
-                  <div className="absolute left-0 top-4 w-12 h-12 rounded-full bg-[#0a0a0a] border-2 border-white/10 flex items-center justify-center text-xl z-10">
-                    {typeIcons[log.type] || '📌'}
+        <div className="space-y-4">
+          {filteredLogs.map((log) => (
+            <div
+              key={log.id}
+              className="rounded-xl p-4 transition-colors hover:bg-bg-hover"
+              style={{
+                backgroundColor: 'var(--color-bg-surface)',
+                border: '1px solid var(--color-border)',
+              }}
+            >
+              <div className="flex items-start gap-4">
+                <div
+                  className="w-10 h-10 rounded-lg flex items-center justify-center text-lg flex-shrink-0"
+                  style={{ backgroundColor: `${typeConfig[log.type].color}15` }}
+                >
+                  {typeConfig[log.type].icon}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-1">
+                    <h3 className="font-semibold" style={{ color: 'var(--color-text)' }}>
+                      {log.title}
+                    </h3>
+                    <span
+                      className="text-xs px-2 py-0.5 rounded-full"
+                      style={{
+                        backgroundColor: `${typeConfig[log.type].color}20`,
+                        color: typeConfig[log.type].color,
+                      }}
+                    >
+                      {typeConfig[log.type].label}
+                    </span>
                   </div>
-
-                  <div className={`border rounded-xl p-4 ${typeColors[log.type] || 'border-white/10 bg-white/5'}`}>
-                    <div className="flex items-start justify-between gap-4 mb-2">
-                      <h3 className="font-semibold">{log.title}</h3>
-                      <span className="text-xs text-gray-500 flex-shrink-0">{formatTime(log.createdAt)}</span>
-                    </div>
-                    <p className="text-sm text-gray-400 mb-3">{log.content}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-500">来源：{log.source || '系统'}</span>
-                      <button className="text-xs text-[#FF6B35] hover:underline">
-                        分享 →
-                      </button>
-                    </div>
+                  <p className="text-sm mb-2" style={{ color: 'var(--color-text-secondary)' }}>
+                    {log.description}
+                  </p>
+                  <div className="flex items-center gap-4 text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                    <span>{formatTime(log.timestamp)}</span>
+                    {log.metadata.score && (
+                      <span>评分: {log.metadata.score}</span>
+                    )}
                   </div>
                 </div>
-              ))}
+                <button
+                  className="text-sm px-3 py-1.5 rounded-lg transition-colors"
+                  style={{
+                    backgroundColor: 'var(--color-bg-hover)',
+                    color: 'var(--color-text-secondary)',
+                  }}
+                >
+                  查看详情
+                </button>
+              </div>
             </div>
+          ))}
+        </div>
+
+        {filteredLogs.length === 0 && (
+          <div
+            className="text-center py-16"
+            style={{ color: 'var(--color-text-muted)' }}
+          >
+            <div className="text-4xl mb-4">📭</div>
+            <p>暂无日志</p>
+            <p className="text-sm mt-2">开始使用 SparkForge 后，日志将在这里显示</p>
           </div>
         )}
 
-        <div className="mt-12 text-center">
-          <div className="inline-flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-5">
-            <div className="w-10 h-10 bg-[#1DA1F2]/20 rounded-full flex items-center justify-center text-xl">
-              𝕏
+        <div className="mt-8">
+          <div
+            className="rounded-xl p-6"
+            style={{
+              backgroundColor: 'var(--color-primary-muted)',
+              border: '1px solid rgba(255, 107, 53, 0.2)',
+            }}
+          >
+            <div className="flex items-center gap-4">
+              <div
+                className="w-12 h-12 rounded-lg flex items-center justify-center text-2xl"
+                style={{ backgroundColor: 'rgba(255, 107, 53, 0.15)' }}
+              >
+                🐦
+              </div>
+              <div className="flex-1">
+                <h3 className="font-bold mb-1" style={{ color: 'var(--color-text)' }}>
+                  自动生成 Twitter 推文
+                </h3>
+                <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                  每次信号发现、复刻完成或部署成功，自动生成推文草稿，一键发布
+                </p>
+              </div>
+              <button
+                className="px-4 py-2 rounded-lg font-medium transition-colors"
+                style={{
+                  backgroundColor: 'var(--color-primary)',
+                  color: 'var(--color-text-inverse)',
+                }}
+              >
+                连接 Twitter
+              </button>
             </div>
-            <div className="text-left">
-              <div className="font-bold">关注 Twitter 获取实时更新</div>
-              <div className="text-sm text-gray-400">@sparkforge_ai</div>
-            </div>
-            <button className="bg-[#1DA1F2] hover:bg-[#1a8cd8] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-              关注
-            </button>
           </div>
         </div>
       </main>

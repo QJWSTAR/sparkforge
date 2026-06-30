@@ -83,78 +83,113 @@ export default function ForgePage() {
 
   return (
     <div className="min-h-screen">
-      <header className="border-b border-white/10 sticky top-0 z-10 bg-[#0a0a0a]/80 backdrop-blur-xl">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-[#FF6B35] to-[#FFB800] rounded-lg flex items-center justify-center font-bold">
-              S
-            </div>
-            <span className="text-xl font-bold">SparkForge</span>
-          </div>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/" className="text-gray-400 hover:text-white transition-colors">首页</Link>
-            <Link href="/radar" className="text-gray-400 hover:text-white transition-colors">创意雷达</Link>
-            <Link href="/forge" className="text-[#FF6B35] font-medium">复刻工坊</Link>
-            <Link href="/canvas" className="text-gray-400 hover:text-white transition-colors">商业画布</Link>
-            <Link href="/stream" className="text-gray-400 hover:text-white transition-colors">公开日志</Link>
-          </nav>
-          <button className="bg-[#FF6B35] hover:bg-[#FF5722] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
-            开始复刻
-          </button>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">复刻工坊</h1>
-          <p className="text-gray-400">
+          <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
+            复刻工坊
+          </h1>
+          <p style={{ color: 'var(--color-text-secondary)' }}>
             一键调用 TRAE IDE 生成可运行 MVP，支持本地化改造和自定义配置
           </p>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-            <h2 className="text-lg font-bold mb-4">📦 选择信号</h2>
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+          <div
+            className="rounded-2xl p-6"
+            style={{
+              backgroundColor: 'var(--color-bg-surface)',
+              border: '1px solid var(--color-border)',
+            }}
+          >
+            <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--color-text)' }}>
+              📦 选择信号
+            </h2>
+            <div
+              className="rounded-xl p-4"
+              style={{
+                backgroundColor: 'var(--color-bg-hover)',
+                border: '1px solid var(--color-border)',
+              }}
+            >
               <div className="flex items-start gap-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-[#FF6B35] to-[#FFB800] rounded-xl flex items-center justify-center text-2xl flex-shrink-0">
+                <div
+                  className="w-16 h-16 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+                  style={{
+                    background:
+                      'linear-gradient(135deg, var(--color-primary), var(--state-warning))',
+                  }}
+                >
                   🚀
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-bold text-lg mb-1">{selectedSignal.title}</h3>
-                  <p className="text-gray-400 text-sm mb-3">{selectedSignal.description}</p>
+                  <h3 className="font-bold text-lg mb-1" style={{ color: 'var(--color-text)' }}>
+                    {selectedSignal.title}
+                  </h3>
+                  <p className="text-sm mb-3" style={{ color: 'var(--color-text-secondary)' }}>
+                    {selectedSignal.description}
+                  </p>
                   <div className="flex flex-wrap gap-2">
                     {selectedSignal.tags?.map((tag) => (
-                      <span key={tag} className="text-xs bg-white/10 text-gray-300 px-2 py-0.5 rounded">
+                      <span
+                        key={tag}
+                        className="text-xs px-2 py-0.5 rounded"
+                        style={{
+                          backgroundColor: 'var(--color-bg-active)',
+                          color: 'var(--color-text-secondary)',
+                        }}
+                      >
                         {tag}
                       </span>
                     ))}
                   </div>
                 </div>
-                <Link href="/radar" className="text-gray-500 hover:text-white">
+                <Link
+                  href="/radar"
+                  style={{ color: 'var(--color-text-muted)' }}
+                  className="hover:text-white"
+                >
                   更换
                 </Link>
               </div>
             </div>
           </div>
 
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-            <h2 className="text-lg font-bold mb-4">⚙️ 复刻配置</h2>
+          <div
+            className="rounded-2xl p-6"
+            style={{
+              backgroundColor: 'var(--color-bg-surface)',
+              border: '1px solid var(--color-border)',
+            }}
+          >
+            <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--color-text)' }}>
+              ⚙️ 复刻配置
+            </h2>
             
             <div className="space-y-5">
               <div>
-                <label className="block text-sm font-medium mb-2">目标语言</label>
-                <div className="grid grid-cols-4 gap-2">
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: 'var(--color-text-secondary)' }}
+                >
+                  目标语言
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {languages.map((lang) => (
                     <button
                       key={lang.value}
                       onClick={() => setTargetLanguage(lang.value)}
-                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        targetLanguage === lang.value
-                          ? 'bg-[#FF6B35] text-white'
-                          : 'bg-white/5 text-gray-400 hover:bg-white/10'
-                      }`}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors`}
+                      style={{
+                        backgroundColor:
+                          targetLanguage === lang.value
+                            ? 'var(--color-primary)'
+                            : 'var(--color-bg-hover)',
+                        color:
+                          targetLanguage === lang.value
+                            ? 'var(--color-text-inverse)'
+                            : 'var(--color-text-secondary)',
+                      }}
                     >
                       {lang.label}
                     </button>
@@ -163,58 +198,113 @@ export default function ForgePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">本地化改造点</label>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: 'var(--color-text-secondary)' }}
+                >
+                  本地化改造点
+                </label>
                 <div className="space-y-2">
                   {transformPoints.map((point) => (
-                    <label key={point.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer">
+                    <label
+                      key={point.id}
+                      className="flex items-center gap-3 p-2 rounded-lg cursor-pointer"
+                      style={{ backgroundColor: 'var(--color-bg-hover)' }}
+                    >
                       <input
                         type="checkbox"
                         defaultChecked={point.checked}
-                        className="w-4 h-4 rounded border-white/20 bg-white/5 text-[#FF6B35] focus:ring-[#FF6B35] focus:ring-offset-0"
+                        className="w-4 h-4 rounded"
+                        style={{
+                          borderColor: 'var(--color-border)',
+                          backgroundColor: 'var(--color-bg-active)',
+                          color: 'var(--color-primary)',
+                        }}
                       />
-                      <span className="text-sm text-gray-300">{point.label}</span>
+                      <span className="text-sm" style={{ color: 'var(--color-text)' }}>
+                        {point.label}
+                      </span>
                     </label>
                   ))}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">自定义 Prompt（可选）</label>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: 'var(--color-text-secondary)' }}
+                >
+                  自定义 Prompt（可选）
+                </label>
                 <textarea
                   value={customPrompt}
                   onChange={(e) => setCustomPrompt(e.target.value)}
                   placeholder="描述你想要的特殊需求，例如：增加深色模式、支持移动端、使用 Vue 框架..."
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#FF6B35]/50 transition-colors resize-none h-24 text-sm"
+                  className="w-full rounded-lg px-4 py-3 text-sm placeholder-gray-500 focus:outline-none resize-none h-24"
+                  style={{
+                    backgroundColor: 'var(--color-bg-hover)',
+                    border: '1px solid var(--color-border)',
+                    color: 'var(--color-text)',
+                  }}
                 />
               </div>
             </div>
           </div>
 
           {isForging && (
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-              <h2 className="text-lg font-bold mb-4">🔨 复刻进度</h2>
+            <div
+              className="rounded-2xl p-6"
+              style={{
+                backgroundColor: 'var(--color-bg-surface)',
+                border: '1px solid var(--color-border)',
+              }}
+            >
+              <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--color-text)' }}>
+                🔨 复刻进度
+              </h2>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-400">生成中...</span>
-                  <span className="text-sm font-bold text-[#FF6B35]">{forgeProgress}%</span>
+                  <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                    生成中...
+                  </span>
+                  <span className="text-sm font-bold" style={{ color: 'var(--color-primary)' }}>
+                    {forgeProgress}%
+                  </span>
                 </div>
-                <div className="h-3 bg-white/10 rounded-full overflow-hidden">
+                <div
+                  className="h-3 rounded-full overflow-hidden"
+                  style={{ backgroundColor: 'var(--color-bg-active)' }}
+                >
                   <div
-                    className="h-full bg-gradient-to-r from-[#FF6B35] to-[#FFB800] rounded-full transition-all duration-500"
-                    style={{ width: `${forgeProgress}%` }}
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${forgeProgress}%`,
+                      background:
+                        'linear-gradient(90deg, var(--color-primary), var(--state-warning))',
+                    }}
                   />
                 </div>
                 <div className="grid grid-cols-6 gap-2">
                   {['分析', '结构', '代码', '本地化', '部署', '完成'].map((step, index) => (
                     <div key={step} className="text-center">
-                      <div className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center text-xs font-bold mb-1 ${
-                        forgeProgress >= (index + 1) * 15
-                          ? 'bg-[#FF6B35] text-white'
-                          : 'bg-white/10 text-gray-500'
-                      }`}>
+                      <div
+                        className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center text-xs font-bold mb-1`}
+                        style={{
+                          backgroundColor:
+                            forgeProgress >= (index + 1) * 15
+                              ? 'var(--color-primary)'
+                              : 'var(--color-bg-active)',
+                          color:
+                            forgeProgress >= (index + 1) * 15
+                              ? 'var(--color-text-inverse)'
+                              : 'var(--color-text-muted)',
+                        }}
+                      >
                         {forgeProgress >= (index + 1) * 15 ? '✓' : index + 1}
                       </div>
-                      <span className="text-xs text-gray-500">{step}</span>
+                      <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                        {step}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -223,41 +313,88 @@ export default function ForgePage() {
           )}
 
           {forgeComplete && (
-            <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-2xl p-6">
+            <div
+              className="rounded-2xl p-6"
+              style={{
+                backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                border: '1px solid rgba(16, 185, 129, 0.2)',
+              }}
+            >
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center text-2xl">
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center text-2xl"
+                  style={{ backgroundColor: 'rgba(16, 185, 129, 0.12)' }}
+                >
                   ✅
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold">复刻完成！</h2>
-                  <p className="text-gray-400 text-sm">MVP 已成功生成，快来查看吧</p>
+                  <h2 className="text-lg font-bold" style={{ color: 'var(--color-text)' }}>
+                    复刻完成！
+                  </h2>
+                  <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                    MVP 已成功生成，快来查看吧
+                  </p>
                 </div>
               </div>
               
               <div className="grid grid-cols-2 gap-4 mb-4">
-                <div className="bg-white/5 rounded-xl p-4">
-                  <div className="text-sm text-gray-500 mb-1">本地化改造度</div>
-                  <div className="text-2xl font-bold text-green-400">{forgeResult.localScore}%</div>
+                <div
+                  className="rounded-xl p-4"
+                  style={{ backgroundColor: 'var(--color-bg-hover)' }}
+                >
+                  <div className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                    本地化改造度
+                  </div>
+                  <div
+                    className="text-2xl font-bold"
+                    style={{ color: 'var(--state-success)' }}
+                  >
+                    {forgeResult.localScore}%
+                  </div>
                 </div>
-                <div className="bg-white/5 rounded-xl p-4">
-                  <div className="text-sm text-gray-500 mb-1">生成时长</div>
-                  <div className="text-2xl font-bold text-[#FF6B35]">28秒</div>
+                <div
+                  className="rounded-xl p-4"
+                  style={{ backgroundColor: 'var(--color-bg-hover)' }}
+                >
+                  <div className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                    生成时长
+                  </div>
+                  <div className="text-2xl font-bold" style={{ color: 'var(--color-primary)' }}>
+                    28秒
+                  </div>
                 </div>
               </div>
 
-              <div className="bg-black/30 rounded-xl p-4 mb-4">
-                <div className="text-sm text-gray-400 mb-2">生成摘要</div>
-                <p className="text-sm text-gray-300">
+              <div
+                className="rounded-xl p-4 mb-4"
+                style={{ backgroundColor: 'var(--color-bg-active)' }}
+              >
+                <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                  生成摘要
+                </div>
+                <p className="text-sm" style={{ color: 'var(--color-text)' }}>
                   已完成对 {selectedSignal.title} 的本地化复刻。适配了中文界面、接入微信登录、
                   优化了国内访问速度，并增加了深色模式支持。
                 </p>
               </div>
 
               <div className="flex gap-3">
-                <button className="flex-1 bg-[#FF6B35] hover:bg-[#FF5722] text-white py-3 rounded-xl font-bold transition-colors">
+                <button
+                  className="flex-1 py-3 rounded-xl font-bold transition-colors"
+                  style={{
+                    backgroundColor: 'var(--color-primary)',
+                    color: 'var(--color-text-inverse)',
+                  }}
+                >
                   查看 Demo
                 </button>
-                <button className="flex-1 bg-white/10 hover:bg-white/20 text-white py-3 rounded-xl font-medium transition-colors">
+                <button
+                  className="flex-1 py-3 rounded-xl font-medium transition-colors"
+                  style={{
+                    backgroundColor: 'var(--color-bg-hover)',
+                    color: 'var(--color-text)',
+                  }}
+                >
                   下载源码
                 </button>
               </div>
@@ -266,49 +403,98 @@ export default function ForgePage() {
         </div>
 
           <div className="space-y-6">
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-              <h3 className="font-bold mb-4">🎯 预估效果</h3>
+            <div
+              className="rounded-2xl p-6"
+              style={{
+                backgroundColor: 'var(--color-bg-surface)',
+                border: '1px solid var(--color-border)',
+              }}
+            >
+              <h3 className="font-bold mb-4" style={{ color: 'var(--color-text)' }}>
+                🎯 预估效果
+              </h3>
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-400">本地化改造度</span>
-                    <span className="text-[#8B5CF6] font-medium">85%</span>
+                    <span style={{ color: 'var(--color-text-secondary)' }}>本地化改造度</span>
+                    <span style={{ color: 'var(--color-dim-novelty)' }} className="font-medium">
+                      85%
+                    </span>
                   </div>
-                  <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                    <div className="h-full bg-[#8B5CF6] rounded-full" style={{ width: '85%' }} />
+                  <div
+                    className="h-2 rounded-full overflow-hidden"
+                    style={{ backgroundColor: 'var(--color-bg-active)' }}
+                  >
+                    <div
+                      className="h-full rounded-full"
+                      style={{ width: '85%', backgroundColor: 'var(--color-dim-novelty)' }}
+                    />
                   </div>
                 </div>
                 <div>
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-400">预计生成时间</span>
-                    <span className="text-[#FFB800] font-medium">30-60 秒</span>
+                    <span style={{ color: 'var(--color-text-secondary)' }}>预计生成时间</span>
+                    <span style={{ color: 'var(--state-warning)' }} className="font-medium">
+                      30-60 秒
+                    </span>
                   </div>
                 </div>
                 <div>
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-400">技术栈</span>
-                    <span className="text-[#3B82F6] font-medium">Next.js + Tailwind</span>
+                    <span style={{ color: 'var(--color-text-secondary)' }}>技术栈</span>
+                    <span style={{ color: 'var(--state-info)' }} className="font-medium">
+                      Next.js + Tailwind
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-              <h3 className="font-bold mb-4">💰 定价</h3>
+            <div
+              className="rounded-2xl p-6"
+              style={{
+                backgroundColor: 'var(--color-bg-surface)',
+                border: '1px solid var(--color-border)',
+              }}
+            >
+              <h3 className="font-bold mb-4" style={{ color: 'var(--color-text)' }}>
+                💰 定价
+              </h3>
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                <div
+                  className="flex items-center justify-between p-3 rounded-lg"
+                  style={{ backgroundColor: 'var(--color-bg-hover)' }}
+                >
                   <div>
-                    <div className="text-sm font-medium">单次复刻</div>
-                    <div className="text-xs text-gray-500">适合偶尔使用</div>
+                    <div className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+                      单次复刻
+                    </div>
+                    <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                      适合偶尔使用
+                    </div>
                   </div>
-                  <div className="text-[#FF6B35] font-bold">¥9.9</div>
+                  <div className="font-bold" style={{ color: 'var(--color-primary)' }}>
+                    ¥9.9
+                  </div>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-[#FF6B35]/10 border border-[#FF6B35]/30 rounded-lg">
+                <div
+                  className="flex items-center justify-between p-3 rounded-lg"
+                  style={{
+                    backgroundColor: 'var(--color-primary-muted)',
+                    border: '1px solid rgba(255, 107, 53, 0.3)',
+                  }}
+                >
                   <div>
-                    <div className="text-sm font-medium">Pro 会员</div>
-                    <div className="text-xs text-gray-500">无限复刻 + 优先队列</div>
+                    <div className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+                      Pro 会员
+                    </div>
+                    <div className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
+                      无限复刻 + 优先队列
+                    </div>
                   </div>
-                  <div className="text-[#FF6B35] font-bold">¥99/月</div>
+                  <div className="font-bold" style={{ color: 'var(--color-primary)' }}>
+                    ¥99/月
+                  </div>
                 </div>
               </div>
             </div>
@@ -316,7 +502,12 @@ export default function ForgePage() {
             {!isForging && !forgeComplete && (
               <button
                 onClick={handleStartForge}
-                className="w-full bg-gradient-to-r from-[#FF6B35] to-[#FFB800] hover:opacity-90 text-white py-4 rounded-xl font-bold text-lg transition-all hover:scale-[1.02] shadow-lg shadow-[#FF6B35]/25"
+                className="w-full py-4 rounded-xl font-bold text-lg transition-all"
+                style={{
+                  background:
+                    'linear-gradient(90deg, var(--color-primary), var(--state-warning))',
+                  color: 'var(--color-text-inverse)',
+                }}
               >
                 🚀 开始复刻
               </button>

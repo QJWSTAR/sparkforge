@@ -1,0 +1,91 @@
+{
+  "project": {
+    "name": "SparkForge 信号仪表板",
+    "operation": "create",
+    "operatingMode": "free-explore",
+    "deviceType": "desktop",
+    "language": "zh-CN",
+    "styleDefinitionBrief": "信息密集型仪表板，深色主题，暖橙色强调，左侧筛选面板 + 右侧信号卡片流，结构化维度展示，高密度但层次分明",
+    "designRead": "dashboard / 独立开发者 / 专业工具感 / 高信息密度 / 避免花哨装饰",
+    "designDials": {
+      "layoutVariance": 2,
+      "motionIntensity": 1,
+      "visualDensity": 4
+    },
+    "sharedProjectShellContract": {
+      "navigationStyle": "minimal top bar with brand + theme toggle + login",
+      "primaryColor": "var(--color-primary) #FF6B35",
+      "cardStyle": "border-first, subtle surface layering, no heavy shadows",
+      "radiusScale": ["--radius-sm: 4px", "--radius-md: 8px", "--radius-lg: 12px", "--radius-full: 9999px"],
+      "surfaceDepthModel": "border-first for static surfaces, shadow-float only for floating layers",
+      "CTAStyle": "solid primary button with --color-primary, medium radius"
+    }
+  },
+  "designSource": {
+    "operatingMode": "free-explore",
+    "brandCSSPath": "colors_and_type.css",
+    "styleConstraints": {
+      "radiusMax": 12,
+      "staticShadowAlphaMax": 0.05,
+      "spacingBase": 4
+    }
+  },
+  "pages": [
+    {
+      "nodeId": "page-dashboard",
+      "title": "信号仪表板",
+      "htmlSrc": "pages/dashboard.html",
+      "pageIndex": 1,
+      "pageType": "information-dense",
+      "businessScenario": "创意信号发现与筛选主界面",
+      "requirements": "左侧来源筛选面板（信号源列表 + 全选/全不选 + 搜索），右侧信号卡片流（每个信号展示：标题、一句话描述、四个评分维度进度条、来源标签、综合评分、一键复刻/画布按钮）。顶部有品牌标识、主题切换、导出、登录按钮。参考 idea.level06.com 的列表式高密度布局但不抄袭其具体内容。",
+      "visualNorthStar": "信息密度极高的一屏式信号仪表板：左侧窄面板做筛选，右侧宽区域用结构化卡片流展示每个信号的核心评估维度，无需翻页即可快速扫描所有信号",
+      "continuityAnchors": {
+        "colorSystem": "深色背景 + 暖橙强调",
+        "shapeSystem": "小圆角卡片，边框分隔",
+        "typographySystem": "Inter + Noto Sans SC，紧凑字号层次",
+        "spacingSystem": "4px 基准网格，紧凑但不拥挤",
+        "componentLanguage": "边框卡片 + 进度条评分 + 标签化来源",
+        "surfaceAndDepth": "边框主导，无重阴影"
+      },
+      "imagePlan": []
+    },
+    {
+      "nodeId": "page-signal-detail",
+      "title": "信号详情",
+      "htmlSrc": "pages/signal-detail.html",
+      "pageIndex": 2,
+      "pageType": "information-dense",
+      "businessScenario": "单个信号的完整分析详情",
+      "requirements": "展示单个信号的完整分析，包含：大标题 + 来源/状态标签、综合评分圆形图、四个维度详细评分条、完整描述、AI 分析文本、相关标签、操作按钮（一键复刻、生成画布、订阅、分享）。",
+      "visualNorthStar": "结构化的信号深度分析视图：大号评分视觉锚点 + 多维度展开分析 + 明确的行动入口",
+      "continuityAnchors": {
+        "colorSystem": "深色背景 + 暖橙强调",
+        "shapeSystem": "小圆角卡片，边框分隔",
+        "typographySystem": "Inter + Noto Sans SC，紧凑字号层次",
+        "spacingSystem": "4px 基准网格，紧凑但不拥挤",
+        "componentLanguage": "边框卡片 + 进度条评分 + 标签化来源",
+        "surfaceAndDepth": "边框主导，无重阴影"
+      },
+      "imagePlan": []
+    }
+  ],
+  "assets": [],
+  "wiringPlan": [
+    {
+      "fromPageId": "page-dashboard",
+      "toPageId": "page-signal-detail",
+      "domId": "signal-card-link",
+      "transitionLabel": "查看信号详情"
+    }
+  ],
+  "hiddenInteractionPlan": [
+    {
+      "fromPageId": "page-signal-detail",
+      "toPageId": "page-dashboard",
+      "domId": "back-to-dashboard",
+      "hideEdge": true,
+      "transitionLabel": "返回仪表板"
+    }
+  ]
+}
