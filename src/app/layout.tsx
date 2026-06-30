@@ -14,7 +14,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN">
-      <body className="min-h-screen bg-[#0a0a0a] text-white antialiased">
+      <body className="min-h-screen antialiased"
+  style={{
+    backgroundColor: 'var(--color-bg)',
+    color: 'var(--color-text)',
+  }}
+>
         <Navbar />
         {children}
       </body>

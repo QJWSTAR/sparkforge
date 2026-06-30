@@ -18,7 +18,7 @@
 
   --color-text: #E8E8EC;
   --color-text-secondary: #9CA3AF;
-  --color-text-muted: #6B7280;
+  --color-text-muted: #8B95A5;
   --color-text-inverse: #0B0D11;
 
   --color-border: rgba(255, 255, 255, 0.08);
@@ -90,8 +90,8 @@
     --color-bg-active: #E5E7EB;
     --color-bg-muted: #F3F4F6;
 
-    --color-primary: #E85D2A;
-    --color-primary-hover: #D14E1F;
+    --color-primary: #F0501A;
+    --color-primary-hover: #D9480F;
     --color-primary-muted: rgba(232, 93, 42, 0.10);
     --color-primary-subtle: rgba(232, 93, 42, 0.05);
 

@@ -55,6 +55,7 @@ export default function CanvasPage() {
               className="rounded-2xl p-6"
               style={{
                 backgroundColor: 'var(--color-bg-surface)',
+                boxShadow: 'var(--shadow-md)',
                 border: '1px solid var(--color-border)',
               }}
             >
@@ -85,10 +86,10 @@ export default function CanvasPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
+                <div className="space-y-4 flex flex-col">
                   <div
-                    className="rounded-xl p-4"
+                    className="rounded-xl p-4 flex-1"
                     style={{
                       backgroundColor: 'var(--color-primary-muted)',
                       border: '1px solid rgba(255, 107, 53, 0.2)',
@@ -103,7 +104,7 @@ export default function CanvasPage() {
                     </p>
                   </div>
                   <div
-                    className="rounded-xl p-4"
+                    className="rounded-xl p-4 flex-1"
                     style={{
                       backgroundColor: 'rgba(59, 130, 246, 0.08)',
                       border: '1px solid rgba(59, 130, 246, 0.2)',
@@ -120,7 +121,7 @@ export default function CanvasPage() {
                     </ul>
                   </div>
                   <div
-                    className="rounded-xl p-4"
+                    className="rounded-xl p-4 flex-1"
                     style={{
                       backgroundColor: 'rgba(139, 92, 246, 0.08)',
                       border: '1px solid rgba(139, 92, 246, 0.2)',
@@ -138,9 +139,9 @@ export default function CanvasPage() {
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-4 flex flex-col">
                   <div
-                    className="rounded-xl p-4"
+                    className="rounded-xl p-4 flex-1"
                     style={{
                       backgroundColor: 'rgba(251, 191, 36, 0.08)',
                       border: '1px solid rgba(251, 191, 36, 0.2)',
@@ -157,7 +158,7 @@ export default function CanvasPage() {
                     </ul>
                   </div>
                   <div
-                    className="rounded-xl p-4"
+                    className="rounded-xl p-4 flex-1"
                     style={{
                       backgroundColor: 'rgba(16, 185, 129, 0.08)',
                       border: '1px solid rgba(16, 185, 129, 0.2)',
@@ -175,9 +176,9 @@ export default function CanvasPage() {
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-4 flex flex-col">
                   <div
-                    className="rounded-xl p-4"
+                    className="rounded-xl p-4 flex-1"
                     style={{
                       backgroundColor: 'rgba(239, 68, 68, 0.08)',
                       border: '1px solid rgba(239, 68, 68, 0.2)',
@@ -244,7 +245,7 @@ export default function CanvasPage() {
                     </div>
                   </div>
                   <div
-                    className="rounded-xl p-4"
+                    className="rounded-xl p-4 flex-1"
                     style={{
                       backgroundColor: 'rgba(236, 72, 153, 0.08)',
                       border: '1px solid rgba(236, 72, 153, 0.2)',
@@ -268,6 +269,7 @@ export default function CanvasPage() {
               className="rounded-2xl p-6"
               style={{
                 backgroundColor: 'var(--color-bg-surface)',
+                boxShadow: 'var(--shadow-md)',
                 border: '1px solid var(--color-border)',
               }}
             >
@@ -348,6 +350,7 @@ export default function CanvasPage() {
               className="rounded-2xl p-6"
               style={{
                 backgroundColor: 'var(--color-bg-surface)',
+                boxShadow: 'var(--shadow-md)',
                 border: '1px solid var(--color-border)',
               }}
             >
@@ -393,6 +396,7 @@ export default function CanvasPage() {
               className="rounded-2xl p-6"
               style={{
                 backgroundColor: 'var(--color-bg-surface)',
+                boxShadow: 'var(--shadow-md)',
                 border: '1px solid var(--color-border)',
               }}
             >

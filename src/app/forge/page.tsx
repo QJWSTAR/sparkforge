@@ -99,6 +99,7 @@ export default function ForgePage() {
             className="rounded-2xl p-6"
             style={{
               backgroundColor: 'var(--color-bg-surface)',
+              boxShadow: 'var(--shadow-md)',
               border: '1px solid var(--color-border)',
             }}
           >
@@ -159,6 +160,7 @@ export default function ForgePage() {
             className="rounded-2xl p-6"
             style={{
               backgroundColor: 'var(--color-bg-surface)',
+              boxShadow: 'var(--shadow-md)',
               border: '1px solid var(--color-border)',
             }}
           >
@@ -256,6 +258,7 @@ export default function ForgePage() {
               className="rounded-2xl p-6"
               style={{
                 backgroundColor: 'var(--color-bg-surface)',
+                boxShadow: 'var(--shadow-md)',
                 border: '1px solid var(--color-border)',
               }}
             >
@@ -407,6 +410,7 @@ export default function ForgePage() {
               className="rounded-2xl p-6"
               style={{
                 backgroundColor: 'var(--color-bg-surface)',
+                boxShadow: 'var(--shadow-md)',
                 border: '1px solid var(--color-border)',
               }}
             >
@@ -454,6 +458,7 @@ export default function ForgePage() {
               className="rounded-2xl p-6"
               style={{
                 backgroundColor: 'var(--color-bg-surface)',
+                boxShadow: 'var(--shadow-md)',
                 border: '1px solid var(--color-border)',
               }}
             >

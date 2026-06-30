@@ -50,7 +50,7 @@ export default async function Home() {
           </div>
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
             <span
-              className="bg-gradient-to-r via-[var(--color-primary)] via-[var(--state-warning)] to-[var(--color-primary)] bg-clip-text text-transparent"
+              className="bg-gradient-to-r from-[var(--color-primary)] via-[var(--state-warning)] to-[var(--color-primary)] bg-clip-text text-transparent"
             >
               创意信号雷达
             </span>
@@ -153,6 +153,7 @@ export default async function Home() {
               className="rounded-2xl p-6 transition-colors"
               style={{
                 backgroundColor: 'var(--color-bg-surface)',
+                boxShadow: 'var(--shadow-md)',
                 border: '1px solid var(--color-border)',
               }}
             >
@@ -175,6 +176,7 @@ export default async function Home() {
               className="rounded-2xl p-6 transition-colors"
               style={{
                 backgroundColor: 'var(--color-bg-surface)',
+                boxShadow: 'var(--shadow-md)',
                 border: '1px solid var(--color-border)',
               }}
             >
@@ -197,6 +199,7 @@ export default async function Home() {
               className="rounded-2xl p-6 transition-colors"
               style={{
                 backgroundColor: 'var(--color-bg-surface)',
+                boxShadow: 'var(--shadow-md)',
                 border: '1px solid var(--color-border)',
               }}
             >
@@ -219,6 +222,7 @@ export default async function Home() {
               className="rounded-2xl p-6 transition-colors"
               style={{
                 backgroundColor: 'var(--color-bg-surface)',
+                boxShadow: 'var(--shadow-md)',
                 border: '1px solid var(--color-border)',
               }}
             >
@@ -263,6 +267,7 @@ export default async function Home() {
                   className="rounded-xl p-4 transition-colors"
                   style={{
                     backgroundColor: 'var(--color-bg-surface)',
+                    boxShadow: 'var(--shadow-md)',
                     border: '1px solid var(--color-border)',
                   }}
                 >
