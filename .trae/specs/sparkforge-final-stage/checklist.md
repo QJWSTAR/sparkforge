@@ -2,24 +2,24 @@
 
 ## 环境变量配置
 
-- [ ] NEXT_PUBLIC_SUPABASE_URL 已配置
-- [ ] NEXT_PUBLIC_SUPABASE_ANON_KEY 已配置
-- [ ] SUPABASE_SERVICE_ROLE_KEY 已配置
-- [ ] DEEPSEEK_API_KEY 已配置
-- [ ] PRODUCTHUNT_ACCESS_TOKEN 已配置
-- [ ] ALGOLIA_API_KEY 已配置
-- [ ] CRON_API_KEY 已配置
+- [x] NEXT_PUBLIC_SUPABASE_URL 已配置
+- [x] NEXT_PUBLIC_SUPABASE_ANON_KEY 已配置
+- [x] SUPABASE_SERVICE_ROLE_KEY 已配置
+- [x] DEEPSEEK_API_KEY 已配置
+- [x] PRODUCTHUNT_ACCESS_TOKEN 已配置
+- [x] ALGOLIA_API_KEY 已配置
+- [x] CRON_API_KEY 已配置
 - [x] .env.local 文件创建完成（模板已生成）
 
 ## 数据库配置
 
-- [ ] Signal 表创建完成（需在 Supabase 执行 supabase-setup.sql）
-- [ ] ForgeProject 表创建完成
-- [ ] CanvasReport 表创建完成
-- [ ] LogEntry 表创建完成
-- [ ] UserSetting 表创建完成
-- [ ] 索引和约束创建完成
-- [ ] Supabase 连接测试通过
+- [x] Signal 表创建完成（需在 Supabase 执行 supabase-setup.sql）
+- [x] ForgeProject 表创建完成
+- [x] CanvasReport 表创建完成
+- [x] LogEntry 表创建完成
+- [x] UserSetting 表创建完成
+- [x] 索引和约束创建完成
+- [x] Supabase 连接测试通过
 - [x] supabase-setup.sql 脚本已创建
 
 ## API 修复

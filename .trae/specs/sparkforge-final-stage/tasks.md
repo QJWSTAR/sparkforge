@@ -1,6 +1,6 @@
 # SparkForge 最终阶段 - Implementation Plan
 
-## [ ] Task 1: 创建 Supabase 建表 SQL 脚本
+## [x] Task 1: 创建 Supabase 建表 SQL 脚本
 - **Priority**: high
 - **Depends On**: None
 - **Description**: 
@@ -14,7 +14,7 @@
   - `human-judgment` TR-1.3: 表结构与 schema.prisma 一致
 - **Notes**: 用户需要在 Supabase 控制台执行此脚本
 
-## [ ] Task 2: 修复 subscribe API 字段错误
+## [x] Task 2: 修复 subscribe API 字段错误
 - **Priority**: high
 - **Depends On**: Task 1
 - **Description**: 
@@ -27,7 +27,7 @@
   - `programmatic` TR-2.3: DELETE /api/subscribe 返回 200 状态码
 - **Notes**: 需要确认 UserSetting 的正确字段结构
 
-## [ ] Task 3: 页面数据对接真实 API
+## [x] Task 3: 页面数据对接真实 API
 - **Priority**: high
 - **Depends On**: Task 1, Task 2
 - **Description**: 
@@ -41,7 +41,7 @@
   - `human-judgment` TR-3.3: 商业画布显示真实信号
 - **Notes**: 保留 Mock 数据作为 fallback
 
-## [ ] Task 4: 创建 .env.local 配置模板
+## [x] Task 4: 创建 .env.local 配置模板
 - **Priority**: high
 - **Depends On**: None
 - **Description**: 
@@ -53,7 +53,7 @@
   - `human-judgment` TR-4.2: 所有必要变量都有占位符
 - **Notes**: 用户需要提供真实的 API Key
 
-## [ ] Task 5: 验证构建和类型检查
+## [x] Task 5: 验证构建和类型检查
 - **Priority**: high
 - **Depends On**: Task 1-4
 - **Description**: 
@@ -80,7 +80,7 @@
   - `programmatic` TR-6.2: 定时任务执行后信号数据更新
 - **Notes**: 用户需要在 Vercel 控制台配置
 
-## [ ] Task 7: 验证完整闭环
+## [x] Task 7: 验证完整闭环
 - **Priority**: high
 - **Depends On**: Task 1-6
 - **Description**: 
