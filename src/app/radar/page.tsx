@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import { useDebounce } from '@/lib/hooks'
 import Link from 'next/link'
 import SignalCard from '@/components/SignalCard'
 import { mockSignals, sourceLabels } from '@/data/mockSignals'
@@ -44,9 +45,12 @@ export default function RadarPage() {
   const [selectedSources, setSelectedSources] = useState<string[]>(ALL_SOURCES)
   const [sortBy, setSortBy] = useState<string>('score-desc')
   const [minScore, setMinScore] = useState<number>(0)
-  const [searchQuery, setSearchQuery] = useState('')
+  const [searchInput, setSearchInput] = useState('')
   const [signals, setSignals] = useState<Signal[]>([])
   const [loading, setLoading] = useState(true)
+
+  const searchQuery = useDebounce(searchInput, 300)
+  const [filterOpen, setFilterOpen] = useState(false)
 
   const showAllSources =
     selectedSources.includes('all') ||
@@ -280,6 +284,63 @@ export default function RadarPage() {
         style={{ backgroundColor: 'var(--color-bg)' }}
       >
         <div className="max-w-3xl mx-auto px-4 py-5 lg:px-8">
+          {/* Mobile filter button */}
+          <div className="md:hidden mb-4">
+            <button
+              onClick={() => setFilterOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+              style={{
+                backgroundColor: 'var(--color-bg-surface)',
+                border: '1px solid var(--color-border)',
+                color: 'var(--color-text)',
+              }}
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M2 3.5h12M4.5 8h7M6.5 12.5h3"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <span>筛选</span>
+              {selectedSources.length > 0 && !selectedSources.includes('all') && (
+                <span
+                  className="flex items-center justify-center rounded-full text-xs"
+                  style={{
+                    minWidth: '18px',
+                    height: '18px',
+                    padding: '0 5px',
+                    backgroundColor: 'var(--color-primary)',
+                    color: 'var(--color-text-inverse)',
+                  }}
+                >
+                  {selectedSources.length}
+                </span>
+              )}
+              {selectedSources.includes('all') && (
+                <span
+                  className="flex items-center justify-center rounded-full text-xs"
+                  style={{
+                    minWidth: '18px',
+                    height: '18px',
+                    padding: '0 5px',
+                    backgroundColor: 'var(--color-primary)',
+                    color: 'var(--color-text-inverse)',
+                  }}
+                >
+                  {ALL_SOURCES.length - 1}
+                </span>
+              )}
+            </button>
+          </div>
+
           {/* Toolbar */}
           <div
             className="flex flex-col sm:flex-row gap-3 mb-5 pb-4 border-b"
@@ -316,8 +377,8 @@ export default function RadarPage() {
               <input
                 type="text"
                 placeholder="搜索信号名称、概念、技术..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
                 className="w-full rounded-md py-2 pl-9 pr-3 text-sm focus:outline-none transition-colors"
                 style={{
                   backgroundColor: 'var(--color-bg-surface)',
@@ -434,6 +495,138 @@ export default function RadarPage() {
           )}
         </div>
       </main>
+
+      {/* Mobile filter bottom sheet */}
+      {filterOpen && (
+        <div className="md:hidden">
+          {/* Overlay */}
+          <div
+            className="fixed inset-0 z-50"
+            style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
+            onClick={() => setFilterOpen(false)}
+          />
+          {/* Bottom sheet panel */}
+          <div
+            className="fixed bottom-0 left-0 right-0 z-50 flex flex-col rounded-t-xl"
+            style={{
+              maxHeight: '60vh',
+              backgroundColor: 'var(--color-bg-elevated)',
+            }}
+          >
+            {/* Header */}
+            <div
+              className="flex items-center justify-between px-4 py-3 border-b flex-shrink-0"
+              style={{ borderColor: 'var(--color-border)' }}
+            >
+              <h2
+                className="text-sm font-semibold"
+                style={{ color: 'var(--color-text)' }}
+              >
+                信号源
+              </h2>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={selectAllSources}
+                  className="text-xs transition-colors"
+                  style={{ color: 'var(--color-primary)' }}
+                >
+                  全选
+                </button>
+                <span style={{ color: 'var(--color-text-muted)' }}>/</span>
+                <button
+                  onClick={clearAllSources}
+                  className="text-xs transition-colors"
+                  style={{ color: 'var(--color-text-muted)' }}
+                >
+                  全部不选
+                </button>
+                <span
+                  className="mx-1"
+                  style={{ color: 'var(--color-border)' }}
+                >
+                  |
+                </span>
+                <button
+                  onClick={() => setFilterOpen(false)}
+                  className="text-xs transition-colors"
+                  style={{ color: 'var(--color-text-secondary)' }}
+                >
+                  关闭
+                </button>
+              </div>
+            </div>
+
+            {/* Source list */}
+            <div className="overflow-y-auto px-4 py-3">
+              <ul className="space-y-1">
+                {ALL_SOURCES.map((source) => {
+                  const checked = selectedSources.includes(source)
+                  return (
+                    <li key={source}>
+                      <label
+                        className="flex items-center gap-2.5 px-2 py-2 rounded-md cursor-pointer transition-colors"
+                        style={{
+                          backgroundColor: checked
+                            ? 'var(--color-primary-subtle)'
+                            : 'transparent',
+                        }}
+                      >
+                        <span
+                          className="flex items-center justify-center flex-shrink-0 rounded-sm"
+                          style={{
+                            width: '14px',
+                            height: '14px',
+                            backgroundColor: checked
+                              ? 'var(--color-primary)'
+                              : 'transparent',
+                            border: checked
+                              ? 'none'
+                              : '1.5px solid var(--color-text-muted)',
+                          }}
+                        >
+                          {checked && (
+                            <svg
+                              width="10"
+                              height="10"
+                              viewBox="0 0 12 12"
+                              fill="none"
+                              aria-hidden="true"
+                            >
+                              <path
+                                d="M2.5 6.5L5 9L9.5 3.5"
+                                stroke="var(--color-text-inverse)"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          )}
+                        </span>
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => toggleSource(source)}
+                          className="sr-only"
+                        />
+                        <span
+                          className="text-sm"
+                          style={{
+                            color: checked
+                              ? 'var(--color-text)'
+                              : 'var(--color-text-secondary)',
+                          }}
+                        >
+                          {getSourceLabel(source)}
+                        </span>
+                      </label>
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

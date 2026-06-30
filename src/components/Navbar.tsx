@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/lib/auth'
@@ -15,6 +16,7 @@ const navLinks = [
 export default function Navbar() {
   const { user, isAuthenticated } = useAuth()
   const pathname = usePathname()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
     <header
@@ -71,6 +73,53 @@ export default function Navbar() {
           })}
         </nav>
 
+        {/* Hamburger (mobile only) */}
+        <button
+          className="md:hidden"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="打开菜单"
+          style={{
+            background: 'none',
+            border: 'none',
+            padding: '4px',
+            cursor: 'pointer',
+            color: 'var(--color-text)',
+          }}
+        >
+          {mobileMenuOpen ? (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          ) : (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="4" y1="6" x2="20" y2="6" />
+              <line x1="4" y1="12" x2="20" y2="12" />
+              <line x1="4" y1="18" x2="20" y2="18" />
+            </svg>
+          )}
+        </button>
+
         {/* Right: Auth */}
         <div className="flex items-center gap-2 shrink-0">
           {isAuthenticated ? (
@@ -99,6 +148,36 @@ export default function Navbar() {
           )}
         </div>
       </div>
+
+      {/* Mobile dropdown menu */}
+      {mobileMenuOpen && (
+        <nav
+          className="md:hidden"
+          style={{
+            borderTop: `1px solid var(--color-border)`,
+            backgroundColor: 'var(--color-bg-elevated)',
+          }}
+        >
+          {navLinks.map((link) => {
+            const isActive = pathname === link.href
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-6 py-3 text-sm font-medium transition-colors"
+                style={{
+                  color: isActive
+                    ? 'var(--color-primary)'
+                    : 'var(--color-text-secondary)',
+                }}
+              >
+                {link.label}
+              </Link>
+            )
+          })}
+        </nav>
+      )}
     </header>
   )
 }
