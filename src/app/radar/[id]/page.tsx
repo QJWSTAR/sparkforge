@@ -6,6 +6,26 @@ import { useParams } from 'next/navigation'
 import { mockSignals, sourceLabels } from '@/data/mockSignals'
 import type { Signal } from '@/types/signal'
 
+const sourceColorMap: Record<string, string> = {
+  producthunt: 'var(--color-primary)',
+  hackernews: 'var(--state-warning)',
+  twitter: 'var(--state-info)',
+  github: 'var(--color-text-secondary)',
+  indiehackers: 'var(--state-success)',
+  v2ex: 'var(--color-dim-novelty)',
+  xiaohongshu: 'var(--state-error)',
+  juejin: 'var(--state-info)',
+  medium: 'var(--color-text-muted)',
+}
+
+function formatDate(iso: string): string {
+  const d = new Date(iso)
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
 export default function SignalDetailPage() {
   const params = useParams()
   const signalId = params.id as string
@@ -44,7 +64,15 @@ export default function SignalDetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-2 border-[#FF6B35] border-t-transparent rounded-full"></div>
+        <div
+          className="animate-spin rounded-full"
+          style={{
+            width: '32px',
+            height: '32px',
+            border: '2px solid var(--color-primary)',
+            borderTopColor: 'transparent',
+          }}
+        ></div>
       </div>
     )
   }
@@ -54,8 +82,12 @@ export default function SignalDetailPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="text-4xl mb-4">🔍</div>
-          <p className="text-gray-400">信号不存在</p>
-          <Link href="/radar" className="text-[#FF6B35] hover:underline mt-4 block">
+          <p style={{ color: 'var(--color-text-secondary)' }}>信号不存在</p>
+          <Link
+            href="/radar"
+            className="mt-4 inline-block hover:underline"
+            style={{ color: 'var(--color-primary)' }}
+          >
             返回雷达页面
           </Link>
         </div>
@@ -63,271 +95,500 @@ export default function SignalDetailPage() {
     )
   }
 
-  const scoreBreakdown = [
-    { name: '新颖度', value: signal.noveltyScore, weight: '30%', color: 'from-blue-500 to-cyan-500' },
-    { name: '商业潜力', value: signal.businessScore, weight: '35%', color: 'from-green-500 to-emerald-500' },
-    { name: '本地化潜力', value: signal.localScore, weight: '35%', color: 'from-orange-500 to-amber-500' },
+  const sourceColor = sourceColorMap[signal.source] || 'var(--color-text-secondary)'
+  const sourceLabel = sourceLabels[signal.source] || signal.source
+
+  const scoreBars = [
+    { label: '热度', value: signal.hotScore, color: 'var(--color-dim-hot)' },
+    { label: '创新', value: signal.noveltyScore, color: 'var(--color-dim-novelty)' },
+    { label: '商业', value: signal.businessScore, color: 'var(--color-dim-business)' },
+    { label: '本地化', value: signal.localScore, color: 'var(--color-dim-local)' },
   ]
 
+  const analysisSections: { title: string; content: string; borderColor: string }[] = []
+  if (signal.concept || signal.description) {
+    analysisSections.push({
+      title: '创意概念',
+      content: (signal.concept || signal.description) as string,
+      borderColor: 'var(--color-dim-novelty)',
+    })
+  }
+  if (signal.painPoint) {
+    analysisSections.push({ title: '市场痛点', content: signal.painPoint, borderColor: 'var(--color-primary)' })
+  }
+  if (signal.innovation) {
+    analysisSections.push({ title: '核心创新', content: signal.innovation, borderColor: 'var(--state-info)' })
+  }
+  if (signal.techSolution) {
+    analysisSections.push({ title: '技术方案', content: signal.techSolution, borderColor: 'var(--state-success)' })
+  }
+  if (signal.acquisition) {
+    analysisSections.push({ title: '获客策略', content: signal.acquisition, borderColor: 'var(--state-warning)' })
+  }
+  if (signal.differentiation) {
+    analysisSections.push({ title: '竞品差异', content: signal.differentiation, borderColor: 'var(--state-info)' })
+  }
+
+  const similarSignals = mockSignals.filter(s => s.id !== signal.id).slice(0, 3)
+
+  const statusTag =
+    signal.status === 'TOP10'
+      ? { text: 'TOP 10', color: 'var(--color-primary)', bg: 'var(--color-primary-muted)' }
+      : signal.status === 'SCORED'
+        ? { text: '已评分', color: 'var(--state-success)', bg: 'color-mix(in srgb, var(--state-success) 12%, transparent)' }
+        : signal.status === 'SCREENED'
+          ? { text: '待评分', color: 'var(--state-warning)', bg: 'color-mix(in srgb, var(--state-warning) 12%, transparent)' }
+          : { text: '新信号', color: 'var(--color-text-secondary)', bg: 'var(--color-bg-hover)' }
+
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-white/10 sticky top-0 z-10 bg-[#0a0a0a]/80 backdrop-blur-xl">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-[#FF6B35] to-[#FFB800] rounded-lg flex items-center justify-center font-bold">
-              S
+    <main className="mx-auto px-4 py-8" style={{ maxWidth: '900px' }}>
+      <div className="flex flex-col lg:flex-row gap-8">
+        {/* ─── Left Column (~65%) ─── */}
+        <div className="flex-1 min-w-0" style={{ flexBasis: '65%' }}>
+          {/* 1. Signal Header */}
+          <section className="mb-6">
+            {/* Tags row */}
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              <span
+                style={{
+                  background: `color-mix(in srgb, ${sourceColor} 12%, transparent)`,
+                  color: sourceColor,
+                  borderRadius: 'var(--radius-full)',
+                  fontSize: 'var(--text-xs)',
+                  fontWeight: 500,
+                  padding: '3px 10px',
+                }}
+              >
+                {sourceLabel}
+              </span>
+              <span
+                style={{
+                  background: statusTag.bg,
+                  color: statusTag.color,
+                  borderRadius: 'var(--radius-full)',
+                  fontSize: 'var(--text-xs)',
+                  fontWeight: 600,
+                  padding: '3px 10px',
+                }}
+              >
+                {statusTag.text}
+              </span>
             </div>
-            <span className="text-xl font-bold">SparkForge</span>
-          </div>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/" className="text-gray-400 hover:text-white transition-colors">首页</Link>
-            <Link href="/radar" className="text-[#FF6B35] font-medium">创意雷达</Link>
-            <Link href="/forge" className="text-gray-400 hover:text-white transition-colors">复刻工坊</Link>
-            <Link href="/canvas" className="text-gray-400 hover:text-white transition-colors">商业画布</Link>
-            <Link href="/stream" className="text-gray-400 hover:text-white transition-colors">公开日志</Link>
-          </nav>
-          <button className="bg-[#FF6B35] hover:bg-[#FF5722] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
-            订阅 Top 10
-          </button>
-        </div>
-      </header>
+            {/* Title */}
+            <h1
+              className="mb-2"
+              style={{
+                fontSize: 'var(--text-2xl)',
+                fontWeight: 600,
+                color: 'var(--color-text)',
+                lineHeight: 'var(--leading-tight)',
+              }}
+            >
+              {signal.title}
+            </h1>
+            {/* Description */}
+            {signal.description && (
+              <p
+                className="mb-3"
+                style={{
+                  fontSize: 'var(--text-base)',
+                  color: 'var(--color-text-secondary)',
+                  lineHeight: 'var(--leading-relaxed)',
+                }}
+              >
+                {signal.description}
+              </p>
+            )}
+            {/* Metadata */}
+            <div
+              className="flex flex-wrap items-center gap-3"
+              style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)' }}
+            >
+              <span>更新于 {formatDate(signal.fetchedAt)}</span>
+              <span style={{ color: 'var(--color-border)' }}>|</span>
+              <span>投票 {signal.votesCount}</span>
+              <span style={{ color: 'var(--color-border)' }}>|</span>
+              <span>评论 {signal.commentsCount}</span>
+            </div>
+          </section>
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <Link href="/radar" className="text-gray-400 hover:text-white flex items-center gap-2 mb-4">
-            <span>←</span> 返回雷达
-          </Link>
-
-          <div className="flex flex-wrap items-center gap-3 mb-4">
-            <span className={`px-3 py-1 rounded-full text-xs font-medium bg-white/10 ${
-              signal.status === 'TOP10' ? 'text-[#FF6B35] border border-[#FF6B35]/30' :
-              signal.status === 'SCORED' ? 'text-green-400 border border-green-400/30' :
-              'text-gray-400'
-            }`}>
-              {signal.status === 'TOP10' ? '🔥 Top 10' :
-               signal.status === 'SCORED' ? '✓ 已评分' :
-               signal.status === 'SCREENED' ? '⏳ 待评分' : '🆕 新信号'}
-            </span>
-            <span className="px-3 py-1 rounded-full text-xs font-medium bg-white/10 text-gray-400">
-              {sourceLabels[signal.source] || signal.source}
-            </span>
-            <span className="text-sm text-gray-500">
-              更新于 {new Date(signal.fetchedAt).toLocaleDateString('zh-CN')}
-            </span>
-          </div>
-
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">{signal.title}</h1>
-          
-          {signal.description && (
-            <p className="text-lg text-gray-300 mb-6 max-w-3xl">{signal.description}</p>
-          )}
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-              <h2 className="text-lg font-bold mb-6 flex items-center gap-2">
-                <span>📊</span> AI 评分详情
-              </h2>
-
-              <div className="flex items-center gap-8 mb-8">
-                <div className="text-center">
-                  <div className="text-5xl font-bold bg-gradient-to-r from-[#FF6B35] to-[#FFB800] bg-clip-text text-transparent">
+          {/* 2. Score Overview */}
+          <section
+            className="mb-6"
+            style={{
+              background: 'var(--color-bg-surface)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-lg)',
+              padding: 'var(--space-6)',
+            }}
+          >
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+              {/* Circular score */}
+              <div className="flex flex-col items-center shrink-0">
+                <div
+                  style={{
+                    width: '96px',
+                    height: '96px',
+                    borderRadius: '50%',
+                    border: '5px solid var(--color-primary)',
+                    background: 'var(--color-bg-elevated)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: '32px',
+                      fontWeight: 700,
+                      color: 'var(--color-primary)',
+                      fontVariantNumeric: 'tabular-nums',
+                      lineHeight: 1,
+                    }}
+                  >
                     {signal.finalScore ?? '-'}
-                  </div>
-                  <div className="text-sm text-gray-500 mt-1">综合评分</div>
+                  </span>
                 </div>
-                
-                <div className="flex-1 space-y-4">
-                  {scoreBreakdown.map((item) => (
-                    <div key={item.name}>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm text-gray-300">{item.name}</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-white">{item.value ?? '-'}</span>
-                          <span className="text-xs text-gray-500">({item.weight})</span>
-                        </div>
-                      </div>
-                      <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div
-                          className={`h-full bg-gradient-to-r ${item.color} rounded-full transition-all duration-500`}
-                          style={{ width: `${item.value ?? 0}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <span
+                  style={{
+                    fontSize: 'var(--text-sm)',
+                    color: 'var(--color-text-secondary)',
+                    marginTop: 'var(--space-2)',
+                  }}
+                >
+                  综合评分
+                </span>
               </div>
-
-              {signal.noveltyScore && (
-                <div className="border-t border-white/10 pt-4">
-                  <h3 className="font-medium mb-2">评分分析</h3>
-                  <p className="text-sm text-gray-400">
-                    该信号在新颖度方面表现{(signal.noveltyScore || 0) >= 70 ? '优秀' : (signal.noveltyScore || 0) >= 50 ? '良好' : '一般'}，
-                    商业潜力{(signal.businessScore || 0) >= 70 ? '优秀' : (signal.businessScore || 0) >= 50 ? '良好' : '一般'}，
-                    本土化潜力{(signal.localScore || 0) >= 70 ? '优秀' : (signal.localScore || 0) >= 50 ? '良好' : '一般'}。
-                    {((signal.finalScore || 0) >= 70) && '建议重点关注，适合快速落地！'}
-                  </p>
-                </div>
-              )}
+              {/* Score bars */}
+              <div className="flex-1 w-full grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {scoreBars.map((bar) => (
+                  <div key={bar.label} className="flex flex-col gap-1">
+                    <div
+                      className="flex items-center justify-between"
+                      style={{ fontSize: 'var(--text-sm)' }}
+                    >
+                      <span style={{ color: 'var(--color-text-secondary)' }}>{bar.label}</span>
+                      <span
+                        style={{
+                          color: 'var(--color-text)',
+                          fontWeight: 500,
+                          fontVariantNumeric: 'tabular-nums',
+                        }}
+                      >
+                        {bar.value ?? '-'}
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        height: '6px',
+                        background: 'var(--color-bg-hover)',
+                        borderRadius: 'var(--radius-full)',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: `${bar.value ?? 0}%`,
+                          height: '100%',
+                          background: bar.color,
+                          borderRadius: 'var(--radius-full)',
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
+          </section>
 
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-              <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-                <span>🏷️</span> 标签
-              </h2>
+          {/* 3. Analysis Sections */}
+          <div className="flex flex-col gap-4 mb-6">
+            {analysisSections.map((section) => (
+              <section
+                key={section.title}
+                style={{
+                  background: 'var(--color-bg-surface)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: 'var(--space-5)',
+                  borderLeft: `3px solid ${section.borderColor}`,
+                }}
+              >
+                <h3
+                  style={{
+                    fontSize: 'var(--text-lg)',
+                    fontWeight: 600,
+                    color: 'var(--color-text)',
+                    marginBottom: 'var(--space-2)',
+                  }}
+                >
+                  {section.title}
+                </h3>
+                <p
+                  style={{
+                    fontSize: 'var(--text-base)',
+                    color: 'var(--color-text-secondary)',
+                    lineHeight: 'var(--leading-relaxed)',
+                  }}
+                >
+                  {section.content}
+                </p>
+              </section>
+            ))}
+          </div>
+
+          {/* 4. Action Buttons */}
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href={`/forge?signalId=${signal.id}`}
+              style={{
+                background: 'var(--color-primary)',
+                color: 'var(--color-text-inverse)',
+                border: 'none',
+                borderRadius: 'var(--radius-md)',
+                fontSize: 'var(--text-base)',
+                fontWeight: 600,
+                padding: '10px 20px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 'var(--space-2)',
+              }}
+            >
+              一键复刻
+            </Link>
+            <Link
+              href={`/canvas?signalId=${signal.id}`}
+              style={{
+                background: 'transparent',
+                color: 'var(--color-text)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius-md)',
+                fontSize: 'var(--text-base)',
+                fontWeight: 500,
+                padding: '10px 20px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 'var(--space-2)',
+              }}
+            >
+              生成商业画布
+            </Link>
+            <button
+              style={{
+                background: 'transparent',
+                color: 'var(--color-text-secondary)',
+                border: 'none',
+                borderRadius: 'var(--radius-md)',
+                fontSize: 'var(--text-base)',
+                fontWeight: 500,
+                padding: '10px 20px',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 'var(--space-2)',
+              }}
+            >
+              订阅信号
+            </button>
+            <button
+              style={{
+                background: 'transparent',
+                color: 'var(--color-text-secondary)',
+                border: 'none',
+                borderRadius: 'var(--radius-md)',
+                fontSize: 'var(--text-base)',
+                fontWeight: 500,
+                padding: '10px 20px',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 'var(--space-2)',
+              }}
+            >
+              分享
+            </button>
+          </div>
+        </div>
+
+        {/* ─── Right Column (sidebar ~35%) ─── */}
+        <aside className="shrink-0 w-full lg:w-auto" style={{ flexBasis: '35%' }}>
+          <div className="flex flex-col gap-4">
+            {/* Quick Actions Card */}
+            <section
+              style={{
+                background: 'var(--color-bg-surface)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius-lg)',
+                padding: 'var(--space-5)',
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: 'var(--text-base)',
+                  fontWeight: 600,
+                  color: 'var(--color-text)',
+                  marginBottom: 'var(--space-3)',
+                }}
+              >
+                快速操作
+              </h3>
+              <div className="flex flex-col gap-1">
+                <Link
+                  href={`/forge?signalId=${signal.id}`}
+                  className="hover:bg-[var(--color-bg-hover)]"
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '2px',
+                    padding: 'var(--space-2)',
+                    borderRadius: 'var(--radius-sm)',
+                    textDecoration: 'none',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 'var(--text-base)',
+                      color: 'var(--color-primary)',
+                      fontWeight: 500,
+                    }}
+                  >
+                    一键复刻
+                  </span>
+                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)' }}>
+                    用 TRAE IDE 自动生成代码
+                  </span>
+                </Link>
+                <Link
+                  href={`/canvas?signalId=${signal.id}`}
+                  className="hover:bg-[var(--color-bg-hover)]"
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '2px',
+                    padding: 'var(--space-2)',
+                    borderRadius: 'var(--radius-sm)',
+                    textDecoration: 'none',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 'var(--text-base)',
+                      color: 'var(--color-primary)',
+                      fontWeight: 500,
+                    }}
+                  >
+                    生成商业画布
+                  </span>
+                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)' }}>
+                    AI 分析市场和竞争
+                  </span>
+                </Link>
+              </div>
+            </section>
+
+            {/* Related Tags Card */}
+            <section
+              style={{
+                background: 'var(--color-bg-surface)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius-lg)',
+                padding: 'var(--space-5)',
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: 'var(--text-base)',
+                  fontWeight: 600,
+                  color: 'var(--color-text)',
+                  marginBottom: 'var(--space-3)',
+                }}
+              >
+                相关标签
+              </h3>
               <div className="flex flex-wrap gap-2">
                 {signal.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="px-3 py-1.5 bg-white/10 text-gray-300 rounded-lg text-sm cursor-pointer hover:bg-white/20 transition-colors"
+                    style={{
+                      background: 'var(--color-bg-hover)',
+                      color: 'var(--color-text-secondary)',
+                      borderRadius: 'var(--radius-full)',
+                      fontSize: 'var(--text-xs)',
+                      padding: '3px 10px',
+                      whiteSpace: 'nowrap',
+                    }}
                   >
                     {tag}
                   </span>
                 ))}
               </div>
-            </div>
+            </section>
 
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-                <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-                  <span>📈</span> 热度数据
-                </h2>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-400">热度评分</span>
-                    <span className="text-white font-bold">{signal.hotScore}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-400">投票数</span>
-                    <span className="text-white font-bold">{signal.votesCount}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-400">评论数</span>
-                    <span className="text-white font-bold">{signal.commentsCount}</span>
-                  </div>
-                  {signal.author && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-400">作者</span>
-                      <span className="text-white">{signal.author}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-                <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-                  <span>🔗</span> 相关链接
-                </h2>
-                <div className="space-y-3">
-                  {signal.url && (
-                    <a
-                      href={signal.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-[#FF6B35] hover:underline"
-                    >
-                      <span>🌐</span>
-                      <span className="truncate">{signal.url}</span>
-                    </a>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href={`/forge?signalId=${signal.id}`}
-                className="bg-[#FF6B35] hover:bg-[#FF5722] text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center gap-2"
+            {/* Similar Signals Card */}
+            <section
+              style={{
+                background: 'var(--color-bg-surface)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius-lg)',
+                padding: 'var(--space-5)',
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: 'var(--text-base)',
+                  fontWeight: 600,
+                  color: 'var(--color-text)',
+                  marginBottom: 'var(--space-3)',
+                }}
               >
-                <span>⚙️</span> 一键复刻
-              </Link>
-              <Link
-                href={`/canvas?signalId=${signal.id}`}
-                className="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center gap-2"
-              >
-                <span>📋</span> 生成商业画布
-              </Link>
-              <button className="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center gap-2">
-                <span>🔔</span> 订阅信号
-              </button>
-              <button className="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center gap-2">
-                <span>📤</span> 分享
-              </button>
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            <div className="bg-gradient-to-br from-[#FF6B35]/10 to-[#FFB800]/10 border border-[#FF6B35]/20 rounded-2xl p-5">
-              <h3 className="font-bold mb-4">📣 快速操作</h3>
-              <div className="space-y-2">
-                <Link
-                  href={`/forge?signalId=${signal.id}`}
-                  className="block w-full p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-left"
-                >
-                  <div className="font-medium text-sm">一键复刻</div>
-                  <div className="text-xs text-gray-400">用 TRAE IDE 自动生成代码</div>
-                </Link>
-                <Link
-                  href={`/canvas?signalId=${signal.id}`}
-                  className="block w-full p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-left"
-                >
-                  <div className="font-medium text-sm">生成商业画布</div>
-                  <div className="text-xs text-gray-400">AI 分析市场和竞争</div>
-                </Link>
-              </div>
-            </div>
-
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
-              <h3 className="font-bold mb-4">📊 评分分布</h3>
-              <div className="flex justify-center">
-                <div className="relative w-32 h-32">
-                  <svg className="w-full h-full transform -rotate-90">
-                    <circle
-                      cx="64"
-                      cy="64"
-                      r="56"
-                      stroke="rgba(255,255,255,0.1)"
-                      strokeWidth="8"
-                      fill="none"
-                    />
-                    <circle
-                      cx="64"
-                      cy="64"
-                      r="56"
-                      stroke="#FF6B35"
-                      strokeWidth="8"
-                      fill="none"
-                      strokeLinecap="round"
-                      strokeDasharray={`${(signal.finalScore || 0) * 3.52} 352`}
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-2xl font-bold text-white">{signal.finalScore ?? '-'}</span>
-                  </div>
-                </div>
-              </div>
-              <div className="text-center mt-2 text-sm text-gray-500">综合评分</div>
-            </div>
-
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
-              <h3 className="font-bold mb-4">💡 类似信号</h3>
-              <div className="space-y-2">
-                {mockSignals.slice(0, 3).map((s) => (
+                相似信号
+              </h3>
+              <div className="flex flex-col gap-1">
+                {similarSignals.map((s) => (
                   <Link
                     key={s.id}
                     href={`/radar/${s.id}`}
-                    className="block p-2 hover:bg-white/5 rounded-lg transition-colors"
+                    className="hover:bg-[var(--color-bg-hover)]"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 'var(--space-2)',
+                      padding: 'var(--space-2)',
+                      borderRadius: 'var(--radius-sm)',
+                      textDecoration: 'none',
+                    }}
                   >
-                    <div className="text-sm font-medium truncate">{s.title}</div>
-                    <div className="text-xs text-gray-500">评分: {s.finalScore}</div>
+                    <span
+                      style={{
+                        fontSize: 'var(--text-sm)',
+                        color: 'var(--color-text)',
+                        fontWeight: 500,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
+                      {s.title}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 'var(--text-xs)',
+                        color: 'var(--color-primary)',
+                        fontWeight: 600,
+                        fontVariantNumeric: 'tabular-nums',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {s.finalScore ?? '-'}分
+                    </span>
                   </Link>
                 ))}
               </div>
-            </div>
+            </section>
           </div>
-        </div>
-      </main>
-    </div>
+        </aside>
+      </div>
+    </main>
   )
 }

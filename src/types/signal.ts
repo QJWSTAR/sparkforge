@@ -18,6 +18,13 @@ export interface Signal {
   status: 'PENDING' | 'SCREENED' | 'SCORED' | 'TOP10' | 'ARCHIVED'
   fetchedAt: string
   createdAt: string
+  // AI 分析维度（可选，评分后填充）
+  concept?: string
+  painPoint?: string
+  innovation?: string
+  techSolution?: string
+  acquisition?: string
+  differentiation?: string
 }
 
 export interface SignalFilters {

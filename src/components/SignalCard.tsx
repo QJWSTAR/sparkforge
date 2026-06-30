@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { sourceLabels, sourceColors } from '@/data/mockSignals'
+import { sourceLabels } from '@/data/mockSignals'
 import type { Signal } from '@/types/signal'
 
 interface SignalCardProps {
@@ -10,134 +10,167 @@ interface SignalCardProps {
 }
 
 export default function SignalCard({ signal, rank }: SignalCardProps) {
-  const scoreColors = {
-    hot: 'bg-[#FF6B35]',
-    novelty: 'bg-[#3B82F6]',
-    business: 'bg-[#FFB800]',
-    local: 'bg-[#8B5CF6]',
-  }
+  const dimensions = [
+    {
+      label: '创意概念',
+      content: signal.concept || signal.description,
+      color: 'var(--color-dim-novelty)',
+    },
+    {
+      label: '市场痛点',
+      content: signal.painPoint,
+      color: 'var(--color-dim-hot)',
+    },
+    {
+      label: '核心创新',
+      content: signal.innovation,
+      color: 'var(--color-dim-local)',
+    },
+    {
+      label: '技术方案',
+      content: signal.techSolution,
+      color: 'var(--state-success)',
+    },
+    {
+      label: '获客策略',
+      content: signal.acquisition,
+      color: 'var(--color-dim-business)',
+    },
+    {
+      label: '竞品差异',
+      content: signal.differentiation,
+      color: 'var(--state-info)',
+    },
+  ].filter((d) => d.content)
+
+  const scoreBars = [
+    { label: '热度', value: signal.hotScore, color: 'var(--color-dim-hot)' },
+    { label: '创新', value: signal.noveltyScore, color: 'var(--color-dim-novelty)' },
+    { label: '商业', value: signal.businessScore, color: 'var(--color-dim-business)' },
+    { label: '本地', value: signal.localScore, color: 'var(--color-dim-local)' },
+  ].filter((s) => s.value !== undefined)
 
   return (
-    <Link href={`/radar/${signal.id}`}>
-      <div className="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer group">
-        <div className="flex items-start gap-4">
-          {rank && (
-            <div className={`flex-shrink-0 w-8 h-8 rounded flex items-center justify-center text-sm font-bold ${
-              rank === 1 ? 'bg-[#FF6B35] text-white' :
-              rank === 2 ? 'bg-[#FFB800] text-black' :
-              rank === 3 ? 'bg-[#3B82F6] text-white' :
-              'bg-white/10 text-gray-400'
-            }`}>
+    <Link
+      href={`/radar/${signal.id}`}
+      className="block border-b py-5 transition-colors hover:bg-[var(--color-bg-hover)] -mx-4 px-4 rounded-md"
+      style={{ borderColor: 'var(--color-border)' }}
+    >
+      {/* Header row */}
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-center gap-2 min-w-0">
+          {rank !== undefined && (
+            <span
+              className="flex-shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-md text-xs font-bold"
+              style={{
+                backgroundColor: 'var(--color-primary-muted)',
+                color: 'var(--color-primary)',
+              }}
+            >
               {rank}
-            </div>
+            </span>
           )}
+          <h3
+            className="text-lg font-semibold truncate"
+            style={{ color: 'var(--color-text)' }}
+          >
+            {signal.title}
+          </h3>
+          <span
+            className="flex-shrink-0 text-xs px-2 py-0.5 rounded-md"
+            style={{
+              backgroundColor: 'var(--color-primary-muted)',
+              color: 'var(--color-primary)',
+            }}
+          >
+            {sourceLabels[signal.source]}
+          </span>
+        </div>
+        {signal.finalScore !== undefined && (
+          <span
+            className="flex-shrink-0 text-2xl font-bold tabular-nums"
+            style={{ color: 'var(--color-primary)' }}
+          >
+            {signal.finalScore}
+          </span>
+        )}
+      </div>
 
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-2 mb-2">
-              <h3 className="font-semibold text-white group-hover:text-[#FF6B35] transition-colors line-clamp-1">
-                {signal.title}
-              </h3>
-              <span className={`flex-shrink-0 text-xs px-2 py-0.5 rounded ${sourceColors[signal.source]}`}>
-                {sourceLabels[signal.source]}
+      {/* Analysis grid */}
+      {dimensions.length > 0 && (
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+          {dimensions.map((d) => (
+            <div key={d.label} className="pl-2.5" style={{ borderLeft: `2px solid ${d.color}` }}>
+              <span
+                className="font-medium text-sm"
+                style={{ color: 'var(--color-text-secondary)' }}
+              >
+                {d.label}
+              </span>
+              <p
+                className="mt-0.5 leading-snug text-sm"
+                style={{ color: 'var(--color-text)' }}
+              >
+                {d.content}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Score bars */}
+      {scoreBars.length > 0 && (
+        <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
+          {scoreBars.map((s) => (
+            <div key={s.label} className="flex items-center gap-2">
+              <span
+                className="w-8 text-xs"
+                style={{ color: 'var(--color-text-secondary)' }}
+              >
+                {s.label}
+              </span>
+              <div
+                className="w-24 h-1.5 rounded-full overflow-hidden"
+                style={{ backgroundColor: 'var(--color-bg-active)' }}
+              >
+                <div
+                  className="h-full rounded-full"
+                  style={{ width: `${s.value}%`, backgroundColor: s.color }}
+                />
+              </div>
+              <span
+                className="tabular-nums w-6 text-right"
+                style={{ color: 'var(--color-text)' }}
+              >
+                {s.value}
               </span>
             </div>
-
-            {signal.description && (
-              <p className="text-gray-400 text-sm mb-3 line-clamp-2">
-                {signal.description}
-              </p>
-            )}
-
-            <div className="flex flex-wrap gap-2 mb-3">
-              {signal.tags.slice(0, 3).map((tag) => (
-                <span
-                  key={tag}
-                  className="text-xs bg-white/10 text-gray-300 px-2 py-0.5 rounded"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-4 gap-3">
-              <div>
-                <div className="text-xs text-gray-500 mb-1">热度</div>
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full ${scoreColors.hot}`}
-                      style={{ width: `${signal.hotScore}%` }}
-                    />
-                  </div>
-                  <span className="text-xs text-gray-400 w-8 text-right">{signal.hotScore}</span>
-                </div>
-              </div>
-
-              {signal.noveltyScore !== undefined && (
-                <div>
-                  <div className="text-xs text-gray-500 mb-1">创新</div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${scoreColors.novelty}`}
-                        style={{ width: `${signal.noveltyScore}%` }}
-                      />
-                    </div>
-                    <span className="text-xs text-gray-400 w-8 text-right">{signal.noveltyScore}</span>
-                  </div>
-                </div>
-              )}
-
-              {signal.businessScore !== undefined && (
-                <div>
-                  <div className="text-xs text-gray-500 mb-1">商业</div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${scoreColors.business}`}
-                        style={{ width: `${signal.businessScore}%` }}
-                      />
-                    </div>
-                    <span className="text-xs text-gray-400 w-8 text-right">{signal.businessScore}</span>
-                  </div>
-                </div>
-              )}
-
-              {signal.localScore !== undefined && (
-                <div>
-                  <div className="text-xs text-gray-500 mb-1">本地化</div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${scoreColors.local}`}
-                        style={{ width: `${signal.localScore}%` }}
-                      />
-                    </div>
-                    <span className="text-xs text-gray-400 w-8 text-right">{signal.localScore}</span>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="flex flex-col items-end gap-2">
-            {signal.finalScore !== undefined && (
-              <div className="text-right">
-                <div className="text-2xl font-bold text-[#FF6B35]">{signal.finalScore}</div>
-                <div className="text-xs text-gray-500">综合评分</div>
-              </div>
-            )}
-            <div className="flex items-center gap-3 text-xs text-gray-500">
-              <span>▲ {signal.votesCount}</span>
-              <span>💬 {signal.commentsCount}</span>
-            </div>
-            <Link href={`/forge?signalId=${signal.id}`}>
-              <button className="bg-[#FF6B35]/20 hover:bg-[#FF6B35]/30 text-[#FF6B35] px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">
-                复刻 →
-              </button>
-            </Link>
-          </div>
+          ))}
         </div>
+      )}
+
+      {/* Action buttons */}
+      <div className="mt-4 flex items-center gap-2">
+        <Link
+          href={`/forge?signalId=${signal.id}`}
+          className="text-xs font-semibold px-3 py-1.5 rounded-md"
+          style={{
+            backgroundColor: 'var(--color-primary)',
+            color: 'var(--color-text-inverse)',
+          }}
+        >
+          复刻
+        </Link>
+        <Link
+          href={`/canvas?signalId=${signal.id}`}
+          className="text-xs font-medium px-3 py-1.5 rounded-md"
+          style={{
+            border: '1px solid var(--color-border)',
+            color: 'var(--color-text-secondary)',
+          }}
+        >
+          画布
+        </Link>
       </div>
     </Link>
   )

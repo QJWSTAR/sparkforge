@@ -3,20 +3,56 @@
 import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import SignalCard from '@/components/SignalCard'
-import { mockSignals, categories, sourceLabels } from '@/data/mockSignals'
+import { mockSignals, sourceLabels } from '@/data/mockSignals'
 import type { Signal } from '@/types/signal'
 
+const ALL_SOURCES = [
+  'all',
+  'producthunt',
+  'hackernews',
+  'twitter',
+  'github',
+  'indiehackers',
+  'v2ex',
+  'xiaohongshu',
+  'juejin',
+  'medium',
+]
+
+const SORT_OPTIONS = [
+  { value: 'score-desc', label: '综合评分高→低' },
+  { value: 'hot-desc', label: '热度高→低' },
+  { value: 'novelty-desc', label: '创新高→低' },
+  { value: 'business-desc', label: '商业高→低' },
+  { value: 'local-desc', label: '本地化高→低' },
+  { value: 'newest', label: '最新' },
+]
+
+const SCORE_CHIPS = [
+  { label: '全部', value: 0 },
+  { label: '80+', value: 80 },
+  { label: '70+', value: 70 },
+  { label: '60+', value: 60 },
+]
+
+function getSourceLabel(source: string): string {
+  if (source === 'all') return '全部源'
+  return sourceLabels[source] || source
+}
+
 export default function RadarPage() {
-  const [selectedSource, setSelectedSource] = useState<string>('all')
-  const [selectedCategory, setSelectedCategory] = useState<string>('全部')
-  const [sortBy, setSortBy] = useState<'hot' | 'score' | 'newest'>('score')
+  const [selectedSources, setSelectedSources] = useState<string[]>(ALL_SOURCES)
+  const [sortBy, setSortBy] = useState<string>('score-desc')
   const [minScore, setMinScore] = useState<number>(0)
   const [searchQuery, setSearchQuery] = useState('')
   const [signals, setSignals] = useState<Signal[]>([])
   const [loading, setLoading] = useState(true)
 
-  const sources = ['all', 'producthunt', 'hackernews', 'twitter', 'github', 'indiehackers', 'v2ex', 'xiaohongshu', 'juejin', 'medium']
+  const showAllSources =
+    selectedSources.includes('all') ||
+    ALL_SOURCES.filter((s) => s !== 'all').every((s) => selectedSources.includes(s))
 
+  // Fetch signals from API, fall back to mockSignals on error/empty
   useEffect(() => {
     const fetchSignals = async () => {
       setLoading(true)
@@ -25,7 +61,12 @@ export default function RadarPage() {
           sortBy,
           limit: '50',
         })
-        if (selectedSource !== 'all') params.set('source', selectedSource)
+        if (!showAllSources) {
+          const activeSources = selectedSources.filter((s) => s !== 'all')
+          if (activeSources.length > 0) {
+            params.set('source', activeSources.join(','))
+          }
+        }
         if (minScore > 0) params.set('minScore', String(minScore))
         if (searchQuery) params.set('search', searchQuery)
 
@@ -46,242 +87,351 @@ export default function RadarPage() {
     }
 
     fetchSignals()
-  }, [selectedSource, sortBy, minScore, searchQuery])
+  }, [selectedSources, sortBy, minScore, searchQuery, showAllSources])
 
+  // Client-side filtering + sorting
   const filteredSignals = useMemo(() => {
     let result = [...signals]
 
-    if (selectedCategory !== '全部') {
-      result = result.filter(s => s.tags?.some(t => t.includes(selectedCategory) || selectedCategory.includes(t)))
+    // Filter by selected sources
+    if (!showAllSources) {
+      const activeSources = selectedSources.filter((s) => s !== 'all')
+      result = result.filter((s) => activeSources.includes(s.source))
+    }
+
+    // Filter by minScore
+    if (minScore > 0) {
+      result = result.filter((s) => (s.finalScore ?? 0) >= minScore)
+    }
+
+    // Filter by search query (title, description, tags)
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase()
+      result = result.filter((s) => {
+        const inTitle = s.title?.toLowerCase().includes(q)
+        const inDesc = s.description?.toLowerCase().includes(q)
+        const inTags = s.tags?.some((t) => t.toLowerCase().includes(q))
+        return inTitle || inDesc || inTags
+      })
+    }
+
+    // Sort
+    switch (sortBy) {
+      case 'score-desc':
+        result.sort((a, b) => (b.finalScore ?? 0) - (a.finalScore ?? 0))
+        break
+      case 'hot-desc':
+        result.sort((a, b) => (b.hotScore ?? 0) - (a.hotScore ?? 0))
+        break
+      case 'novelty-desc':
+        result.sort((a, b) => (b.noveltyScore ?? 0) - (a.noveltyScore ?? 0))
+        break
+      case 'business-desc':
+        result.sort((a, b) => (b.businessScore ?? 0) - (a.businessScore ?? 0))
+        break
+      case 'local-desc':
+        result.sort((a, b) => (b.localScore ?? 0) - (a.localScore ?? 0))
+        break
+      case 'newest':
+        result.sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )
+        break
     }
 
     return result
-  }, [signals, selectedCategory])
+  }, [signals, selectedSources, minScore, searchQuery, sortBy, showAllSources])
 
-  const top10Signals = filteredSignals
-    .filter(s => s.status === 'TOP10' || (s.finalScore && s.finalScore >= 70))
-    .slice(0, 10)
+  const toggleSource = (source: string) => {
+    setSelectedSources((prev) => {
+      if (prev.includes(source)) {
+        return prev.filter((s) => s !== source)
+      }
+      return [...prev, source]
+    })
+  }
+
+  const selectAllSources = () => setSelectedSources(ALL_SOURCES)
+  const clearAllSources = () => setSelectedSources([])
 
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-white/10 sticky top-0 z-10 bg-[#0a0a0a]/80 backdrop-blur-xl">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+    <div className="flex" style={{ height: 'calc(100vh - 56px)' }}>
+      {/* Left Sidebar - Source Filter */}
+      <aside
+        className="hidden md:flex flex-col border-r"
+        style={{
+          width: '260px',
+          backgroundColor: 'var(--color-bg-elevated)',
+          borderColor: 'var(--color-border)',
+        }}
+      >
+        <div
+          className="flex items-center justify-between px-4 py-4 border-b"
+          style={{ borderColor: 'var(--color-border)' }}
+        >
+          <h2
+            className="text-sm font-semibold"
+            style={{ color: 'var(--color-text)' }}
+          >
+            信号源
+          </h2>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-[#FF6B35] to-[#FFB800] rounded-lg flex items-center justify-center font-bold">
-              S
-            </div>
-            <span className="text-xl font-bold">SparkForge</span>
+            <button
+              onClick={selectAllSources}
+              className="text-xs transition-colors"
+              style={{ color: 'var(--color-primary)' }}
+            >
+              全选
+            </button>
+            <span style={{ color: 'var(--color-text-muted)' }}>/</span>
+            <button
+              onClick={clearAllSources}
+              className="text-xs transition-colors"
+              style={{ color: 'var(--color-text-muted)' }}
+            >
+              全部不选
+            </button>
           </div>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/" className="text-gray-400 hover:text-white transition-colors">首页</Link>
-            <Link href="/radar" className="text-[#FF6B35] font-medium">创意雷达</Link>
-            <Link href="/forge" className="text-gray-400 hover:text-white transition-colors">复刻工坊</Link>
-            <Link href="/canvas" className="text-gray-400 hover:text-white transition-colors">商业画布</Link>
-            <Link href="/stream" className="text-gray-400 hover:text-white transition-colors">公开日志</Link>
-          </nav>
-          <button className="bg-[#FF6B35] hover:bg-[#FF5722] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
-            订阅 Top 10
-          </button>
         </div>
-      </header>
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">创意信号雷达</h1>
-              <p className="text-gray-400">
-                实时监控 9 大信号源，AI 智能评分，发现下一个爆款创意
-              </p>
-            </div>
-            <div className="flex items-center gap-4 text-sm text-gray-500">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                <span>实时更新中</span>
-              </div>
-              <div>
-                共 <span className="text-white font-medium">{filteredSignals.length}</span> 条信号
-              </div>
-            </div>
-          </div>
+        <div className="flex-1 overflow-y-auto px-4 py-3">
+          <ul className="space-y-1">
+            {ALL_SOURCES.map((source) => {
+              const checked = selectedSources.includes(source)
+              return (
+                <li key={source}>
+                  <label
+                    className="flex items-center gap-2.5 px-2 py-2 rounded-md cursor-pointer transition-colors"
+                    style={{
+                      backgroundColor: checked
+                        ? 'var(--color-primary-subtle)'
+                        : 'transparent',
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!checked) {
+                        e.currentTarget.style.backgroundColor =
+                          'var(--color-bg-hover)'
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!checked) {
+                        e.currentTarget.style.backgroundColor = 'transparent'
+                      }
+                    }}
+                  >
+                    <span
+                      className="flex items-center justify-center flex-shrink-0 rounded-sm"
+                      style={{
+                        width: '14px',
+                        height: '14px',
+                        backgroundColor: checked
+                          ? 'var(--color-primary)'
+                          : 'transparent',
+                        border: checked
+                          ? 'none'
+                          : '1.5px solid var(--color-text-muted)',
+                      }}
+                    >
+                      {checked && (
+                        <svg
+                          width="10"
+                          height="10"
+                          viewBox="0 0 12 12"
+                          fill="none"
+                          aria-hidden="true"
+                        >
+                          <path
+                            d="M2.5 6.5L5 9L9.5 3.5"
+                            stroke="var(--color-text-inverse)"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      )}
+                    </span>
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => toggleSource(source)}
+                      className="sr-only"
+                    />
+                    <span
+                      className="text-sm"
+                      style={{
+                        color: checked
+                          ? 'var(--color-text)'
+                          : 'var(--color-text-secondary)',
+                      }}
+                    >
+                      {getSourceLabel(source)}
+                    </span>
+                  </label>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      </aside>
 
-          <div className="flex flex-col lg:flex-row gap-4 mb-6">
-            <div className="flex-1 relative">
+      {/* Right Main Content */}
+      <main
+        className="flex-1 overflow-y-auto"
+        style={{ backgroundColor: 'var(--color-bg)' }}
+      >
+        <div className="max-w-3xl mx-auto px-4 py-5 lg:px-8">
+          {/* Toolbar */}
+          <div
+            className="flex flex-col sm:flex-row gap-3 mb-5 pb-4 border-b"
+            style={{ borderColor: 'var(--color-border)' }}
+          >
+            {/* Search input */}
+            <div className="relative flex-1">
+              <span
+                className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center"
+                style={{ color: 'var(--color-text-muted)' }}
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <circle
+                    cx="7"
+                    cy="7"
+                    r="5"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
+                  <path
+                    d="M11 11L14 14"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </span>
               <input
                 type="text"
-                placeholder="搜索信号、标签、描述..."
+                placeholder="搜索信号名称、概念、技术..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-[#FF6B35]/50 transition-colors"
+                className="w-full rounded-md py-2 pl-9 pr-3 text-sm focus:outline-none transition-colors"
+                style={{
+                  backgroundColor: 'var(--color-bg-surface)',
+                  border: '1px solid var(--color-border)',
+                  color: 'var(--color-text)',
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = 'var(--color-border-active)'
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'var(--color-border)'
+                }}
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">
-                ⌘K
-              </span>
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as 'hot' | 'score' | 'newest')}
-                className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#FF6B35]/50"
-              >
-                <option value="score">按综合评分</option>
-                <option value="hot">按热度</option>
-                <option value="newest">按时间</option>
-              </select>
-
-              <select
-                value={minScore}
-                onChange={(e) => setMinScore(Number(e.target.value))}
-                className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#FF6B35]/50"
-              >
-                <option value={0}>全部分数</option>
-                <option value={60}>60+ 分</option>
-                <option value={70}>70+ 分</option>
-                <option value={80}>80+ 分</option>
-              </select>
-            </div>
+            {/* Sort select */}
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="rounded-md px-3 py-2 text-sm focus:outline-none transition-colors cursor-pointer"
+              style={{
+                backgroundColor: 'var(--color-bg-surface)',
+                border: '1px solid var(--color-border)',
+                color: 'var(--color-text)',
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = 'var(--color-border-active)'
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = 'var(--color-border)'
+              }}
+            >
+              {SORT_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
           </div>
 
-          <div className="flex flex-wrap gap-2 mb-4">
-            {sources.map((source) => (
-              <button
-                key={source}
-                onClick={() => setSelectedSource(source)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  selectedSource === source
-                    ? 'bg-[#FF6B35] text-white'
-                    : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
-                }`}
-              >
-                {source === 'all' ? '全部源' : sourceLabels[source] || source}
-              </button>
-            ))}
+          {/* Score filter chips */}
+          <div className="flex flex-wrap items-center gap-2 mb-4">
+            {SCORE_CHIPS.map((chip) => {
+              const active = minScore === chip.value
+              return (
+                <button
+                  key={chip.value}
+                  onClick={() => setMinScore(chip.value)}
+                  className="px-3 py-1 rounded-full text-xs font-medium transition-colors"
+                  style={{
+                    backgroundColor: active
+                      ? 'var(--color-primary)'
+                      : 'var(--color-bg-surface)',
+                    color: active
+                      ? 'var(--color-text-inverse)'
+                      : 'var(--color-text-secondary)',
+                    border: active
+                      ? 'none'
+                      : '1px solid var(--color-border)',
+                  }}
+                >
+                  {chip.label}
+                </button>
+              )
+            })}
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                  selectedCategory === category
-                    ? 'bg-white/20 text-white'
-                    : 'bg-white/5 text-gray-500 hover:bg-white/10 hover:text-gray-300'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">
-                全部信号
-                <span className="ml-2 text-sm font-normal text-gray-500">
-                  ({filteredSignals.length} 条)
-                </span>
-              </h2>
-            </div>
-
-            {loading ? (
-              <div className="text-center py-16 text-gray-500">
-                <div className="animate-spin w-8 h-8 border-2 border-[#FF6B35] border-t-transparent rounded-full mx-auto mb-4"></div>
-                <p>加载中...</p>
-              </div>
-            ) : filteredSignals.length === 0 ? (
-              <div className="text-center py-16 text-gray-500">
-                <div className="text-4xl mb-4">🔍</div>
-                <p>没有找到匹配的信号</p>
-                <p className="text-sm">试试调整筛选条件</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {filteredSignals.map((signal, index) => (
-                  <SignalCard
-                    key={signal.id}
-                    signal={signal}
-                    rank={sortBy === 'score' ? index + 1 : undefined}
-                  />
-                ))}
-              </div>
-            )}
+          {/* Result count */}
+          <div className="mb-4">
+            <span
+              className="text-xs"
+              style={{ color: 'var(--color-text-muted)' }}
+            >
+              共 {filteredSignals.length} 条信号
+            </span>
           </div>
 
-          <div className="space-y-6">
-            <div className="bg-gradient-to-br from-[#FF6B35]/10 to-[#FFB800]/10 border border-[#FF6B35]/20 rounded-2xl p-5">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-xl">🏆</span>
-                <h3 className="font-bold text-lg">今日 Top 10</h3>
-              </div>
-              <div className="space-y-2">
-                {top10Signals.slice(0, 5).map((signal, index) => (
-                  <div
-                    key={signal.id}
-                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors"
-                  >
-                    <span className={`w-6 h-6 rounded flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                      index === 0 ? 'bg-[#FF6B35] text-white' :
-                      index === 1 ? 'bg-[#FFB800] text-black' :
-                      index === 2 ? 'bg-[#3B82F6] text-white' :
-                      'bg-white/10 text-gray-400'
-                    }`}>
-                      {index + 1}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium truncate">{signal.title}</div>
-                      <div className="text-xs text-gray-500">{sourceLabels[signal.source] || signal.source}</div>
-                    </div>
-                    <span className="text-[#FF6B35] font-bold text-sm">{signal.finalScore ?? '-'}</span>
-                  </div>
-                ))}
-              </div>
-              <button className="w-full mt-4 text-center text-sm text-[#FF6B35] hover:underline">
-                查看完整 Top 10 →
-              </button>
+          {/* Signal cards */}
+          {loading ? (
+            <div
+              className="flex flex-col items-center justify-center py-16"
+              style={{ color: 'var(--color-text-muted)' }}
+            >
+              <div
+                className="animate-spin rounded-full mb-4"
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  border: '2px solid var(--color-primary)',
+                  borderTopColor: 'transparent',
+                }}
+              />
+              <p className="text-sm">加载中...</p>
             </div>
-
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
-              <h3 className="font-bold mb-4">🔥 热门标签</h3>
-              <div className="flex flex-wrap gap-2">
-                {['AI', 'SaaS', '开发者工具', '生产力', '开源', 'NoCode'].map((tag) => (
-                  <span
-                    key={tag}
-                    className="text-xs bg-white/10 text-gray-300 px-2.5 py-1 rounded-full cursor-pointer hover:bg-white/20 transition-colors"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
+          ) : filteredSignals.length === 0 ? (
+            <div
+              className="flex flex-col items-center justify-center py-16"
+              style={{ color: 'var(--color-text-muted)' }}
+            >
+              <div className="text-4xl mb-3">🔍</div>
+              <p className="text-sm mb-1">没有找到匹配的信号</p>
+              <p className="text-xs">试试调整筛选条件</p>
             </div>
-
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
-              <h3 className="font-bold mb-4">📊 信号源分布</h3>
-              <div className="space-y-3">
-                {Object.entries(sourceLabels).map(([key, label]) => {
-                  const count = signals.filter(s => s.source === key).length
-                  const percentage = signals.length > 0 ? (count / signals.length) * 100 : 0
-                  return (
-                    <div key={key}>
-                      <div className="flex items-center justify-between text-sm mb-1">
-                        <span className="text-gray-400">{label}</span>
-                        <span className="text-gray-500">{count}</span>
-                      </div>
-                      <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-gradient-to-r from-[#FF6B35] to-[#FFB800] rounded-full"
-                          style={{ width: `${percentage}%` }}
-                        />
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
+          ) : (
+            <div className="space-y-3">
+              {filteredSignals.map((signal, index) => (
+                <SignalCard
+                  key={signal.id}
+                  signal={signal}
+                  rank={sortBy === 'score-desc' ? index + 1 : undefined}
+                />
+              ))}
             </div>
-          </div>
+          )}
         </div>
       </main>
     </div>
