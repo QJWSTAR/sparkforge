@@ -1,7 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase'
+import { cookies } from 'next/headers'
+import { getSupabase, getSupabaseAdmin } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
+  const cookieStore = await cookies()
+
+  const authHeader = request.headers.get('authorization')
+  if (!authHeader?.startsWith('Bearer ')) {
+    return NextResponse.json(
+      { success: false, error: 'Unauthorized' },
+      { status: 401 }
+    )
+  }
+
+  const token = authHeader.split(' ')[1]
+  const supabase = getSupabase()
+  if (!supabase) {
+    return NextResponse.json(
+      { success: false, error: 'Supabase not configured' },
+      { status: 500 }
+    )
+  }
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+  if (authError || !user) {
+    return NextResponse.json(
+      { success: false, error: 'Unauthorized' },
+      { status: 401 }
+    )
+  }
+
   const { userId, signalId } = await request.json()
 
   if (!userId || !signalId) {
@@ -56,6 +84,33 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const cookieStore = await cookies()
+
+  const authHeader = request.headers.get('authorization')
+  if (!authHeader?.startsWith('Bearer ')) {
+    return NextResponse.json(
+      { success: false, error: 'Unauthorized' },
+      { status: 401 }
+    )
+  }
+
+  const token = authHeader.split(' ')[1]
+  const supabase = getSupabase()
+  if (!supabase) {
+    return NextResponse.json(
+      { success: false, error: 'Supabase not configured' },
+      { status: 500 }
+    )
+  }
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+  if (authError || !user) {
+    return NextResponse.json(
+      { success: false, error: 'Unauthorized' },
+      { status: 401 }
+    )
+  }
+
   const { userId, signalId } = await request.json()
 
   if (!userId || !signalId) {
@@ -108,6 +163,33 @@ export async function DELETE(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
+  const cookieStore = await cookies()
+
+  const authHeader = request.headers.get('authorization')
+  if (!authHeader?.startsWith('Bearer ')) {
+    return NextResponse.json(
+      { success: false, error: 'Unauthorized' },
+      { status: 401 }
+    )
+  }
+
+  const token = authHeader.split(' ')[1]
+  const supabase = getSupabase()
+  if (!supabase) {
+    return NextResponse.json(
+      { success: false, error: 'Supabase not configured' },
+      { status: 500 }
+    )
+  }
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+  if (authError || !user) {
+    return NextResponse.json(
+      { success: false, error: 'Unauthorized' },
+      { status: 401 }
+    )
+  }
+
   const { searchParams } = new URL(request.url)
   const userId = searchParams.get('userId')
 

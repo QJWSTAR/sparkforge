@@ -387,6 +387,7 @@ export default function SignalDetailPage() {
                 alignItems: 'center',
                 gap: 'var(--space-2)',
               }}
+              onClick={() => alert('功能即将上线')}
             >
               订阅信号
             </button>
@@ -404,6 +405,7 @@ export default function SignalDetailPage() {
                 alignItems: 'center',
                 gap: 'var(--space-2)',
               }}
+              onClick={() => alert('功能即将上线')}
             >
               分享
             </button>

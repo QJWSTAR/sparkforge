@@ -18,17 +18,20 @@ interface LogEntry {
 export default function StreamPage() {
   const [logs, setLogs] = useState<LogEntry[]>([])
   const [filter, setFilter] = useState<string>('all')
+  const [fetchError, setFetchError] = useState(false)
 
   useEffect(() => {
     const fetchLogs = async () => {
       try {
         const res = await fetch('/api/logs?limit=50')
         const data = await res.json()
+        setFetchError(false)
         if (data.success && data.data?.length > 0) {
           setLogs(data.data)
         }
       } catch (error) {
         console.error('Failed to fetch logs:', error)
+        setFetchError(true)
       }
     }
 
@@ -102,7 +105,7 @@ export default function StreamPage() {
     },
   ]
 
-  const displayLogs = logs.length > 0 ? logs : mockLogs
+  const displayLogs = fetchError ? mockLogs : logs
 
   const filteredLogs = filter === 'all' 
     ? displayLogs 
@@ -179,6 +182,7 @@ export default function StreamPage() {
               className="rounded-xl p-4 transition-colors hover:bg-bg-hover"
               style={{
                 backgroundColor: 'var(--color-bg-surface)',
+                boxShadow: 'var(--shadow-md)',
                 border: '1px solid var(--color-border)',
               }}
             >
@@ -268,6 +272,7 @@ export default function StreamPage() {
                   backgroundColor: 'var(--color-primary)',
                   color: 'var(--color-text-inverse)',
                 }}
+                onClick={() => alert('功能即将上线')}
               >
                 连接 Twitter
               </button>
