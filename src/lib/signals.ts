@@ -1,4 +1,4 @@
-import { supabaseAdmin } from './supabase'
+import { getSupabaseAdmin } from './supabase'
 import { fetchHackerNewsTop, saveHNSignals } from './hackernews'
 import { fetchProductHuntToday, savePHSignals } from './producthunt'
 
@@ -13,6 +13,7 @@ export interface SignalQuery {
 }
 
 export async function getSignals(query: SignalQuery = {}) {
+  const supabaseAdmin = getSupabaseAdmin()
   if (!supabaseAdmin) {
     return { signals: [], total: 0 }
   }
@@ -72,6 +73,7 @@ export async function getSignals(query: SignalQuery = {}) {
 }
 
 export async function getSignalById(id: string) {
+  const supabaseAdmin = getSupabaseAdmin()
   if (!supabaseAdmin) {
     return null
   }
@@ -91,6 +93,7 @@ export async function getSignalById(id: string) {
 }
 
 export async function crawlAllSources(): Promise<{ hn: number; ph: number; total: number }> {
+  const supabaseAdmin = getSupabaseAdmin()
   if (!supabaseAdmin) {
     return { hn: 0, ph: 0, total: 0 }
   }
@@ -126,6 +129,7 @@ export async function addLogEntry(entry: {
   forgeId?: string
   metadata?: any
 }) {
+  const supabaseAdmin = getSupabaseAdmin()
   if (!supabaseAdmin) {
     return
   }
@@ -151,6 +155,7 @@ export async function addLogEntry(entry: {
 }
 
 export async function getLogs(limit: number = 20, type?: string) {
+  const supabaseAdmin = getSupabaseAdmin()
   if (!supabaseAdmin) {
     return []
   }

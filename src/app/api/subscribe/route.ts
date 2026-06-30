@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { getSupabaseAdmin } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
   const { userId, signalId } = await request.json()
@@ -11,6 +11,7 @@ export async function POST(request: NextRequest) {
     )
   }
 
+  const supabaseAdmin = getSupabaseAdmin()
   if (!supabaseAdmin) {
     return NextResponse.json(
       { success: false, error: 'Supabase not configured' },
@@ -64,6 +65,7 @@ export async function DELETE(request: NextRequest) {
     )
   }
 
+  const supabaseAdmin = getSupabaseAdmin()
   if (!supabaseAdmin) {
     return NextResponse.json(
       { success: false, error: 'Supabase not configured' },
@@ -116,6 +118,7 @@ export async function GET(request: NextRequest) {
     )
   }
 
+  const supabaseAdmin = getSupabaseAdmin()
   if (!supabaseAdmin) {
     return NextResponse.json({
       success: true,

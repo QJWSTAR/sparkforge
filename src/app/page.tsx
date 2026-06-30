@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import { sourceLabels } from '@/data/mockSignals'
 import type { Signal } from '@/types/signal'
-import { supabaseAdmin } from '@/lib/supabase'
+import { getSupabaseAdmin } from '@/lib/supabase'
 
 async function getSignals(): Promise<Signal[]> {
+  const supabaseAdmin = getSupabaseAdmin()
   if (!supabaseAdmin) {
     return []
   }

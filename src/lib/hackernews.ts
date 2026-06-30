@@ -1,4 +1,4 @@
-import { supabaseAdmin } from './supabase'
+import { getSupabaseAdmin } from './supabase'
 
 export interface RawHNItem {
   objectID: string
@@ -62,6 +62,7 @@ export async function fetchHNByQuery(query: string, limit: number = 20): Promise
 }
 
 export async function saveHNSignals(items: RawHNItem[]): Promise<number> {
+  const supabaseAdmin = getSupabaseAdmin()
   if (!supabaseAdmin) {
     return 0
   }

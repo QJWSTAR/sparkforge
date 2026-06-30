@@ -32,6 +32,3 @@ export function getSupabaseAdmin(): SupabaseClient | null {
   supabaseAdminClient = getOrCreateClient(supabaseUrl || '', supabaseServiceKey || '')
   return supabaseAdminClient
 }
-
-export const supabase = getSupabase()
-export const supabaseAdmin = getSupabaseAdmin()

@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { scoreSignal } from '@/lib/scoring'
-import { supabaseAdmin } from '@/lib/supabase'
+import { getSupabaseAdmin } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
+  const supabaseAdmin = getSupabaseAdmin()
   if (!supabaseAdmin) {
     return NextResponse.json(
       { success: false, error: 'Supabase not configured' },
