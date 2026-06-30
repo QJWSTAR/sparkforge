@@ -85,7 +85,7 @@
   - `programmatic` TR-6.3: npm run lint 成功
 - **Notes**: 修复任何发现的错误
 
-## [/] Task 7: 提交 commit
+## [x] Task 7: 提交 commit
 - **Priority**: medium
 - **Depends On**: Task 1-6
 - **Description**: 
