@@ -1,3 +1,5 @@
+import { getSupabaseAdmin, invalidateDbConnection } from './supabase'
+
 export interface ScoreResult {
   noveltyScore: number
   businessScore: number
@@ -212,5 +214,74 @@ function calculateHeuristicScore(input: ScoringInput): ScoreResult {
     ],
     model: 'heuristic',
     version: '1.0',
+  }
+}
+
+export async function batchScoreUnscoredSignals(limit: number = 50): Promise<number> {
+  const supabaseAdmin = await getSupabaseAdmin()
+
+  if (!supabaseAdmin) {
+    console.warn('[Scoring] Database unavailable, skipping batch score')
+    return 0
+  }
+
+  try {
+    const { data: signals, error } = await supabaseAdmin
+      .from('Signal')
+      .select('id, title, description, url, tags, source, hotScore')
+      .in('status', ['PENDING', 'SCREENED'])
+      .is('finalScore', null)
+      .order('fetchedAt', { ascending: false })
+      .limit(limit)
+
+    if (error) {
+      console.error('[Scoring] Failed to fetch unscored signals:', error)
+      return 0
+    }
+
+    if (!signals || signals.length === 0) {
+      return 0
+    }
+
+    let scoredCount = 0
+
+    for (const signal of signals) {
+      try {
+        const result = await scoreSignal({
+          title: signal.title,
+          description: signal.description || '',
+          url: signal.url || undefined,
+          tags: signal.tags || [],
+          source: signal.source,
+          hotScore: signal.hotScore || 0,
+        })
+
+        const { error: updateError } = await supabaseAdmin
+          .from('Signal')
+          .update({
+            noveltyScore: result.noveltyScore,
+            businessScore: result.businessScore,
+            localScore: result.localScore,
+            finalScore: result.finalScore,
+            scoreVersion: `${result.model}-${result.version}`,
+            status: 'SCORED',
+          })
+          .eq('id', signal.id)
+
+        if (updateError) {
+          console.error(`[Scoring] Failed to update signal ${signal.id}:`, updateError)
+        } else {
+          scoredCount++
+        }
+      } catch (err) {
+        console.error(`[Scoring] Failed to score signal ${signal.id}:`, err)
+      }
+    }
+
+    return scoredCount
+  } catch (error) {
+    console.error('[Scoring] Batch scoring failed:', error)
+    invalidateDbConnection()
+    return 0
   }
 }
