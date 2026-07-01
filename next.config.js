@@ -12,7 +12,7 @@ const nextConfig = {
         has: [
           {
             type: 'host',
-            value: 'aiforyou\\.icu',
+            value: 'aiforyou.icu',
           },
         ],
         destination: 'https://sparkforge-blush.vercel.app/:1',
@@ -23,7 +23,7 @@ const nextConfig = {
         has: [
           {
             type: 'host',
-            value: 'www\\.aiforyou\\.icu',
+            value: 'www.aiforyou.icu',
           },
         ],
         destination: 'https://sparkforge-blush.vercel.app/:1',
