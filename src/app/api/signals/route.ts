@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
           ? (error instanceof Error ? error.message : 'Unknown error') 
           : 'Internal server error'
       },
-      { status: 200 }
+      { status: 500 }
     )
   }
 }

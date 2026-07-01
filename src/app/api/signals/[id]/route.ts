@@ -40,7 +40,7 @@ export async function GET(
           ? (error instanceof Error ? error.message : 'Unknown error') 
           : undefined
       },
-      { status: 200 }
+      { status: 500 }
     )
   }
 }
