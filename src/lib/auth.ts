@@ -127,6 +127,13 @@ export function useAuth() {
     return { success: true }
   }, [])
 
+  const getSessionToken = useCallback(async () => {
+    const supabase = getSupabase()
+    if (!supabase) return null
+    const { data } = await supabase.auth.getSession()
+    return data.session?.access_token || null
+  }, [])
+
   return {
     user,
     loading,
@@ -134,5 +141,6 @@ export function useAuth() {
     signUp,
     signOut,
     isAuthenticated: !!user,
+    getSessionToken,
   }
 }

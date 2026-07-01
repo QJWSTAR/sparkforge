@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { mockSignals, sourceLabels } from '@/data/mockSignals'
 import type { Signal } from '@/types/signal'
+import { useAuth } from '@/lib/auth'
 
 const sourceColorMap: Record<string, string> = {
   producthunt: 'var(--color-primary)',
@@ -30,8 +31,10 @@ export default function SignalDetailPage() {
   const params = useParams()
   const signalId = params.id as string
 
+  const { user, isAuthenticated, getSessionToken } = useAuth()
   const [signal, setSignal] = useState<Signal | null>(null)
   const [loading, setLoading] = useState(true)
+  const [subscribed, setSubscribed] = useState(false)
 
   useEffect(() => {
     const fetchSignal = async () => {
@@ -374,10 +377,40 @@ export default function SignalDetailPage() {
               生成商业画布
             </Link>
             <button
+              onClick={async () => {
+                if (!isAuthenticated) {
+                  alert('请先登录')
+                  return
+                }
+                const sessionToken = await getSessionToken()
+                if (!sessionToken) {
+                  alert('会话无效，请重新登录')
+                  return
+                }
+                try {
+                  const res = await fetch('/api/subscribe', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      Authorization: `Bearer ${sessionToken}`,
+                    },
+                    body: JSON.stringify({ userId: user!.id, signalId: signal!.id }),
+                  })
+                  const data = await res.json()
+                  if (data.success) {
+                    setSubscribed(true)
+                    alert('订阅成功')
+                  } else {
+                    alert(data.error || '订阅失败')
+                  }
+                } catch (error) {
+                  alert('订阅失败，请重试')
+                }
+              }}
               style={{
-                background: 'transparent',
-                color: 'var(--color-text-secondary)',
-                border: 'none',
+                background: subscribed ? 'var(--color-primary-muted)' : 'transparent',
+                color: subscribed ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+                border: subscribed ? '1px solid var(--color-primary)' : 'none',
                 borderRadius: 'var(--radius-md)',
                 fontSize: 'var(--text-base)',
                 fontWeight: 500,
@@ -387,25 +420,26 @@ export default function SignalDetailPage() {
                 alignItems: 'center',
                 gap: 'var(--space-2)',
               }}
-              onClick={() => alert('功能即将上线')}
             >
-              订阅信号
+              {subscribed ? '已订阅' : '订阅信号'}
             </button>
             <button
+              disabled
+              title="功能即将上线"
               style={{
                 background: 'transparent',
-                color: 'var(--color-text-secondary)',
+                color: 'var(--color-text-muted)',
                 border: 'none',
                 borderRadius: 'var(--radius-md)',
                 fontSize: 'var(--text-base)',
                 fontWeight: 500,
                 padding: '10px 20px',
-                cursor: 'pointer',
+                cursor: 'not-allowed',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 'var(--space-2)',
+                opacity: 0.6,
               }}
-              onClick={() => alert('功能即将上线')}
             >
               分享
             </button>

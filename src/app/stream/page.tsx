@@ -267,12 +267,15 @@ export default function StreamPage() {
                 </p>
               </div>
               <button
-                className="px-4 py-2 rounded-lg font-medium transition-colors"
+                disabled
+                title="功能即将上线"
+                className="px-4 py-2 rounded-lg font-medium"
                 style={{
-                  backgroundColor: 'var(--color-primary)',
+                  backgroundColor: 'var(--color-text-muted)',
                   color: 'var(--color-text-inverse)',
+                  cursor: 'not-allowed',
+                  opacity: 0.6,
                 }}
-                onClick={() => alert('功能即将上线')}
               >
                 连接 Twitter
               </button>
