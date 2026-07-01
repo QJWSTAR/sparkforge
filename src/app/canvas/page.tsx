@@ -5,11 +5,37 @@ import Link from 'next/link'
 import { mockSignals } from '@/data/mockSignals'
 import type { Signal } from '@/types/signal'
 
+interface CanvasData {
+  valueProposition: string
+  customerSegments: string[]
+  revenueStreams: string[]
+  keyPartners: string[]
+  keyActivities: string[]
+  keyResources: string[]
+  channels: string[]
+  customerRelationships: string[]
+  costStructure: string[]
+  competitiveAnalysis: Array<{
+    competitor: string
+    strengths: string
+    weaknesses: string
+    opportunity: string
+  }>
+  swot: {
+    strengths: string[]
+    weaknesses: string[]
+    opportunities: string[]
+    threats: string[]
+  }
+  actionPlan: string[]
+  summary: string
+}
+
 export default function CanvasPage() {
   const [signals, setSignals] = useState<Signal[]>([])
   const [selectedSignal, setSelectedSignal] = useState<Signal>(mockSignals[0])
   const [isGenerating, setIsGenerating] = useState(false)
-  const [generated, setGenerated] = useState(true)
+  const [canvasData, setCanvasData] = useState<CanvasData | null>(null)
 
   useEffect(() => {
     const fetchSignals = async () => {
@@ -29,12 +55,73 @@ export default function CanvasPage() {
     fetchSignals()
   }, [])
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     setIsGenerating(true)
-    setTimeout(() => {
+
+    try {
+      const response = await fetch('/api/generate/canvas', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          signalTitle: selectedSignal.title,
+          signalDescription: selectedSignal.description,
+        }),
+      })
+
+      const result = await response.json()
+      if (result.success && result.data) {
+        setCanvasData(result.data)
+      } else {
+        setCanvasData(result.data || null)
+      }
+    } catch (error) {
+      console.error('Canvas generation failed:', error)
+      setCanvasData({
+        valueProposition: selectedSignal.title,
+        customerSegments: ['目标用户群体'],
+        revenueStreams: ['订阅收入'],
+        keyPartners: [],
+        keyActivities: ['产品开发', '市场营销'],
+        keyResources: ['技术团队', '资金'],
+        channels: ['社交媒体', '内容营销'],
+        customerRelationships: ['社区运营'],
+        costStructure: ['人力成本', '服务器成本'],
+        competitiveAnalysis: [],
+        swot: {
+          strengths: ['创新的产品理念'],
+          weaknesses: ['品牌认知度低'],
+          opportunities: ['市场增长潜力大'],
+          threats: ['竞争激烈'],
+        },
+        actionPlan: ['Day 1-7: MVP开发', 'Day 8-14: 用户获取'],
+        summary: 'AI 服务暂时不可用，使用默认模板',
+      })
+    } finally {
       setIsGenerating(false)
-      setGenerated(true)
-    }, 2000)
+    }
+  }
+
+  const displayData = canvasData || {
+    valueProposition: `${selectedSignal.title} 是一个创新产品，帮助用户解决特定问题。`,
+    customerSegments: ['中小型开发团队', '独立开发者', '技术爱好者'],
+    revenueStreams: ['SaaS 订阅', '团队版', '企业定制'],
+    keyPartners: [],
+    keyActivities: ['产品开发', '市场营销'],
+    keyResources: ['技术团队', '资金'],
+    channels: ['社交媒体', '内容营销'],
+    customerRelationships: ['社区运营'],
+    costStructure: ['人力成本', '服务器成本'],
+    competitiveAnalysis: [],
+    swot: {
+      strengths: ['创新的产品理念'],
+      weaknesses: ['品牌认知度低'],
+      opportunities: ['市场增长潜力大'],
+      threats: ['竞争激烈'],
+    },
+    actionPlan: ['Day 1-7: MVP开发', 'Day 8-14: 用户获取'],
+    summary: '',
   }
 
   return (
@@ -62,6 +149,14 @@ export default function CanvasPage() {
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-bold" style={{ color: 'var(--color-text)' }}>
                   📋 商业模型画布
+                  {canvasData && (
+                    <span
+                      className="ml-2 text-xs px-2 py-0.5 rounded"
+                      style={{ backgroundColor: 'rgba(16, 185, 129, 0.12)', color: 'var(--state-success)' }}
+                    >
+                      AI 生成
+                    </span>
+                  )}
                 </h2>
                 <div className="flex gap-2">
                   <button
@@ -75,13 +170,14 @@ export default function CanvasPage() {
                   </button>
                   <button
                     onClick={handleGenerate}
+                    disabled={isGenerating}
                     className="px-3 py-1.5 text-sm transition-colors btn-press"
                     style={{
                       backgroundColor: 'var(--color-bg-hover)',
                       color: 'var(--color-text-secondary)',
                     }}
                   >
-                    重新生成
+                    {isGenerating ? '生成中...' : '重新生成'}
                   </button>
                 </div>
               </div>
@@ -99,8 +195,7 @@ export default function CanvasPage() {
                       🎯 一句话定位
                     </h3>
                     <p className="text-sm" style={{ color: 'var(--color-text)' }}>
-                      {selectedSignal.title} 是一个{selectedSignal.description || '创新的产品'}，
-                      帮助目标用户解决特定问题，提供独特价值。
+                      {displayData.valueProposition}
                     </p>
                   </div>
                   <div
@@ -114,10 +209,9 @@ export default function CanvasPage() {
                       👥 用户画像
                     </h3>
                     <ul className="text-sm space-y-1" style={{ color: 'var(--color-text)' }}>
-                      <li>• 中小型开发团队 Tech Lead</li>
-                      <li>• 独立开发者 / 自由职业者</li>
-                      <li>• 开源项目维护者</li>
-                      <li>• 技术教育机构</li>
+                      {displayData.customerSegments.map((segment, idx) => (
+                        <li key={idx}>• {segment}</li>
+                      ))}
                     </ul>
                   </div>
                   <div
@@ -131,10 +225,9 @@ export default function CanvasPage() {
                       💰 收入来源
                     </h3>
                     <ul className="text-sm space-y-1" style={{ color: 'var(--color-text)' }}>
-                      <li>• SaaS 订阅：$19/月/开发者</li>
-                      <li>• 团队版：$49/月/开发者</li>
-                      <li>• 企业版：定制报价</li>
-                      <li>• Open Source 赞助</li>
+                      {displayData.revenueStreams.map((stream, idx) => (
+                        <li key={idx}>• {stream}</li>
+                      ))}
                     </ul>
                   </div>
                 </div>
@@ -148,13 +241,12 @@ export default function CanvasPage() {
                     }}
                   >
                     <h3 className="font-bold mb-2" style={{ color: 'var(--state-warning)' }}>
-                      🔥 核心价值
+                      🔥 核心活动
                     </h3>
                     <ul className="text-sm space-y-1" style={{ color: 'var(--color-text)' }}>
-                      <li>• 节省 60% 代码审查时间</li>
-                      <li>• 提前发现 80% 安全漏洞</li>
-                      <li>• 统一团队代码规范</li>
-                      <li>• 降低线上 Bug 率</li>
+                      {displayData.keyActivities.map((activity, idx) => (
+                        <li key={idx}>• {activity}</li>
+                      ))}
                     </ul>
                   </div>
                   <div
@@ -165,18 +257,14 @@ export default function CanvasPage() {
                     }}
                   >
                     <h3 className="font-bold mb-2" style={{ color: 'var(--state-success)' }}>
-                      ⚡ 核心竞争力
+                      ⚡ 关键资源
                     </h3>
                     <ul className="text-sm space-y-1" style={{ color: 'var(--color-text)' }}>
-                      <li>• 支持多语言：JS/TS/Python/Go/Rust</li>
-                      <li>• 自定义审查规则，灵活配置</li>
-                      <li>• GitHub/GitLab/Bitbucket 全集成</li>
-                      <li>• 本地化部署，数据安全</li>
+                      {displayData.keyResources.map((resource, idx) => (
+                        <li key={idx}>• {resource}</li>
+                      ))}
                     </ul>
                   </div>
-                </div>
-
-                <div className="space-y-4 flex flex-col">
                   <div
                     className="rounded-xl p-4 flex-1"
                     style={{
@@ -185,64 +273,36 @@ export default function CanvasPage() {
                     }}
                   >
                     <h3 className="font-bold mb-2" style={{ color: 'var(--state-error)' }}>
-                      ⚠️ 竞品图谱
+                      🔗 合作方
                     </h3>
-                    <div className="space-y-2">
-                      <div className="text-xs">
-                        <div
-                          className="flex justify-between"
-                          style={{ color: 'var(--color-text-secondary)' }}
-                        >
-                          <span>SonarQube</span>
-                          <span>传统静态分析</span>
-                        </div>
-                        <div
-                          className="h-1.5 rounded-full mt-1"
-                          style={{ backgroundColor: 'var(--color-bg-active)' }}
-                        >
-                          <div
-                            className="h-full rounded-full"
-                            style={{ width: '70%', backgroundColor: 'var(--color-text-muted)' }}
-                          />
-                        </div>
-                      </div>
-                      <div className="text-xs">
-                        <div
-                          className="flex justify-between"
-                          style={{ color: 'var(--color-text-secondary)' }}
-                        >
-                          <span>CodeGuru</span>
-                          <span>AWS 生态</span>
-                        </div>
-                        <div
-                          className="h-1.5 rounded-full mt-1"
-                          style={{ backgroundColor: 'var(--color-bg-active)' }}
-                        >
-                          <div
-                            className="h-full rounded-full"
-                            style={{ width: '55%', backgroundColor: 'var(--color-text-muted)' }}
-                          />
-                        </div>
-                      </div>
-                      <div className="text-xs">
-                        <div
-                          className="flex justify-between"
-                          style={{ color: 'var(--color-text-secondary)' }}
-                        >
-                          <span>DeepCode</span>
-                          <span>AI 新秀</span>
-                        </div>
-                        <div
-                          className="h-1.5 rounded-full mt-1"
-                          style={{ backgroundColor: 'var(--color-bg-active)' }}
-                        >
-                          <div
-                            className="h-full rounded-full"
-                            style={{ width: '45%', backgroundColor: 'var(--color-text-muted)' }}
-                          />
-                        </div>
-                      </div>
-                    </div>
+                    <ul className="text-sm space-y-1" style={{ color: 'var(--color-text)' }}>
+                      {displayData.keyPartners.length > 0 ? (
+                        displayData.keyPartners.map((partner, idx) => (
+                          <li key={idx}>• {partner}</li>
+                        ))
+                      ) : (
+                        <li style={{ color: 'var(--color-text-muted)' }}>• 暂无</li>
+                      )}
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="space-y-4 flex flex-col">
+                  <div
+                    className="rounded-xl p-4 flex-1"
+                    style={{
+                      backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                      border: '1px solid rgba(59, 130, 246, 0.2)',
+                    }}
+                  >
+                    <h3 className="font-bold mb-2" style={{ color: 'var(--state-info)' }}>
+                      📢 渠道
+                    </h3>
+                    <ul className="text-sm space-y-1" style={{ color: 'var(--color-text)' }}>
+                      {displayData.channels.map((channel, idx) => (
+                        <li key={idx}>• {channel}</li>
+                      ))}
+                    </ul>
                   </div>
                   <div
                     className="rounded-xl p-4 flex-1"
@@ -252,18 +312,83 @@ export default function CanvasPage() {
                     }}
                   >
                     <h3 className="font-bold mb-2" style={{ color: '#EC4899' }}>
-                      📅 30 天行动清单
+                      🤝 客户关系
                     </h3>
                     <ul className="text-sm space-y-1" style={{ color: 'var(--color-text)' }}>
-                      <li>• Day 1-7: MVP 开发与内测</li>
-                      <li>• Day 8-14: Product Hunt 发布</li>
-                      <li>• Day 15-21: 种子用户获取</li>
-                      <li>• Day 22-30: 付费转化验证</li>
+                      {displayData.customerRelationships.map((relation, idx) => (
+                        <li key={idx}>• {relation}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div
+                    className="rounded-xl p-4 flex-1"
+                    style={{
+                      backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                      border: '1px solid rgba(239, 68, 68, 0.2)',
+                    }}
+                  >
+                    <h3 className="font-bold mb-2" style={{ color: 'var(--state-error)' }}>
+                      💰 成本结构
+                    </h3>
+                    <ul className="text-sm space-y-1" style={{ color: 'var(--color-text)' }}>
+                      {displayData.costStructure.map((cost, idx) => (
+                        <li key={idx}>• {cost}</li>
+                      ))}
                     </ul>
                   </div>
                 </div>
               </div>
             </div>
+
+            {(displayData.competitiveAnalysis || []).length > 0 && (
+              <div
+                className="rounded-2xl p-6 card-hover"
+                style={{
+                  backgroundColor: 'var(--color-bg-surface)',
+                  boxShadow: 'var(--shadow-md)',
+                  border: '1px solid var(--color-border)',
+                }}
+              >
+                <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--color-text)' }}>
+                  📊 竞品分析
+                </h2>
+                <div className="space-y-4">
+                  {displayData.competitiveAnalysis.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="rounded-xl p-4"
+                      style={{ backgroundColor: 'var(--color-bg-hover)' }}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="font-bold" style={{ color: 'var(--color-primary)' }}>
+                          {item.competitor}
+                        </h3>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div>
+                          <div className="font-medium mb-1" style={{ color: 'var(--state-success)' }}>
+                            优势
+                          </div>
+                          <div style={{ color: 'var(--color-text)' }}>{item.strengths}</div>
+                        </div>
+                        <div>
+                          <div className="font-medium mb-1" style={{ color: 'var(--state-warning)' }}>
+                            劣势
+                          </div>
+                          <div style={{ color: 'var(--color-text)' }}>{item.weaknesses}</div>
+                        </div>
+                        <div>
+                          <div className="font-medium mb-1" style={{ color: 'var(--state-info)' }}>
+                            机会
+                          </div>
+                          <div style={{ color: 'var(--color-text)' }}>{item.opportunity}</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div
               className="rounded-2xl p-6 card-hover"
@@ -288,9 +413,9 @@ export default function CanvasPage() {
                     💪 优势 (Strengths)
                   </h3>
                   <ul className="text-sm space-y-1" style={{ color: 'var(--color-text)' }}>
-                    <li>• AI 驱动，准确率高于传统工具</li>
-                    <li>• 多语言支持，覆盖面广</li>
-                    <li>• 开箱即用，集成简单</li>
+                    {displayData.swot.strengths.map((item, idx) => (
+                      <li key={idx}>• {item}</li>
+                    ))}
                   </ul>
                 </div>
                 <div
@@ -304,9 +429,9 @@ export default function CanvasPage() {
                     ⚠️ 劣势 (Weaknesses)
                   </h3>
                   <ul className="text-sm space-y-1" style={{ color: 'var(--color-text)' }}>
-                    <li>• LLM 成本较高</li>
-                    <li>• 误报率需要持续优化</li>
-                    <li>• 品牌认知度低</li>
+                    {displayData.swot.weaknesses.map((item, idx) => (
+                      <li key={idx}>• {item}</li>
+                    ))}
                   </ul>
                 </div>
                 <div
@@ -320,9 +445,9 @@ export default function CanvasPage() {
                     🚀 机会 (Opportunities)
                   </h3>
                   <ul className="text-sm space-y-1" style={{ color: 'var(--color-text)' }}>
-                    <li>• AI 代码工具赛道火热</li>
-                    <li>• 远程办公增加代码审查需求</li>
-                    <li>• 开源社区生态红利</li>
+                    {displayData.swot.opportunities.map((item, idx) => (
+                      <li key={idx}>• {item}</li>
+                    ))}
                   </ul>
                 </div>
                 <div
@@ -336,13 +461,42 @@ export default function CanvasPage() {
                     🔥 威胁 (Threats)
                   </h3>
                   <ul className="text-sm space-y-1" style={{ color: 'var(--color-text)' }}>
-                    <li>• 大厂可能入局</li>
-                    <li>• LLM 价格战风险</li>
-                    <li>• 数据安全合规风险</li>
+                    {displayData.swot.threats.map((item, idx) => (
+                      <li key={idx}>• {item}</li>
+                    ))}
                   </ul>
                 </div>
               </div>
             </div>
+
+            {(displayData.actionPlan || []).length > 0 && (
+              <div
+                className="rounded-2xl p-6 card-hover"
+                style={{
+                  backgroundColor: 'var(--color-bg-surface)',
+                  boxShadow: 'var(--shadow-md)',
+                  border: '1px solid var(--color-border)',
+                }}
+              >
+                <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--color-text)' }}>
+                  📅 行动清单
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                  {displayData.actionPlan.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="rounded-lg p-3 text-sm"
+                      style={{ backgroundColor: 'var(--color-bg-hover)' }}
+                    >
+                      <span className="font-bold" style={{ color: 'var(--color-primary)' }}>
+                        阶段 {idx + 1}:
+                      </span>
+                      <span style={{ color: 'var(--color-text)' }}> {item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="space-y-6">

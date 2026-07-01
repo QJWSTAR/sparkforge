@@ -13,11 +13,7 @@ export default function ForgePage() {
   const [isForging, setIsForging] = useState(false)
   const [forgeProgress, setForgeProgress] = useState(0)
   const [forgeComplete, setForgeComplete] = useState(false)
-  const [forgeResult, setForgeResult] = useState<any>({
-    outputUrl: '',
-    outputSummary: '',
-    localScore: 85,
-  })
+  const [forgeResult, setForgeResult] = useState<any>(null)
 
   useEffect(() => {
     const fetchSignals = async () => {
@@ -37,10 +33,11 @@ export default function ForgePage() {
     fetchSignals()
   }, [])
 
-  const handleStartForge = () => {
+  const handleStartForge = async () => {
     setIsForging(true)
     setForgeProgress(0)
     setForgeComplete(false)
+    setForgeResult(null)
 
     const steps = [
       { progress: 10, message: '分析信号分析中...' },
@@ -53,16 +50,60 @@ export default function ForgePage() {
     ]
 
     let stepIndex = 0
-    const interval = setInterval(() => {
+    const progressInterval = setInterval(() => {
       if (stepIndex < steps.length) {
-      setForgeProgress(steps[stepIndex].progress)
-      stepIndex++
+        setForgeProgress(steps[stepIndex].progress)
+        stepIndex++
+      }
+    }, 400)
+
+    try {
+      const response = await fetch('/api/generate/forge', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          signalTitle: selectedSignal.title,
+          signalDescription: selectedSignal.description,
+          language: targetLanguage,
+          transformPoints: [
+            { id: 1, label: '中文界面适配', checked: true },
+            { id: 2, label: '国内支付接入', checked: true },
+            { id: 3, label: '微信/QQ 登录', checked: true },
+            { id: 4, label: '国内云服务部署', checked: false },
+            { id: 5, label: '数据本地化存储', checked: false },
+            { id: 6, label: '合规隐私调整', checked: true },
+          ],
+          customPrompt,
+        }),
+      })
+
+      const result = await response.json()
+      if (result.success) {
+        setForgeResult(result.data)
       } else {
-      clearInterval(interval)
+        setForgeResult(result.data || {})
+      }
+    } catch (error) {
+      console.error('Forge generation failed:', error)
+      setForgeResult({
+        techStack: 'Next.js + React + TypeScript',
+        projectStructure: ['src/', '  components/', '  pages/', '  lib/'],
+        coreFeatures: [
+          { name: '核心功能', description: '基于信号生成的核心功能', implementation: '待实现' }
+        ],
+        localizationPlan: [],
+        estimatedTime: '2-4周',
+        difficulty: '中等',
+        summary: 'AI 服务暂时不可用，使用默认方案',
+      })
+    } finally {
+      clearInterval(progressInterval)
+      setForgeProgress(100)
       setIsForging(false)
       setForgeComplete(true)
-      }
-    }, 800)
+    }
   }
 
   const languages = [
@@ -89,7 +130,7 @@ export default function ForgePage() {
             复刻工坊
           </h1>
           <p style={{ color: 'var(--color-text-secondary)' }}>
-            一键调用 TRAE IDE 生成可运行 MVP，支持本地化改造和自定义配置
+            一键调用 AI 生成完整项目方案，支持本地化改造和自定义配置
           </p>
         </div>
 
@@ -268,7 +309,7 @@ export default function ForgePage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                    生成中...
+                    AI 正在生成项目方案...
                   </span>
                   <span className="text-sm font-bold" style={{ color: 'var(--color-primary)' }}>
                     {forgeProgress}%
@@ -315,7 +356,7 @@ export default function ForgePage() {
             </div>
           )}
 
-          {forgeComplete && (
+          {forgeComplete && forgeResult && (
             <div
               className="rounded-2xl p-6"
               style={{
@@ -323,7 +364,7 @@ export default function ForgePage() {
                 border: '1px solid rgba(16, 185, 129, 0.2)',
               }}
             >
-              <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center gap-3 mb-6">
                 <div
                   className="w-12 h-12 rounded-full flex items-center justify-center text-2xl"
                   style={{ backgroundColor: 'rgba(16, 185, 129, 0.12)' }}
@@ -335,24 +376,24 @@ export default function ForgePage() {
                     复刻完成！
                   </h2>
                   <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                    MVP 已成功生成，快来查看吧
+                    AI 已生成完整的项目方案
                   </p>
                 </div>
               </div>
-              
-              <div className="grid grid-cols-2 gap-4 mb-4">
+
+              <div className="grid grid-cols-3 gap-4 mb-6">
                 <div
                   className="rounded-xl p-4"
                   style={{ backgroundColor: 'var(--color-bg-hover)' }}
                 >
                   <div className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                    本地化改造度
+                    推荐技术栈
                   </div>
                   <div
-                    className="text-2xl font-bold"
-                    style={{ color: 'var(--state-success)' }}
+                    className="text-sm font-bold mt-1"
+                    style={{ color: 'var(--color-primary)' }}
                   >
-                    {forgeResult.localScore}%
+                    {forgeResult.techStack || 'Next.js + React'}
                   </div>
                 </div>
                 <div
@@ -360,26 +401,101 @@ export default function ForgePage() {
                   style={{ backgroundColor: 'var(--color-bg-hover)' }}
                 >
                   <div className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                    生成时长
+                    难度评级
                   </div>
-                  <div className="text-2xl font-bold" style={{ color: 'var(--color-primary)' }}>
-                    28秒
+                  <div
+                    className="text-sm font-bold mt-1"
+                    style={{ color: 'var(--state-warning)' }}
+                  >
+                    {forgeResult.difficulty || '中等'}
+                  </div>
+                </div>
+                <div
+                  className="rounded-xl p-4"
+                  style={{ backgroundColor: 'var(--color-bg-hover)' }}
+                >
+                  <div className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                    预估时间
+                  </div>
+                  <div
+                    className="text-sm font-bold mt-1"
+                    style={{ color: 'var(--state-success)' }}
+                  >
+                    {forgeResult.estimatedTime || '2-4周'}
                   </div>
                 </div>
               </div>
 
               <div
-                className="rounded-xl p-4 mb-4"
+                className="rounded-xl p-4 mb-6"
                 style={{ backgroundColor: 'var(--color-bg-active)' }}
               >
-                <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                  生成摘要
+                <div className="text-sm font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>
+                  📋 项目方案摘要
                 </div>
                 <p className="text-sm" style={{ color: 'var(--color-text)' }}>
-                  已完成对 {selectedSignal.title} 的本地化复刻。适配了中文界面、接入微信登录、
-                  优化了国内访问速度，并增加了深色模式支持。
+                  {forgeResult.summary || 'AI 生成的项目方案摘要'}
                 </p>
               </div>
+
+              <div
+                className="rounded-xl p-4 mb-6"
+                style={{ backgroundColor: 'var(--color-bg-hover)' }}
+              >
+                <div className="text-sm font-medium mb-3" style={{ color: 'var(--color-text-secondary)' }}>
+                  📁 项目结构
+                </div>
+                <div className="space-y-1">
+                  {(forgeResult.projectStructure || []).map((item: string, idx: number) => (
+                    <div key={idx} className="text-sm" style={{ color: 'var(--color-text)' }}>
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div
+                className="rounded-xl p-4 mb-6"
+                style={{ backgroundColor: 'var(--color-bg-hover)' }}
+              >
+                <div className="text-sm font-medium mb-3" style={{ color: 'var(--color-text-secondary)' }}>
+                  🎯 核心功能模块
+                </div>
+                <div className="space-y-3">
+                  {(forgeResult.coreFeatures || []).map((feature: any, idx: number) => (
+                    <div key={idx} className="p-3 rounded-lg" style={{ backgroundColor: 'var(--color-bg-active)' }}>
+                      <div className="text-sm font-bold" style={{ color: 'var(--color-primary)' }}>
+                        {feature.name}
+                      </div>
+                      <div className="text-xs mt-1" style={{ color: 'var(--color-text-secondary)' }}>
+                        {feature.description}
+                      </div>
+                      <div className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
+                        实现要点: {feature.implementation}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {(forgeResult.localizationPlan || []).length > 0 && (
+                <div
+                  className="rounded-xl p-4 mb-6"
+                  style={{ backgroundColor: 'var(--color-bg-hover)' }}
+                >
+                  <div className="text-sm font-medium mb-3" style={{ color: 'var(--color-text-secondary)' }}>
+                    🌍 本地化改造计划
+                  </div>
+                  <div className="space-y-2">
+                    {forgeResult.localizationPlan.map((item: string, idx: number) => (
+                      <div key={idx} className="text-sm flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
+                        <span>✓</span>
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className="flex gap-3">
                 <button
@@ -398,7 +514,7 @@ export default function ForgePage() {
                     color: 'var(--color-text)',
                   }}
                 >
-                  下载源码
+                  下载方案
                 </button>
               </div>
             </div>
