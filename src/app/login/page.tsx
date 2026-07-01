@@ -58,10 +58,11 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               onFocus={() => setFocusedField('email')}
               onBlur={() => setFocusedField(null)}
-              className="w-full border rounded-xl px-4 py-3 text-white focus:outline-none transition-colors"
+              className="w-full border rounded-xl px-4 py-3 focus:outline-none transition-colors"
               style={{
                 backgroundColor: 'var(--color-bg-hover)',
                 borderColor: focusedField === 'email' ? 'var(--color-border-active)' : 'var(--color-border)',
+                color: 'var(--color-text)',
               }}
               placeholder="your@email.com"
               required
@@ -76,10 +77,11 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               onFocus={() => setFocusedField('password')}
               onBlur={() => setFocusedField(null)}
-              className="w-full border rounded-xl px-4 py-3 text-white focus:outline-none transition-colors"
+              className="w-full border rounded-xl px-4 py-3 focus:outline-none transition-colors"
               style={{
                 backgroundColor: 'var(--color-bg-hover)',
                 borderColor: focusedField === 'password' ? 'var(--color-border-active)' : 'var(--color-border)',
+                color: 'var(--color-text)',
               }}
               placeholder="••••••••"
               required

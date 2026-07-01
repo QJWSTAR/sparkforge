@@ -40,7 +40,7 @@
   - `human-judgment` TR-4.1: 点击"生成商业画布"显示真实 AI 输出
 - **Estimate**: 15 min
 
-## [ ] Task 5: 触发数据抓取和评分 (P0)
+## [x] Task 5: 触发数据抓取和评分 (P0)
 - **Priority**: P0
 - **Depends On**: None
 - **Description**:

@@ -49,11 +49,11 @@ export default function SubscribeButton({ signalId, initialSubscribed = false }:
     <button
       onClick={handleClick}
       disabled={loading}
-      className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
-        subscribed
-          ? 'bg-[#FF6B35] text-white hover:bg-[#FF5722]'
-          : 'bg-white/10 text-gray-400 hover:bg-white/20 hover:text-white'
-      }`}
+      className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-colors btn-press"
+      style={{
+        backgroundColor: subscribed ? 'var(--color-primary)' : 'var(--color-bg-hover)',
+        color: subscribed ? 'var(--color-text-inverse)' : 'var(--color-text-secondary)',
+      }}
     >
       {loading ? (
         <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>

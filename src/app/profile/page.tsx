@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth'
+import { SkeletonProfile } from '@/components/Skeleton'
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -18,9 +19,9 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full" style={{ borderColor: 'var(--color-primary)' }}></div>
-      </div>
+      <main className="container-app py-8">
+        <SkeletonProfile />
+      </main>
     )
   }
 
@@ -230,10 +231,11 @@ export default function ProfilePage() {
                         defaultValue={user?.name}
                         onFocus={() => setFocusedField(true)}
                         onBlur={() => setFocusedField(false)}
-                        className="w-full border rounded-xl px-4 py-3 text-white focus:outline-none transition-colors"
+                        className="w-full border rounded-xl px-4 py-3 focus:outline-none transition-colors"
                         style={{
                           backgroundColor: 'var(--color-bg-hover)',
                           borderColor: focusedField ? 'var(--color-border-active)' : 'var(--color-border)',
+                          color: 'var(--color-text)',
                         }}
                       />
                     </div>

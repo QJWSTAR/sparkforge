@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { mockSignals } from '@/data/mockSignals'
+import { SkeletonCanvas } from '@/components/Skeleton'
 import type { Signal } from '@/types/signal'
 
 interface CanvasData {

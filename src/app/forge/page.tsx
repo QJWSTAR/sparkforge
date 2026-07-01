@@ -5,6 +5,12 @@ import Link from 'next/link'
 import { mockSignals } from '@/data/mockSignals'
 import type { Signal } from '@/types/signal'
 
+interface TransformPoint {
+  id: number
+  label: string
+  checked: boolean
+}
+
 export default function ForgePage() {
   const [signals, setSignals] = useState<Signal[]>([])
   const [selectedSignal, setSelectedSignal] = useState<Signal>(mockSignals[0])
@@ -14,6 +20,14 @@ export default function ForgePage() {
   const [forgeProgress, setForgeProgress] = useState(0)
   const [forgeComplete, setForgeComplete] = useState(false)
   const [forgeResult, setForgeResult] = useState<any>(null)
+  const [transformPoints, setTransformPoints] = useState<TransformPoint[]>([
+    { id: 1, label: '中文界面适配', checked: true },
+    { id: 2, label: '国内支付接入', checked: true },
+    { id: 3, label: '微信/QQ 登录', checked: true },
+    { id: 4, label: '国内云服务部署', checked: false },
+    { id: 5, label: '数据本地化存储', checked: false },
+    { id: 6, label: '合规隐私调整', checked: true },
+  ])
 
   useEffect(() => {
     const fetchSignals = async () => {
@@ -67,14 +81,7 @@ export default function ForgePage() {
           signalTitle: selectedSignal.title,
           signalDescription: selectedSignal.description,
           language: targetLanguage,
-          transformPoints: [
-            { id: 1, label: '中文界面适配', checked: true },
-            { id: 2, label: '国内支付接入', checked: true },
-            { id: 3, label: '微信/QQ 登录', checked: true },
-            { id: 4, label: '国内云服务部署', checked: false },
-            { id: 5, label: '数据本地化存储', checked: false },
-            { id: 6, label: '合规隐私调整', checked: true },
-          ],
+          transformPoints,
           customPrompt,
         }),
       })
@@ -113,14 +120,13 @@ export default function ForgePage() {
     { value: 'ja-JP', label: '日本語' },
   ]
 
-  const transformPoints = [
-    { id: 1, label: '中文界面适配', checked: true },
-    { id: 2, label: '国内支付接入', checked: true },
-    { id: 3, label: '微信/QQ 登录', checked: true },
-    { id: 4, label: '国内云服务部署', checked: false },
-    { id: 5, label: '数据本地化存储', checked: false },
-    { id: 6, label: '合规隐私调整', checked: true },
-  ]
+  const handleTransformPointToggle = (id: number) => {
+    setTransformPoints((prev) =>
+      prev.map((point) =>
+        point.id === id ? { ...point, checked: !point.checked } : point
+      )
+    )
+  }
 
   return (
     <div className="min-h-screen">
@@ -189,7 +195,7 @@ export default function ForgePage() {
                 <Link
                   href="/radar"
                   style={{ color: 'var(--color-text-muted)' }}
-                  className="hover:text-white"
+                  className="hover:opacity-70 transition-opacity"
                 >
                   更换
                 </Link>
@@ -256,7 +262,8 @@ export default function ForgePage() {
                     >
                       <input
                         type="checkbox"
-                        defaultChecked={point.checked}
+                        checked={point.checked}
+                        onChange={() => handleTransformPointToggle(point.id)}
                         className="w-4 h-4 rounded"
                         style={{
                           borderColor: 'var(--color-border)',

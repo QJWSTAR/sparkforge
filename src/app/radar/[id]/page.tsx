@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation'
 import { mockSignals, sourceLabels } from '@/data/mockSignals'
 import type { Signal } from '@/types/signal'
 import { useAuth } from '@/lib/auth'
+import { useToast } from '@/components/ToastProvider'
 
 const sourceColorMap: Record<string, string> = {
   producthunt: 'var(--color-primary)',
@@ -32,6 +33,7 @@ export default function SignalDetailPage() {
   const signalId = params.id as string
 
   const { user, isAuthenticated, getSessionToken } = useAuth()
+  const { showError, showSuccess } = useToast()
   const [signal, setSignal] = useState<Signal | null>(null)
   const [loading, setLoading] = useState(true)
   const [subscribed, setSubscribed] = useState(false)
@@ -381,12 +383,12 @@ export default function SignalDetailPage() {
             <button
               onClick={async () => {
                 if (!isAuthenticated) {
-                  alert('请先登录')
+                  showError('请先登录')
                   return
                 }
                 const sessionToken = await getSessionToken()
                 if (!sessionToken) {
-                  alert('会话无效，请重新登录')
+                  showError('会话无效，请重新登录')
                   return
                 }
                 try {
@@ -401,12 +403,12 @@ export default function SignalDetailPage() {
                   const data = await res.json()
                   if (data.success) {
                     setSubscribed(true)
-                    alert('订阅成功')
+                    showSuccess('订阅成功')
                   } else {
-                    alert(data.error || '订阅失败')
+                    showError(data.error || '订阅失败')
                   }
                 } catch (error) {
-                  alert('订阅失败，请重试')
+                  showError('订阅失败，请重试')
                 }
               }}
               className="btn-press"

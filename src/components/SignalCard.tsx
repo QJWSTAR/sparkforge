@@ -53,8 +53,7 @@ export default function SignalCard({ signal, rank }: SignalCardProps) {
   ].filter((s) => s.value !== undefined)
 
   return (
-    <Link
-      href={`/radar/${signal.id}`}
+    <div
       className="block border-b py-5 card-hover -mx-4 px-4 rounded-md"
       style={{ borderColor: 'var(--color-border)' }}
     >
@@ -72,12 +71,13 @@ export default function SignalCard({ signal, rank }: SignalCardProps) {
               {rank}
             </span>
           )}
-          <h3
-            className="text-lg font-semibold truncate"
+          <Link
+            href={`/radar/${signal.id}`}
+            className="text-lg font-semibold truncate hover:text-primary transition-colors"
             style={{ color: 'var(--color-text)' }}
           >
             {signal.title}
-          </h3>
+          </Link>
           <span
             className="flex-shrink-0 text-xs px-2 py-0.5 rounded-md"
             style={{
@@ -173,7 +173,17 @@ export default function SignalCard({ signal, rank }: SignalCardProps) {
         >
           画布
         </button>
+        <Link
+          href={`/radar/${signal.id}`}
+          className="text-xs font-medium px-3 py-1.5 rounded-md btn-press"
+          style={{
+            border: '1px solid var(--color-border)',
+            color: 'var(--color-text-secondary)',
+          }}
+        >
+          详情
+        </Link>
       </div>
-    </Link>
+    </div>
   )
 }

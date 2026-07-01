@@ -70,10 +70,11 @@ export default function RegisterPage() {
               onChange={(e) => setName(e.target.value)}
               onFocus={() => setFocusedField('name')}
               onBlur={() => setFocusedField(null)}
-              className="w-full border rounded-xl px-4 py-3 text-white focus:outline-none transition-colors"
+              className="w-full border rounded-xl px-4 py-3 focus:outline-none transition-colors"
               style={{
                 backgroundColor: 'var(--color-bg-hover)',
                 borderColor: focusedField === 'name' ? 'var(--color-border-active)' : 'var(--color-border)',
+                color: 'var(--color-text)',
               }}
               placeholder="你的名字"
             />
@@ -87,10 +88,11 @@ export default function RegisterPage() {
               onChange={(e) => setEmail(e.target.value)}
               onFocus={() => setFocusedField('email')}
               onBlur={() => setFocusedField(null)}
-              className="w-full border rounded-xl px-4 py-3 text-white focus:outline-none transition-colors"
+              className="w-full border rounded-xl px-4 py-3 focus:outline-none transition-colors"
               style={{
                 backgroundColor: 'var(--color-bg-hover)',
                 borderColor: focusedField === 'email' ? 'var(--color-border-active)' : 'var(--color-border)',
+                color: 'var(--color-text)',
               }}
               placeholder="your@email.com"
               required
@@ -105,10 +107,11 @@ export default function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
               onFocus={() => setFocusedField('password')}
               onBlur={() => setFocusedField(null)}
-              className="w-full border rounded-xl px-4 py-3 text-white focus:outline-none transition-colors"
+              className="w-full border rounded-xl px-4 py-3 focus:outline-none transition-colors"
               style={{
                 backgroundColor: 'var(--color-bg-hover)',
                 borderColor: focusedField === 'password' ? 'var(--color-border-active)' : 'var(--color-border)',
+                color: 'var(--color-text)',
               }}
               placeholder="••••••••"
               required
@@ -123,10 +126,11 @@ export default function RegisterPage() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               onFocus={() => setFocusedField('confirmPassword')}
               onBlur={() => setFocusedField(null)}
-              className="w-full border rounded-xl px-4 py-3 text-white focus:outline-none transition-colors"
+              className="w-full border rounded-xl px-4 py-3 focus:outline-none transition-colors"
               style={{
                 backgroundColor: 'var(--color-bg-hover)',
                 borderColor: focusedField === 'confirmPassword' ? 'var(--color-border-active)' : 'var(--color-border)',
+                color: 'var(--color-text)',
               }}
               placeholder="••••••••"
               required

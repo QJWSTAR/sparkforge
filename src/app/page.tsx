@@ -463,13 +463,13 @@ export default async function Home() {
             </span>
           </div>
           <div className="flex items-center gap-6 text-sm" style={{ color: 'var(--color-text-muted)' }}>
-            <a href="#" className="hover:text-white transition-colors">
+            <a href="#" className="hover:opacity-70 transition-opacity">
               隐私政策
             </a>
-            <a href="#" className="hover:text-white transition-colors">
+            <a href="#" className="hover:opacity-70 transition-opacity">
               服务条款
             </a>
-            <a href="#" className="hover:text-white transition-colors">
+            <a href="#" className="hover:opacity-70 transition-opacity">
               联系我们
             </a>
           </div>

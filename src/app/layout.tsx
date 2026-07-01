@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import Navbar from '@/components/Navbar'
+import { ToastProvider } from '@/components/ToastProvider'
 
 export const metadata: Metadata = {
   title: 'SparkForge - 创意信号雷达 + TRAE 自动化落地工坊',
@@ -26,10 +27,12 @@ export default function RootLayout({
           color: 'var(--color-text)',
         }}
       >
-        <Navbar />
-        <div className="w-full">
-          {children}
-        </div>
+        <ToastProvider>
+          <Navbar />
+          <div className="w-full">
+            {children}
+          </div>
+        </ToastProvider>
       </body>
     </html>
   )

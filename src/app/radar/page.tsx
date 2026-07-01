@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useDebounce } from '@/lib/hooks'
 import Link from 'next/link'
 import SignalCard from '@/components/SignalCard'
+import { SkeletonSignalCard } from '@/components/Skeleton'
 import { mockSignals, sourceLabels } from '@/data/mockSignals'
 import type { Signal } from '@/types/signal'
 
@@ -458,20 +459,10 @@ export default function RadarPage() {
 
           {/* Signal cards */}
           {loading ? (
-            <div
-              className="flex flex-col items-center justify-center py-16"
-              style={{ color: 'var(--color-text-muted)' }}
-            >
-              <div
-                className="animate-spin rounded-full mb-4"
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  border: '2px solid var(--color-primary)',
-                  borderTopColor: 'transparent',
-                }}
-              />
-              <p className="text-sm">加载中...</p>
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <SkeletonSignalCard key={i} />
+              ))}
             </div>
           ) : filteredSignals.length === 0 ? (
             <div
