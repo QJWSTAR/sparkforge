@@ -97,7 +97,7 @@ export default function LoginPage() {
             disabled={loading}
             onMouseEnter={() => setHoveredButton(true)}
             onMouseLeave={() => setHoveredButton(false)}
-            className="w-full text-white py-3 rounded-xl font-medium transition-colors"
+            className="w-full text-white py-3 rounded-xl font-medium transition-colors btn-press"
             style={{
               backgroundColor: loading ? 'gray' : hoveredButton ? 'var(--color-primary-hover)' : 'var(--color-primary)',
             }}

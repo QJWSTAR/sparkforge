@@ -34,7 +34,7 @@ export default async function Home() {
   return (
     <main className="min-h-screen">
       <section className="py-20 px-4">
-        <div className="container mx-auto text-center">
+        <div className="container-app text-center">
           <div
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6"
             style={{
@@ -48,7 +48,7 @@ export default async function Home() {
             ></span>
             全网创意信号实时监控
           </div>
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+          <h1 className="text-6xl md:text-8xl font-bold mb-8 leading-tight">
             <span
               className="bg-gradient-to-r from-[var(--color-primary)] via-[var(--state-warning)] to-[var(--color-primary)] bg-clip-text text-transparent"
             >
@@ -69,7 +69,7 @@ export default async function Home() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/radar"
-              className="px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105"
+              className="px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 btn-press"
               style={{
                 backgroundColor: 'var(--color-primary)',
                 color: 'var(--color-text-inverse)',
@@ -82,7 +82,7 @@ export default async function Home() {
               href="https://github.com/QJWSTAR/sparkforge"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-8 py-4 rounded-xl font-medium transition-colors"
+              className="px-8 py-4 rounded-xl font-medium transition-colors btn-press"
               style={{
                 border: '1px solid var(--color-border)',
                 color: 'var(--color-text)',
@@ -98,7 +98,7 @@ export default async function Home() {
         className="py-16 px-4 border-y"
         style={{ borderColor: 'var(--color-border)' }}
       >
-        <div className="container mx-auto">
+        <div className="container-app">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="text-center">
               <div
@@ -141,7 +141,7 @@ export default async function Home() {
       </section>
 
       <section className="py-20 px-4">
-        <div className="container mx-auto">
+        <div className="container-app">
           <h2
             className="text-3xl md:text-4xl font-bold text-center mb-16"
             style={{ color: 'var(--color-text)' }}
@@ -150,7 +150,7 @@ export default async function Home() {
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div
-              className="rounded-2xl p-6 transition-colors"
+              className="rounded-2xl p-6 card-hover"
               style={{
                 backgroundColor: 'var(--color-bg-surface)',
                 boxShadow: 'var(--shadow-md)',
@@ -173,7 +173,7 @@ export default async function Home() {
             </div>
 
             <div
-              className="rounded-2xl p-6 transition-colors"
+              className="rounded-2xl p-6 card-hover"
               style={{
                 backgroundColor: 'var(--color-bg-surface)',
                 boxShadow: 'var(--shadow-md)',
@@ -196,7 +196,7 @@ export default async function Home() {
             </div>
 
             <div
-              className="rounded-2xl p-6 transition-colors"
+              className="rounded-2xl p-6 card-hover"
               style={{
                 backgroundColor: 'var(--color-bg-surface)',
                 boxShadow: 'var(--shadow-md)',
@@ -219,7 +219,7 @@ export default async function Home() {
             </div>
 
             <div
-              className="rounded-2xl p-6 transition-colors"
+              className="rounded-2xl p-6 card-hover"
               style={{
                 backgroundColor: 'var(--color-bg-surface)',
                 boxShadow: 'var(--shadow-md)',
@@ -245,7 +245,7 @@ export default async function Home() {
       </section>
 
       <section className="py-20 px-4">
-        <div className="container mx-auto">
+        <div className="container-app">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold" style={{ color: 'var(--color-text)' }}>
               实时信号
@@ -264,7 +264,7 @@ export default async function Home() {
               {signals.map((signal, index) => (
                 <div
                   key={signal.id}
-                  className="rounded-xl p-4 transition-colors"
+                  className="rounded-xl p-4 card-hover cursor-pointer"
                   style={{
                     backgroundColor: 'var(--color-bg-surface)',
                     boxShadow: 'var(--shadow-md)',
@@ -408,7 +408,7 @@ export default async function Home() {
       </section>
 
       <section className="py-20 px-4">
-        <div className="container mx-auto text-center">
+        <div className="container-app text-center">
           <h2
             className="text-3xl md:text-4xl font-bold mb-6"
             style={{ color: 'var(--color-text)' }}

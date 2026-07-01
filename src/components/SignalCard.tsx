@@ -53,7 +53,7 @@ export default function SignalCard({ signal, rank }: SignalCardProps) {
   return (
     <Link
       href={`/radar/${signal.id}`}
-      className="block border-b py-5 transition-colors hover:bg-[var(--color-bg-hover)] -mx-4 px-4 rounded-md"
+      className="block border-b py-5 card-hover -mx-4 px-4 rounded-md"
       style={{ borderColor: 'var(--color-border)' }}
     >
       {/* Header row */}

@@ -39,7 +39,7 @@ export default function CanvasPage() {
 
   return (
     <div className="min-h-screen">
-      <main className="container mx-auto px-4 py-8 max-w-6xl">
+      <main className="container-app py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
             商业画布

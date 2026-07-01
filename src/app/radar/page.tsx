@@ -427,7 +427,7 @@ export default function RadarPage() {
                 <button
                   key={chip.value}
                   onClick={() => setMinScore(chip.value)}
-                  className="px-3 py-1 rounded-full text-xs font-medium transition-colors"
+                  className="px-3 py-1 rounded-full text-xs font-medium filter-chip"
                   style={{
                     backgroundColor: active
                       ? 'var(--color-primary)'

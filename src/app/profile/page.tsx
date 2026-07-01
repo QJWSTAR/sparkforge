@@ -50,7 +50,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen">
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container-app py-8">
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-1">
             <div className="border rounded-2xl p-6" style={{ backgroundColor: 'var(--color-bg-hover)', borderColor: 'var(--color-border)' }}>
