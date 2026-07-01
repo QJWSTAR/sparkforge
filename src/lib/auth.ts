@@ -98,13 +98,26 @@ export function useAuth() {
       return { success: false, error: error.message }
     }
 
-    if (data.session?.user) {
+    const userId = data.user?.id
+    if (userId) {
       setUser({
-        id: data.session.user.id,
-        email: data.session.user.email || '',
-        name: data.session.user.user_metadata?.name || name || undefined,
-        avatarUrl: data.session.user.user_metadata?.avatar_url || undefined,
+        id: userId,
+        email: data.user?.email || email,
+        name: data.user?.user_metadata?.name || name || undefined,
+        avatarUrl: data.user?.user_metadata?.avatar_url || undefined,
       })
+
+      try {
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .upsert({ id: userId, email, name: name || null }, { onConflict: 'id' })
+
+        if (insertError) {
+          console.error('[Auth] Failed to insert profile:', insertError.message)
+        }
+      } catch (err) {
+        console.error('[Auth] Profile insert error:', err)
+      }
     }
 
     return { success: true }

@@ -77,15 +77,24 @@ async function getOrCreateClientWithRetry(url: string, key: string, clientType: 
 
 export function getSupabase(): SupabaseClient | null {
   if (supabaseClient && clientValidated) return supabaseClient
-  
-  const client = getOrCreateClientWithRetry(
-    supabaseUrl || '', 
-    supabaseAnonKey || '', 
-    'anon', 
-    false
-  )
-  
-  return supabaseClient || null
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.warn('[Supabase] Anon URL or key not configured')
+    return null
+  }
+
+  supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+    },
+    global: {
+      headers: { 'Content-Type': 'application/json' },
+    },
+  })
+  clientValidated = true
+
+  return supabaseClient
 }
 
 export async function getSupabaseAdmin(): Promise<SupabaseClient | null> {

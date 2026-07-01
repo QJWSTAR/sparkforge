@@ -66,10 +66,7 @@
   --color-dim-business: #F59E0B;
   --color-dim-local: #3B82F6;
 
-  /* ── Typography ── */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
-
+  /* ── Typography (font-family via next/font/google in layout.tsx) ── */
   --text-xs: 0.75rem;
   --text-sm: 0.8125rem;
   --text-base: 0.875rem;
@@ -111,7 +108,6 @@
   /* ── UI Component Library Tokens ── */
   --ui-focus-ring: 0 0 0 3px rgba(77, 168, 255, 0.15);
   --ui-overlay-bg: rgba(0, 0, 0, 0.6);
-  --ui-font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
 }
 
 /* ── Light Mode ── */
