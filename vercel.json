@@ -8,5 +8,156 @@
       "path": "/api/score/batch",
       "schedule": "0 1 * * *"
     }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
+      ]
+    },
+    {
+      "source": "/_next/static/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        },
+        {
+          "key": "ETag",
+          "value": "W/\"[hash]\""
+        },
+        {
+          "key": "CF-Cache-Status",
+          "value": "HIT"
+        }
+      ]
+    },
+    {
+      "source": "/static/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        },
+        {
+          "key": "ETag",
+          "value": "W/\"[hash]\""
+        },
+        {
+          "key": "CF-Cache-Status",
+          "value": "HIT"
+        }
+      ]
+    },
+    {
+      "source": "/images/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        },
+        {
+          "key": "ETag",
+          "value": "W/\"[hash]\""
+        },
+        {
+          "key": "CF-Cache-Status",
+          "value": "HIT"
+        }
+      ]
+    },
+    {
+      "source": "/fonts/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        },
+        {
+          "key": "ETag",
+          "value": "W/\"[hash]\""
+        },
+        {
+          "key": "CF-Cache-Status",
+          "value": "HIT"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.(js|css)$)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        },
+        {
+          "key": "ETag",
+          "value": "W/\"[hash]\""
+        },
+        {
+          "key": "CF-Cache-Status",
+          "value": "HIT"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.(png|jpg|jpeg|gif|webp|svg|ico)$)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        },
+        {
+          "key": "ETag",
+          "value": "W/\"[hash]\""
+        },
+        {
+          "key": "CF-Cache-Status",
+          "value": "HIT"
+        },
+        {
+          "key": "Content-Type",
+          "value": "image/[ext]"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.(html|htm)$)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        },
+        {
+          "key": "ETag",
+          "value": "W/\"[hash]\""
+        },
+        {
+          "key": "CF-Cache-Status",
+          "value": "REVALIDATED"
+        }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, must-revalidate"
+        },
+        {
+          "key": "CF-Cache-Status",
+          "value": "MISS"
+        }
+      ]
+    }
   ]
 }

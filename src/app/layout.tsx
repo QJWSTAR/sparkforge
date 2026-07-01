@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import Navbar from '@/components/Navbar'
 import { ToastProvider } from '@/components/ToastProvider'
+import CookieConsent from '@/components/CookieConsent'
 
 export const metadata: Metadata = {
   title: 'SparkForge - 创意信号雷达 + TRAE 自动化落地工坊',
@@ -32,6 +33,7 @@ export default function RootLayout({
           <div className="w-full">
             {children}
           </div>
+          <CookieConsent />
         </ToastProvider>
       </body>
     </html>

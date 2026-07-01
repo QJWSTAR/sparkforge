@@ -2,11 +2,12 @@ import Link from 'next/link'
 import { sourceLabels } from '@/data/mockSignals'
 import type { Signal } from '@/types/signal'
 import { getSupabaseAdmin } from '@/lib/supabase'
+import { mockSignals } from '@/data/mockSignals'
 
 async function getSignals(): Promise<Signal[]> {
-  const supabaseAdmin = getSupabaseAdmin()
+  const supabaseAdmin = await getSupabaseAdmin()
   if (!supabaseAdmin) {
-    return []
+    return mockSignals.slice(0, 3)
   }
 
   try {
@@ -18,13 +19,13 @@ async function getSignals(): Promise<Signal[]> {
 
     if (error) {
       console.error('Failed to fetch signals:', error)
-      return []
+      return mockSignals.slice(0, 3)
     }
 
-    return data || []
+    return data || mockSignals.slice(0, 3)
   } catch (error) {
     console.error('Failed to fetch signals:', error)
-    return []
+    return mockSignals.slice(0, 3)
   }
 }
 
@@ -444,32 +445,37 @@ export default async function Home() {
         style={{ borderColor: 'var(--color-border)' }}
       >
         <div className="container-app flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div
-              className="w-6 h-6 rounded flex items-center justify-center text-sm font-bold"
-              style={{
-                background:
-                  'linear-gradient(135deg, var(--color-primary), var(--state-warning))',
-                color: 'var(--color-text-inverse)',
-              }}
-            >
-              S
+          <div className="flex flex-col items-center md:items-start gap-2">
+            <div className="flex items-center gap-2">
+              <div
+                className="w-6 h-6 rounded flex items-center justify-center text-sm font-bold"
+                style={{
+                  background:
+                    'linear-gradient(135deg, var(--color-primary), var(--state-warning))',
+                  color: 'var(--color-text-inverse)',
+                }}
+              >
+                S
+              </div>
+              <span className="font-bold" style={{ color: 'var(--color-text)' }}>
+                SparkForge
+              </span>
+              <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                © 2026
+              </span>
             </div>
-            <span className="font-bold" style={{ color: 'var(--color-text)' }}>
-              SparkForge
-            </span>
-            <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-              © 2026
+            <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+              Hosted on Cloudflare · Vercel
             </span>
           </div>
           <div className="flex items-center gap-6 text-sm" style={{ color: 'var(--color-text-muted)' }}>
-            <a href="#" className="hover:opacity-70 transition-opacity">
+            <Link href="/privacy" className="hover:opacity-70 transition-opacity">
               隐私政策
-            </a>
-            <a href="#" className="hover:opacity-70 transition-opacity">
+            </Link>
+            <Link href="/terms" className="hover:opacity-70 transition-opacity">
               服务条款
-            </a>
-            <a href="#" className="hover:opacity-70 transition-opacity">
+            </Link>
+            <a href="https://github.com/QJWSTAR/sparkforge/issues" target="_blank" rel="noopener noreferrer" className="hover:opacity-70 transition-opacity">
               联系我们
             </a>
           </div>

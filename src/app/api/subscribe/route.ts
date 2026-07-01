@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const supabaseAdmin = getSupabaseAdmin()
+  const supabaseAdmin = await getSupabaseAdmin()
   if (!supabaseAdmin) {
     return NextResponse.json(
       { success: false, error: 'Supabase not configured' },
@@ -120,7 +120,7 @@ export async function DELETE(request: NextRequest) {
     )
   }
 
-  const supabaseAdmin = getSupabaseAdmin()
+  const supabaseAdmin = await getSupabaseAdmin()
   if (!supabaseAdmin) {
     return NextResponse.json(
       { success: false, error: 'Supabase not configured' },
@@ -200,7 +200,7 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  const supabaseAdmin = getSupabaseAdmin()
+  const supabaseAdmin = await getSupabaseAdmin()
   if (!supabaseAdmin) {
     return NextResponse.json({
       success: true,

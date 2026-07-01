@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const supabaseAdmin = getSupabaseAdmin()
+  const supabaseAdmin = await getSupabaseAdmin()
   if (!supabaseAdmin) {
     return NextResponse.json(
       { success: false, error: 'Supabase not configured' },

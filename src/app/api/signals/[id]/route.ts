@@ -8,11 +8,15 @@ export async function GET(
   const { id } = await params
 
   try {
-    const signal = await getSignalById(id)
+    const { signal, dbAvailable } = await getSignalById(id)
 
     if (!signal) {
       return NextResponse.json(
-        { success: false, error: 'Signal not found' },
+        { 
+          success: false, 
+          error: 'Signal not found',
+          dbStatus: dbAvailable ? 'available' : 'unavailable'
+        },
         { status: 404 }
       )
     }
@@ -20,12 +24,23 @@ export async function GET(
     return NextResponse.json({
       success: true,
       data: signal,
+      dbStatus: dbAvailable ? 'available' : 'unavailable'
     })
+
   } catch (error) {
-    console.error('API error:', error)
+    console.error('[API] Unexpected error in signal detail endpoint:', error)
+    
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch signal' },
-      { status: 500 }
+      {
+        success: false,
+        error: 'Failed to fetch signal',
+        dbStatus: 'unavailable',
+        message: 'An unexpected error occurred, database connection may be unstable',
+        details: process.env.NODE_ENV === 'development' 
+          ? (error instanceof Error ? error.message : 'Unknown error') 
+          : undefined
+      },
+      { status: 200 }
     )
   }
 }

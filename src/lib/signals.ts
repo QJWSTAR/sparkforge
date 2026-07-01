@@ -1,6 +1,7 @@
-import { getSupabaseAdmin } from './supabase'
+import { getSupabaseAdmin, isDbAvailable, invalidateDbConnection } from './supabase'
 import { fetchHackerNewsTop, saveHNSignals } from './hackernews'
 import { fetchProductHuntToday, savePHSignals } from './producthunt'
+import { mockSignals } from '@/data/mockSignals'
 
 export interface SignalQuery {
   source?: string
@@ -12,113 +13,223 @@ export interface SignalQuery {
   search?: string
 }
 
-export async function getSignals(query: SignalQuery = {}) {
-  const supabaseAdmin = getSupabaseAdmin()
-  if (!supabaseAdmin) {
-    return { signals: [], total: 0 }
+function filterMockSignals(mockData: any[], query: SignalQuery): any[] {
+  let filtered = [...mockData]
+
+  if (query.source && query.source !== 'all') {
+    filtered = filtered.filter(s => s.source === query.source)
   }
 
-  const {
-    source,
-    status,
-    minScore = 0,
-    sortBy = 'score',
-    limit = 20,
-    offset = 0,
-    search,
-  } = query
-
-  let dbQuery = supabaseAdmin
-    .from('Signal')
-    .select('*', { count: 'exact' })
-
-  if (source && source !== 'all') {
-    dbQuery = dbQuery.eq('source', source)
+  if (query.status) {
+    filtered = filtered.filter(s => s.status === query.status)
   }
 
-  if (status) {
-    dbQuery = dbQuery.eq('status', status)
+  if (query.minScore && query.minScore > 0) {
+    const minScore = query.minScore
+    filtered = filtered.filter(s => s.finalScore >= minScore)
   }
 
-  if (minScore > 0) {
-    dbQuery = dbQuery.gte('finalScore', minScore)
+  if (query.search) {
+    const searchLower = query.search.toLowerCase()
+    filtered = filtered.filter(s => 
+      s.title.toLowerCase().includes(searchLower) ||
+      (s.description && s.description.toLowerCase().includes(searchLower))
+    )
   }
 
-  if (search) {
-    dbQuery = dbQuery.or(`title.ilike.%${search}%,description.ilike.%${search}%`)
-  }
-
-  switch (sortBy) {
+  switch (query.sortBy) {
     case 'hot':
-      dbQuery = dbQuery.order('hotScore', { ascending: false })
+      filtered.sort((a, b) => (b.hotScore || 0) - (a.hotScore || 0))
       break
     case 'score':
-      dbQuery = dbQuery.order('finalScore', { ascending: false, nullsFirst: false })
+      filtered.sort((a, b) => (b.finalScore || 0) - (a.finalScore || 0))
       break
     case 'newest':
-      dbQuery = dbQuery.order('fetchedAt', { ascending: false })
+      filtered.sort((a, b) => new Date(b.fetchedAt).getTime() - new Date(a.fetchedAt).getTime())
       break
   }
 
-  dbQuery = dbQuery.range(offset, offset + limit - 1)
+  const offset = query.offset || 0
+  const limit = query.limit || 20
 
-  const { data, count, error } = await dbQuery
+  return filtered.slice(offset, offset + limit)
+}
 
-  if (error) {
-    console.error('Failed to fetch signals:', error)
-    return { signals: [], total: 0 }
+export async function getSignals(query: SignalQuery = {}) {
+  const dbAvailable = isDbAvailable()
+
+  try {
+    const supabaseAdmin = await getSupabaseAdmin()
+
+    if (!supabaseAdmin) {
+      console.warn('[Signals] Database unavailable, returning mock data')
+      const filtered = filterMockSignals(mockSignals, query)
+      return { 
+        signals: filtered, 
+        total: mockSignals.length,
+        fromCache: true,
+        dbAvailable: false
+      }
+    }
+
+    const {
+      source,
+      status,
+      minScore = 0,
+      sortBy = 'score',
+      limit = 20,
+      offset = 0,
+      search,
+    } = query
+
+    let dbQuery = supabaseAdmin
+      .from('Signal')
+      .select('*', { count: 'exact' })
+
+    if (source && source !== 'all') {
+      dbQuery = dbQuery.eq('source', source)
+    }
+
+    if (status) {
+      dbQuery = dbQuery.eq('status', status)
+    }
+
+    if (minScore > 0) {
+      dbQuery = dbQuery.gte('finalScore', minScore)
+    }
+
+    if (search) {
+      dbQuery = dbQuery.or(`title.ilike.%${search}%,description.ilike.%${search}%`)
+    }
+
+    switch (sortBy) {
+      case 'hot':
+        dbQuery = dbQuery.order('hotScore', { ascending: false })
+        break
+      case 'score':
+        dbQuery = dbQuery.order('finalScore', { ascending: false, nullsFirst: false })
+        break
+      case 'newest':
+        dbQuery = dbQuery.order('fetchedAt', { ascending: false })
+        break
+    }
+
+    dbQuery = dbQuery.range(offset, offset + limit - 1)
+
+    const { data, count, error } = await dbQuery
+
+    if (error) {
+      console.error('[Signals] Failed to fetch signals from database:', error)
+      
+      if (error.code === 'PGRST001' || error.message?.includes('connection')) {
+        invalidateDbConnection()
+      }
+
+      const filtered = filterMockSignals(mockSignals, query)
+      return { 
+        signals: filtered, 
+        total: mockSignals.length,
+        fromCache: true,
+        dbAvailable: false,
+        error: error.message
+      }
+    }
+
+    return { 
+      signals: data || [], 
+      total: count || 0,
+      fromCache: false,
+      dbAvailable: true
+    }
+
+  } catch (error) {
+    console.error('[Signals] Unexpected error fetching signals:', error)
+    invalidateDbConnection()
+    
+    const filtered = filterMockSignals(mockSignals, query)
+    return { 
+      signals: filtered, 
+      total: mockSignals.length,
+      fromCache: true,
+      dbAvailable: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }
   }
-
-  return { signals: data || [], total: count || 0 }
 }
 
 export async function getSignalById(id: string) {
-  const supabaseAdmin = getSupabaseAdmin()
-  if (!supabaseAdmin) {
-    return null
+  try {
+    const supabaseAdmin = await getSupabaseAdmin()
+
+    if (!supabaseAdmin) {
+      console.warn('[Signals] Database unavailable, searching mock data for signal:', id)
+      const signal = mockSignals.find(s => s.id === id) || null
+      return { signal, dbAvailable: false }
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from('Signal')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    if (error) {
+      console.error('[Signals] Failed to fetch signal from database:', error)
+      
+      if (error.code === 'PGRST001' || error.message?.includes('connection')) {
+        invalidateDbConnection()
+      }
+
+      const signal = mockSignals.find(s => s.id === id) || null
+      return { signal, dbAvailable: false }
+    }
+
+    return { signal: data, dbAvailable: true }
+
+  } catch (error) {
+    console.error('[Signals] Unexpected error fetching signal:', error)
+    invalidateDbConnection()
+    const signal = mockSignals.find(s => s.id === id) || null
+    return { signal, dbAvailable: false }
   }
-
-  const { data, error } = await supabaseAdmin
-    .from('Signal')
-    .select('*')
-    .eq('id', id)
-    .single()
-
-  if (error) {
-    console.error('Failed to fetch signal:', error)
-    return null
-  }
-
-  return data
 }
 
-export async function crawlAllSources(): Promise<{ hn: number; ph: number; total: number }> {
-  const supabaseAdmin = getSupabaseAdmin()
+export async function crawlAllSources(): Promise<{ hn: number; ph: number; total: number; dbAvailable: boolean }> {
+  const supabaseAdmin = await getSupabaseAdmin()
+  
   if (!supabaseAdmin) {
-    return { hn: 0, ph: 0, total: 0 }
+    console.warn('[Signals] Database unavailable, skipping crawl')
+    return { hn: 0, ph: 0, total: 0, dbAvailable: false }
   }
 
-  const [hnItems, phPosts] = await Promise.all([
-    fetchHackerNewsTop(30),
-    fetchProductHuntToday(20),
-  ])
+  try {
+    const [hnItems, phPosts] = await Promise.all([
+      fetchHackerNewsTop(30),
+      fetchProductHuntToday(20),
+    ])
 
-  const [hnSaved, phSaved] = await Promise.all([
-    saveHNSignals(hnItems),
-    savePHSignals(phPosts),
-  ])
+    const [hnSaved, phSaved] = await Promise.all([
+      saveHNSignals(hnItems),
+      savePHSignals(phPosts),
+    ])
 
-  const total = hnSaved + phSaved
+    const total = hnSaved + phSaved
 
-  if (total > 0) {
-    await addLogEntry({
-      type: 'SYSTEM',
-      title: `信号抓取完成`,
-      content: `Hacker News: ${hnSaved} 条 | Product Hunt: ${phSaved} 条 | 总计: ${total} 条新信号`,
-    })
+    if (total > 0) {
+      await addLogEntry({
+        type: 'SYSTEM',
+        title: `信号抓取完成`,
+        content: `Hacker News: ${hnSaved} 条 | Product Hunt: ${phSaved} 条 | 总计: ${total} 条新信号`,
+      })
+    }
+
+    return { hn: hnSaved, ph: phSaved, total, dbAvailable: true }
+
+  } catch (error) {
+    console.error('[Signals] Unexpected error during crawl:', error)
+    invalidateDbConnection()
+    return { hn: 0, ph: 0, total: 0, dbAvailable: false }
   }
-
-  return { hn: hnSaved, ph: phSaved, total }
 }
 
 export async function addLogEntry(entry: {
@@ -129,8 +240,10 @@ export async function addLogEntry(entry: {
   forgeId?: string
   metadata?: any
 }) {
-  const supabaseAdmin = getSupabaseAdmin()
+  const supabaseAdmin = await getSupabaseAdmin()
+  
   if (!supabaseAdmin) {
+    console.warn('[Signals] Database unavailable, skipping log entry')
     return
   }
 
@@ -147,35 +260,55 @@ export async function addLogEntry(entry: {
       })
 
     if (error) {
-      console.error('Failed to add log entry:', error)
+      console.error('[Signals] Failed to add log entry:', error)
+      if (error.code === 'PGRST001' || error.message?.includes('connection')) {
+        invalidateDbConnection()
+      }
     }
   } catch (err) {
-    console.error('Failed to add log entry:', err)
+    console.error('[Signals] Unexpected error adding log entry:', err)
+    invalidateDbConnection()
   }
 }
 
 export async function getLogs(limit: number = 20, type?: string) {
-  const supabaseAdmin = getSupabaseAdmin()
-  if (!supabaseAdmin) {
+  const dbAvailable = isDbAvailable()
+
+  try {
+    const supabaseAdmin = await getSupabaseAdmin()
+
+    if (!supabaseAdmin) {
+      console.warn('[Signals] Database unavailable, returning empty logs')
+      return []
+    }
+
+    let query = supabaseAdmin
+      .from('LogEntry')
+      .select('*')
+      .order('createdAt', { ascending: false })
+      .limit(limit)
+
+    if (type) {
+      query = query.eq('type', type)
+    }
+
+    const { data, error } = await query
+
+    if (error) {
+      console.error('[Signals] Failed to fetch logs from database:', error)
+      
+      if (error.code === 'PGRST001' || error.message?.includes('connection')) {
+        invalidateDbConnection()
+      }
+
+      return []
+    }
+
+    return data || []
+
+  } catch (error) {
+    console.error('[Signals] Unexpected error fetching logs:', error)
+    invalidateDbConnection()
     return []
   }
-
-  let query = supabaseAdmin
-    .from('LogEntry')
-    .select('*')
-    .order('createdAt', { ascending: false })
-    .limit(limit)
-
-  if (type) {
-    query = query.eq('type', type)
-  }
-
-  const { data, error } = await query
-
-  if (error) {
-    console.error('Failed to fetch logs:', error)
-    return []
-  }
-
-  return data || []
 }

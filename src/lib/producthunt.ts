@@ -1,4 +1,4 @@
-import { getSupabaseAdmin } from './supabase'
+import { getSupabaseAdmin, invalidateDbConnection } from './supabase'
 
 export interface RawPHPost {
   id: string
@@ -31,7 +31,7 @@ export async function fetchProductHuntToday(limit: number = 20): Promise<RawPHPo
   const token = process.env.PRODUCTHUNT_ACCESS_TOKEN
   
   if (!token) {
-    console.warn('Product Hunt API token not configured')
+    console.warn('[ProductHunt] API token not configured')
     return []
   }
 
@@ -87,21 +87,23 @@ export async function fetchProductHuntToday(limit: number = 20): Promise<RawPHPo
     const data = await response.json()
     
     if (data.errors) {
-      console.error('Product Hunt GraphQL errors:', data.errors)
+      console.error('[ProductHunt] GraphQL errors:', data.errors)
       return []
     }
 
     const edges = data?.data?.posts?.edges || []
     return edges.map((edge: any) => edge.node as RawPHPost)
   } catch (error) {
-    console.error('Failed to fetch Product Hunt:', error)
+    console.error('[ProductHunt] Failed to fetch:', error)
     return []
   }
 }
 
 export async function savePHSignals(posts: RawPHPost[]): Promise<number> {
-  const supabaseAdmin = getSupabaseAdmin()
+  const supabaseAdmin = await getSupabaseAdmin()
+  
   if (!supabaseAdmin) {
+    console.warn('[ProductHunt] Database unavailable, skipping save')
     return 0
   }
 
@@ -138,7 +140,8 @@ export async function savePHSignals(posts: RawPHPost[]): Promise<number> {
         savedCount++
       }
     } catch (err) {
-      console.error(`Failed to save PH post ${post.id}:`, err)
+      console.error(`[ProductHunt] Failed to save post ${post.id}:`, err)
+      invalidateDbConnection()
     }
   }
 

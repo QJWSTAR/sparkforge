@@ -1,4 +1,4 @@
-import { getSupabaseAdmin } from './supabase'
+import { getSupabaseAdmin, invalidateDbConnection } from './supabase'
 
 export interface RawHNItem {
   objectID: string
@@ -35,7 +35,7 @@ export async function fetchHackerNewsTop(limit: number = 30): Promise<RawHNItem[
     const data = await response.json()
     return data.hits || []
   } catch (error) {
-    console.error('Failed to fetch Hacker News:', error)
+    console.error('[HackerNews] Failed to fetch:', error)
     return []
   }
 }
@@ -56,14 +56,16 @@ export async function fetchHNByQuery(query: string, limit: number = 20): Promise
     const data = await response.json()
     return data.hits || []
   } catch (error) {
-    console.error('Failed to search Hacker News:', error)
+    console.error('[HackerNews] Failed to search:', error)
     return []
   }
 }
 
 export async function saveHNSignals(items: RawHNItem[]): Promise<number> {
-  const supabaseAdmin = getSupabaseAdmin()
+  const supabaseAdmin = await getSupabaseAdmin()
+  
   if (!supabaseAdmin) {
+    console.warn('[HackerNews] Database unavailable, skipping save')
     return 0
   }
 
@@ -98,7 +100,8 @@ export async function saveHNSignals(items: RawHNItem[]): Promise<number> {
         savedCount++
       }
     } catch (err) {
-      console.error(`Failed to save HN item ${item.objectID}:`, err)
+      console.error(`[HackerNews] Failed to save item ${item.objectID}:`, err)
+      invalidateDbConnection()
     }
   }
 
