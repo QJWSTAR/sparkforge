@@ -25,11 +25,15 @@
 
 ### 产品界面展示
 
-![SparkForge 首页 - 创意信号雷达](图片1：首页Hero区域与KPI面板)
+![SparkForge 首页 - 创意信号雷达](image/0afb89c3e51fa3920b2e842ccc29087a.png)
 
-![SparkForge 雷达页 - 信号列表与筛选](图片2：信号雷达页，展示多维度评分和筛选功能)
+![SparkForge 雷达页 - 信号列表与筛选](image/737fa6814db8f1ac6ee3527ea5bac980.png)
 
-![SparkForge 信号详情 - AI评分详情](图片3：信号详情页，展示4维度评分雷达图)
+![SparkForge 信号详情 - AI评分详情](image/915801e9fd08b0e73658049cc05d1abf.png)
+
+![SparkForge 复刻工坊 - MVP生成配置](image/c494709bb05ef535979aaa80a6e6e0b8.png)
+
+![SparkForge 商业画布 - 商业模式分析](image/ea453e3cd5e1b7f3dc3ffa55589b11ff.png)
 
 ---
 
@@ -85,23 +89,23 @@ Vercel 部署 → Cron Job 配置 → UI 设计系统统一
 
 **截图1：TRAE IDE 中项目架构设计与数据库建表**
 
-![开发截图1 - 项目架构设计](图片：TRAE IDE 中讨论项目整体架构和 Supabase 数据库设计的对话)
+![开发截图1 - 项目架构设计](image/c494709bb05ef535979aaa80a6e6e0b8.png)
 
 **截图2：核心功能开发 - 信号抓取引擎与 AI 评分系统**
 
-![开发截图2 - 核心功能开发](图片：TRAE IDE 中实现信号抓取和评分逻辑的代码开发过程)
+![开发截图2 - 核心功能开发](image/915801e9fd08b0e73658049cc05d1abf.png)
 
 **截图3：问题排查与修复 - Supabase 连接与构建错误**
 
-![开发截图3 - 问题排查](图片：TRAE IDE 中排查 Supabase 连接问题和构建错误的调试过程)
+![开发截图3 - 问题排查](image/737fa6814db8f1ac6ee3527ea5bac980.png)
 
 **截图4：Vercel 部署与 Cron Job 配置**
 
-![开发截图4 - 部署配置](图片：TRAE IDE 中配置 Vercel 部署和定时任务的对话)
+![开发截图4 - 部署配置](image/0afb89c3e51fa3920b2e842ccc29087a.png)
 
 **截图5：UI 设计系统统一与响应式适配**
 
-![开发截图5 - UI 重构](图片：TRAE IDE 中统一设计系统 CSS 变量和响应式布局的代码重构)
+![开发截图5 - UI 重构](image/ea453e3cd5e1b7f3dc3ffa55589b11ff.png)
 
 ### Session ID 记录
 
@@ -142,6 +146,10 @@ Vercel 部署 → Cron Job 配置 → UI 设计系统统一
 ### 踩坑3：Vercel Cron Job 频率限制
 - **问题**：Hobby 账户只支持每天执行一次的 Cron Job，配置为每小时会部署失败
 - **解决**：将抓取和评分任务改为每天凌晨执行，确保免费账户可用
+
+### 踩坑4：API 认证不匹配
+- **问题**：服务端订阅 API 添加了 Bearer token 认证，但客户端未携带 token
+- **解决**：在客户端获取 Supabase session token，请求时携带 Authorization 头
 
 ---
 

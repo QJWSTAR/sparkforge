@@ -3,6 +3,7 @@
 /* ── SparkForge Dashboard Design System ── */
 /* Dark Mode (default) */
 :root {
+  color-scheme: dark;
   /* ── Color System ── */
   --color-bg: #0B0D11;
   --color-bg-elevated: #12151A;
@@ -144,3 +145,14 @@ body {
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+.h-safe-screen {
+  height: 100vh;
+  height: 100dvh;
+}
+
+input,
+textarea,
+select {
+  font-size: 16px;
+}

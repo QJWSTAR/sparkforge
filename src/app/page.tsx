@@ -318,11 +318,11 @@ export default async function Home() {
                       >
                         {signal.description || '无描述'}
                       </p>
-                      <div className="flex items-center gap-4 text-sm">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-x-3 gap-y-2 text-sm">
                         <div className="flex items-center gap-2">
                           <span style={{ color: 'var(--color-text-muted)' }}>热度</span>
                           <div
-                            className="w-20 h-2 rounded-full overflow-hidden"
+                            className="flex-1 h-2 rounded-full overflow-hidden"
                             style={{ backgroundColor: 'var(--color-bg-active)' }}
                           >
                             <div
@@ -337,7 +337,7 @@ export default async function Home() {
                         <div className="flex items-center gap-2">
                           <span style={{ color: 'var(--color-text-muted)' }}>商业</span>
                           <div
-                            className="w-20 h-2 rounded-full overflow-hidden"
+                            className="flex-1 h-2 rounded-full overflow-hidden"
                             style={{ backgroundColor: 'var(--color-bg-active)' }}
                           >
                             <div
@@ -352,7 +352,7 @@ export default async function Home() {
                         <div className="flex items-center gap-2">
                           <span style={{ color: 'var(--color-text-muted)' }}>创新</span>
                           <div
-                            className="w-20 h-2 rounded-full overflow-hidden"
+                            className="flex-1 h-2 rounded-full overflow-hidden"
                             style={{ backgroundColor: 'var(--color-bg-active)' }}
                           >
                             <div
@@ -367,7 +367,7 @@ export default async function Home() {
                         <div className="flex items-center gap-2">
                           <span style={{ color: 'var(--color-text-muted)' }}>本地化</span>
                           <div
-                            className="w-20 h-2 rounded-full overflow-hidden"
+                            className="flex-1 h-2 rounded-full overflow-hidden"
                             style={{ backgroundColor: 'var(--color-bg-active)' }}
                           >
                             <div
