@@ -159,7 +159,7 @@ export default function RadarPage() {
   const clearAllSources = () => setSelectedSources([])
 
   return (
-    <div className="flex" style={{ height: 'calc(100dvh - 56px)' }}>
+    <div className="flex w-full" style={{ height: 'calc(100dvh - 56px)' }}>
       {/* Left Sidebar - Source Filter */}
       <aside
         className="hidden md:flex flex-col border-r"

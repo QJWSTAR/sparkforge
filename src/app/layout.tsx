@@ -20,14 +20,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN">
-      <body className="min-h-screen antialiased"
-  style={{
-    backgroundColor: 'var(--color-bg)',
-    color: 'var(--color-text)',
-  }}
->
+      <body className="min-h-screen w-full antialiased"
+        style={{
+          backgroundColor: 'var(--color-bg)',
+          color: 'var(--color-text)',
+        }}
+      >
         <Navbar />
-        {children}
+        <div className="w-full">
+          {children}
+        </div>
       </body>
     </html>
   )
