@@ -4,33 +4,6 @@ const nextConfig = {
   images: {
     domains: ['images.unsplash.com', 'via.placeholder.com'],
   },
-  outputFileTracingRoot: '/Users/quanjiawei/Documents/sparkforge',
-  async redirects() {
-    return [
-      {
-        source: '/(.*)',
-        has: [
-          {
-            type: 'host',
-            value: 'aiforyou.icu',
-          },
-        ],
-        destination: 'https://sparkforge-blush.vercel.app/:1',
-        permanent: true,
-      },
-      {
-        source: '/(.*)',
-        has: [
-          {
-            type: 'host',
-            value: 'www.aiforyou.icu',
-          },
-        ],
-        destination: 'https://sparkforge-blush.vercel.app/:1',
-        permanent: true,
-      },
-    ]
-  },
   async headers() {
     return [
       {
@@ -91,8 +64,8 @@ const nextConfig = {
           },
         ],
       },
-    ]
+    ];
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
