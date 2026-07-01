@@ -1,8 +1,21 @@
 import type { Metadata, Viewport } from 'next'
+import { Inter, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/Navbar'
 import { ToastProvider } from '@/components/ToastProvider'
 import CookieConsent from '@/components/CookieConsent'
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+})
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: 'SparkForge - 创意信号雷达 + TRAE 自动化落地工坊',
@@ -21,8 +34,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="zh-CN">
-      <body className="min-h-screen w-full antialiased"
+    <html lang="zh-CN" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+      <body
+        className="min-h-screen w-full antialiased font-sans"
         style={{
           backgroundColor: 'var(--color-bg)',
           color: 'var(--color-text)',
@@ -30,9 +44,7 @@ export default function RootLayout({
       >
         <ToastProvider>
           <Navbar />
-          <div className="w-full">
-            {children}
-          </div>
+          <div className="w-full">{children}</div>
           <CookieConsent />
         </ToastProvider>
       </body>
