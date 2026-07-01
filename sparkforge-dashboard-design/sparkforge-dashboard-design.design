@@ -48,7 +48,7 @@
   ],
   "config": {
     "autoLayout": false,
-    "deviceType": "desktop",
+    "deviceType": "mobile",
     "projectName": "SparkForge 信号仪表板",
     "designLibrary": null
   }

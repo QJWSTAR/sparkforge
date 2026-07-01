@@ -52,7 +52,7 @@ export default function CanvasPage() {
         <div className="grid lg:grid-cols-4 gap-6">
           <div className="lg:col-span-3 space-y-6">
             <div
-              className="rounded-2xl p-6"
+              className="rounded-2xl p-6 card-hover"
               style={{
                 backgroundColor: 'var(--color-bg-surface)',
                 boxShadow: 'var(--shadow-md)',
@@ -65,7 +65,7 @@ export default function CanvasPage() {
                 </h2>
                 <div className="flex gap-2">
                   <button
-                    className="px-3 py-1.5 text-sm transition-colors"
+                    className="px-3 py-1.5 text-sm transition-colors btn-press"
                     style={{
                       backgroundColor: 'var(--color-bg-hover)',
                       color: 'var(--color-text-secondary)',
@@ -75,7 +75,7 @@ export default function CanvasPage() {
                   </button>
                   <button
                     onClick={handleGenerate}
-                    className="px-3 py-1.5 text-sm transition-colors"
+                    className="px-3 py-1.5 text-sm transition-colors btn-press"
                     style={{
                       backgroundColor: 'var(--color-bg-hover)',
                       color: 'var(--color-text-secondary)',
@@ -266,7 +266,7 @@ export default function CanvasPage() {
             </div>
 
             <div
-              className="rounded-2xl p-6"
+              className="rounded-2xl p-6 card-hover"
               style={{
                 backgroundColor: 'var(--color-bg-surface)',
                 boxShadow: 'var(--shadow-md)',
@@ -382,7 +382,7 @@ export default function CanvasPage() {
             <button
               onClick={handleGenerate}
               disabled={isGenerating}
-              className="w-full py-4 rounded-xl font-bold text-lg transition-all"
+              className="w-full py-4 rounded-xl font-bold text-lg transition-all btn-press"
               style={{
                 background:
                   'linear-gradient(90deg, var(--color-primary), var(--state-warning))',

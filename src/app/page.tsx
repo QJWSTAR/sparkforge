@@ -424,7 +424,7 @@ export default async function Home() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/radar"
-              className="px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105"
+              className="px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 btn-press"
               style={{
                 background: 'linear-gradient(90deg, var(--color-primary), var(--state-warning))',
                 color: 'var(--color-text-inverse)',
@@ -443,7 +443,7 @@ export default async function Home() {
         className="py-8 px-4 border-t"
         style={{ borderColor: 'var(--color-border)' }}
       >
-        <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="container-app flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <div
               className="w-6 h-6 rounded flex items-center justify-center text-sm font-bold"

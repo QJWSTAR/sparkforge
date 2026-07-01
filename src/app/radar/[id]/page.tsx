@@ -344,6 +344,7 @@ export default function SignalDetailPage() {
           <div className="flex flex-wrap items-center gap-3">
             <Link
               href={`/forge?signalId=${signal.id}`}
+              className="btn-press"
               style={{
                 background: 'var(--color-primary)',
                 color: 'var(--color-text-inverse)',
@@ -361,6 +362,7 @@ export default function SignalDetailPage() {
             </Link>
             <Link
               href={`/canvas?signalId=${signal.id}`}
+              className="btn-press"
               style={{
                 background: 'transparent',
                 color: 'var(--color-text)',
@@ -407,6 +409,7 @@ export default function SignalDetailPage() {
                   alert('订阅失败，请重试')
                 }
               }}
+              className="btn-press"
               style={{
                 background: subscribed ? 'var(--color-primary-muted)' : 'transparent',
                 color: subscribed ? 'var(--color-primary)' : 'var(--color-text-secondary)',

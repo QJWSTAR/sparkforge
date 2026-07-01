@@ -96,7 +96,7 @@ export default function ForgePage() {
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
           <div
-            className="rounded-2xl p-6"
+            className="rounded-2xl p-6 card-hover"
             style={{
               backgroundColor: 'var(--color-bg-surface)',
               boxShadow: 'var(--shadow-md)',
@@ -157,7 +157,7 @@ export default function ForgePage() {
           </div>
 
           <div
-            className="rounded-2xl p-6"
+            className="rounded-2xl p-6 card-hover"
             style={{
               backgroundColor: 'var(--color-bg-surface)',
               boxShadow: 'var(--shadow-md)',
@@ -383,7 +383,7 @@ export default function ForgePage() {
 
               <div className="flex gap-3">
                 <button
-                  className="flex-1 py-3 rounded-xl font-bold transition-colors"
+                  className="flex-1 py-3 rounded-xl font-bold transition-colors btn-press"
                   style={{
                     backgroundColor: 'var(--color-primary)',
                     color: 'var(--color-text-inverse)',
@@ -392,7 +392,7 @@ export default function ForgePage() {
                   查看 Demo
                 </button>
                 <button
-                  className="flex-1 py-3 rounded-xl font-medium transition-colors"
+                  className="flex-1 py-3 rounded-xl font-medium transition-colors btn-press"
                   style={{
                     backgroundColor: 'var(--color-bg-hover)',
                     color: 'var(--color-text)',
@@ -506,16 +506,16 @@ export default function ForgePage() {
 
             {!isForging && !forgeComplete && (
               <button
-                onClick={handleStartForge}
-                className="w-full py-4 rounded-xl font-bold text-lg transition-all"
-                style={{
-                  background:
-                    'linear-gradient(90deg, var(--color-primary), var(--state-warning))',
-                  color: 'var(--color-text-inverse)',
-                }}
-              >
-                🚀 开始复刻
-              </button>
+              onClick={handleStartForge}
+              className="w-full py-4 rounded-xl font-bold text-lg transition-all btn-press"
+              style={{
+                background:
+                  'linear-gradient(90deg, var(--color-primary), var(--state-warning))',
+                color: 'var(--color-text-inverse)',
+              }}
+            >
+              🚀 开始复刻
+            </button>
             )}
           </div>
         </div>

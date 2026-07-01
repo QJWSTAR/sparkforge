@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { sourceLabels } from '@/data/mockSignals'
 import type { Signal } from '@/types/signal'
 
@@ -10,6 +11,7 @@ interface SignalCardProps {
 }
 
 export default function SignalCard({ signal, rank }: SignalCardProps) {
+  const router = useRouter()
   const dimensions = [
     {
       label: '创意概念',
@@ -151,26 +153,26 @@ export default function SignalCard({ signal, rank }: SignalCardProps) {
 
       {/* Action buttons */}
       <div className="mt-4 flex items-center gap-2">
-        <Link
-          href={`/forge?signalId=${signal.id}`}
-          className="text-xs font-semibold px-3 py-1.5 rounded-md"
+        <button
+          onClick={() => router.push(`/forge?signalId=${signal.id}`)}
+          className="text-xs font-semibold px-3 py-1.5 rounded-md btn-press"
           style={{
             backgroundColor: 'var(--color-primary)',
             color: 'var(--color-text-inverse)',
           }}
         >
           复刻
-        </Link>
-        <Link
-          href={`/canvas?signalId=${signal.id}`}
-          className="text-xs font-medium px-3 py-1.5 rounded-md"
+        </button>
+        <button
+          onClick={() => router.push(`/canvas?signalId=${signal.id}`)}
+          className="text-xs font-medium px-3 py-1.5 rounded-md btn-press"
           style={{
             border: '1px solid var(--color-border)',
             color: 'var(--color-text-secondary)',
           }}
         >
           画布
-        </Link>
+        </button>
       </div>
     </Link>
   )
