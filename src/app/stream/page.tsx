@@ -202,7 +202,9 @@ export default function StreamPage() {
         <div className="mb-8 p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg-surface)' }}>
           <h3 className="font-semibold mb-3" style={{ color: 'var(--color-text)' }}>发布日志</h3>
           <div className="flex flex-col gap-3">
+            <label htmlFor="publish-title" className="sr-only">日志标题</label>
             <input
+              id="publish-title"
               type="text"
               placeholder="日志标题"
               value={publishTitle}
@@ -214,8 +216,9 @@ export default function StreamPage() {
                 borderColor: 'var(--color-border)',
               }}
             />
+            <label htmlFor="publish-content" className="sr-only">日志内容</label>
             <textarea
-              placeholder="日志内容（可选）"
+              id="publish-content"
               value={publishContent}
               onChange={(e) => setPublishContent(e.target.value)}
               rows={2}

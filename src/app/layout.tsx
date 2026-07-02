@@ -44,7 +44,7 @@ export default function RootLayout({
       >
         <ToastProvider>
           <Navbar />
-          <div className="w-full">{children}</div>
+          <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">{children}</main>
           <CookieConsent />
         </ToastProvider>
       </body>

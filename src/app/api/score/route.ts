@@ -3,6 +3,14 @@ import { scoreSignal } from '@/lib/scoring'
 import { getSupabaseAdmin } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
+  const apiKey = request.headers.get('x-api-key')
+  if (apiKey !== process.env.CRON_API_KEY && process.env.NODE_ENV === 'production') {
+    return NextResponse.json(
+      { success: false, error: 'Unauthorized' },
+      { status: 401 }
+    )
+  }
+
   const supabaseAdmin = await getSupabaseAdmin()
   if (!supabaseAdmin) {
     return NextResponse.json(

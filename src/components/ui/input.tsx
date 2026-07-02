@@ -13,7 +13,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         ref={ref}
         disabled={disabled}
         className={[
-          'bg-ui-surface border rounded-lg px-3 py-2 text-sm w-full transition-all duration-150',
+          'bg-ui-surface border rounded-lg px-3 py-2 text-sm w-full transition-all duration-150 min-h-[44px]',
           'placeholder:text-ui-text-secondary',
           'focus:outline-none',
           error ? 'border-ui-error' : 'border-ui-border',

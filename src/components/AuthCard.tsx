@@ -58,8 +58,9 @@ export default function AuthCard({ mode }: AuthCardProps) {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-fog text-sm mb-1">邮箱地址</label>
+              <label htmlFor="auth-email" className="block text-fog text-sm mb-1">邮箱地址</label>
               <Input
+                id="auth-email"
                 type="email"
                 placeholder="hello@example.com"
                 value={email}
@@ -69,8 +70,9 @@ export default function AuthCard({ mode }: AuthCardProps) {
             </div>
 
             <div>
-              <label className="block text-fog text-sm mb-1">密码</label>
+              <label htmlFor="auth-password" className="block text-fog text-sm mb-1">密码</label>
               <Input
+                id="auth-password"
                 type="password"
                 placeholder="••••••••"
                 value={password}
@@ -81,8 +83,9 @@ export default function AuthCard({ mode }: AuthCardProps) {
 
             {mode === 'register' && (
               <div>
-                <label className="block text-fog text-sm mb-1">昵称</label>
+                <label htmlFor="auth-name" className="block text-fog text-sm mb-1">昵称</label>
                 <Input
+                  id="auth-name"
                   placeholder="你的昵称"
                   value={name}
                   onChange={(e) => setName(e.target.value)}

@@ -230,8 +230,9 @@ export default function ProfilePage() {
                   <h3 className="text-lg font-bold mb-4">👤 个人信息</h3>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text)' }}>用户名</label>
+                      <label htmlFor="profile-name" className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text)' }}>用户名</label>
                       <input
+                        id="profile-name"
                         type="text"
                         defaultValue={user?.name}
                         onFocus={() => setFocusedField(true)}
@@ -245,8 +246,9 @@ export default function ProfilePage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text)' }}>邮箱</label>
+                      <label htmlFor="profile-email" className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text)' }}>邮箱</label>
                       <input
+                        id="profile-email"
                         type="email"
                         defaultValue={user?.email}
                         disabled

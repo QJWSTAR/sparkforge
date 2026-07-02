@@ -306,12 +306,14 @@ export default function ForgePage() {
 
               <div>
                 <label
+                  htmlFor="forge-custom-prompt"
                   className="block text-sm font-medium mb-2"
                   style={{ color: 'var(--color-text-secondary)' }}
                 >
                   自定义 Prompt（可选）
                 </label>
                 <textarea
+                  id="forge-custom-prompt"
                   value={customPrompt}
                   onChange={(e) => setCustomPrompt(e.target.value)}
                   placeholder="描述你想要的特殊需求，例如：增加深色模式、支持移动端、使用 Vue 框架..."
