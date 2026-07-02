@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Input - SparkForge 冰焰版</title>
+  <link rel="stylesheet" href="../colors_and_type.css">
+  <style>
+    body {
+      margin: 0;
+      padding: var(--page-padding);
+      min-height: 100vh;
+      position: relative;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--atmosphere-glow);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px;
+    }
+    .section { margin-bottom: 48px; }
+    .section-title {
+      font-family: var(--font-body);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-on-surface-variant);
+      margin-bottom: 16px;
+    }
+    .state-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .state-label {
+      font-size: var(--font-size-xs);
+      color: var(--color-muted-foreground);
+      width: 60px;
+      flex-shrink: 0;
+    }
+
+    /* === Input Base === */
+    .input {
+      width: 320px;
+      height: var(--size-input-height);
+      padding: 0 12px;
+      font-family: var(--font-body);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-regular);
+      color: var(--color-foreground);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-button);
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      box-sizing: border-box;
+    }
+    .input::placeholder {
+      color: var(--color-muted-foreground);
+    }
+    .input-focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(77, 168, 255, 0.15);
+    }
+    .input-error {
+      border-color: var(--color-error);
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+    }
+    .input-disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* === Dev Spec Table === */
+    .spec-section { margin-top: 48px; }
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      font-size: var(--font-size-sm);
+    }
+    .spec-table th {
+      text-align: left;
+      padding: 10px 16px;
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-on-surface-variant);
+      background: var(--color-surface-dim);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .spec-table td {
+      padding: 8px 16px;
+      color: var(--color-on-surface-variant);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .spec-table tr:last-child td { border-bottom: none; }
+    .color-swatch {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      vertical-align: middle;
+      margin-right: 6px;
+      border: 1px solid var(--color-border);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <h2 class="sf-h2" style="color: var(--color-foreground); margin-bottom: 8px;">Input 输入框</h2>
+    <p class="sf-body" style="color: var(--color-muted-foreground); margin-bottom: 40px;">4 个状态: default, focus, error, disabled</p>
+
+    <div class="section">
+      <div class="state-row">
+        <span class="state-label">Default</span>
+        <input class="input" type="text" placeholder="请输入内容...">
+      </div>
+      <div class="state-row">
+        <span class="state-label">Focus</span>
+        <input class="input input-focus" type="text" value="聚焦状态的内容">
+      </div>
+      <div class="state-row">
+        <span class="state-label">Error</span>
+        <input class="input input-error" type="text" value="错误输入的内容">
+      </div>
+      <div class="state-row">
+        <span class="state-label">Disabled</span>
+        <input class="input input-disabled" type="text" placeholder="不可编辑" disabled>
+      </div>
+    </div>
+
+    <!-- ===== Dev Spec Table ===== -->
+    <div class="spec-section">
+      <h3 class="sf-h3" style="color: var(--color-foreground); margin-bottom: 16px;">Dev Spec</h3>
+      <table class="spec-table">
+        <thead>
+          <tr><th>属性</th><th>Default</th><th>Focus</th><th>Error</th><th>Disabled</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>背景色</td>
+            <td><span class="color-swatch" style="background:#1C2128;"></span>#1C2128</td>
+            <td><span class="color-swatch" style="background:#1C2128;"></span>#1C2128</td>
+            <td><span class="color-swatch" style="background:#1C2128;"></span>#1C2128</td>
+            <td><span class="color-swatch" style="background:#1C2128; opacity:0.4;"></span>#1C2128</td>
+          </tr>
+          <tr>
+            <td>文字色</td>
+            <td>#E8F4FF</td>
+            <td>#E8F4FF</td>
+            <td>#E8F4FF</td>
+            <td>#E8F4FF</td>
+          </tr>
+          <tr>
+            <td>占位符色</td>
+            <td>#8B949E</td>
+            <td>#8B949E</td>
+            <td>#8B949E</td>
+            <td>#8B949E</td>
+          </tr>
+          <tr>
+            <td>边框</td>
+            <td>1px solid #30363D</td>
+            <td>1px solid #4DA8FF</td>
+            <td>1px solid #EF4444</td>
+            <td>1px solid #30363D</td>
+          </tr>
+          <tr>
+            <td>阴影</td>
+            <td>none</td>
+            <td>0 0 0 3px rgba(77,168,255,0.15)</td>
+            <td>0 0 0 3px rgba(239,68,68,0.15)</td>
+            <td>none</td>
+          </tr>
+          <tr>
+            <td>透明度</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0.4</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="spec-section">
+      <h3 class="sf-h3" style="color: var(--color-foreground); margin-bottom: 16px;">Dev Spec - 共享属性</h3>
+      <table class="spec-table">
+        <thead>
+          <tr><th>属性</th><th>值</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>高度</td><td>40px (--size-input-height)</td></tr>
+          <tr><td>内边距</td><td>0 12px</td></tr>
+          <tr><td>字号</td><td>14px (--font-size-base)</td></tr>
+          <tr><td>字重</td><td>400 (Regular)</td></tr>
+          <tr><td>字体</td><td>Inter</td></tr>
+          <tr><td>圆角</td><td>6px (--radius-button)</td></tr>
+          <tr><td>过渡</td><td>border-color 0.15s, box-shadow 0.15s</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</body>
+</html>

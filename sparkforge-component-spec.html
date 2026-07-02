@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SparkForge UI 组件规格</title>
+<link rel="stylesheet" href=".design_library/sparkforge-iceflame-v2/colors_and_type.css">
+<style>
+/* Inline fallback: all critical token variables for standalone viewing */
+:root {
+  --spark-blue-400: #4DA8FF;
+  --spark-blue-300: #85BFFF;
+  --spark-blue-500: #2D8AE0;
+  --nebula-purple-400: #7B61FF;
+  --success-500: #22C55E;
+  --warning-500: #EAB308;
+  --error-500: #EF4444;
+  --deep-space-50: #8B949E;
+  --deep-space-100: #6E7681;
+  --deep-space-200: #484F58;
+  --deep-space-300: #30363D;
+  --deep-space-400: #21262D;
+  --deep-space-500: #1C2128;
+  --deep-space-600: #161B22;
+  --deep-space-700: #0D1117;
+  --deep-space-800: #0A0E14;
+  --deep-space-900: #06080C;
+  --bg: #0A0E14;
+  --bg-elevated: #1C2128;
+  --fg: #E8F4FF;
+  --fg-secondary: #8B949E;
+  --fg-muted: #6E7681;
+  --primary: #4DA8FF;
+  --primary-hover: #69B9FF;
+  --primary-muted: rgba(77,168,255,0.12);
+  --primary-subtle: rgba(77,168,255,0.06);
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-base: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 32px;
+  --radius-sm: 4px;
+  --radius-button: 6px;
+  --radius-card: 8px;
+  --radius-modal: 12px;
+  --radius-full: 9999px;
+  --shadow-2: 0px 4px 16px rgba(77,168,255,0.08);
+}
+
+/* === Page Base === */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0A0E14;
+  color: #E8F4FF;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(600px at 50% 30%, rgba(77,168,255,0.04), transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page-wrapper {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+/* === Header === */
+.page-header {
+  margin-bottom: 40px;
+}
+.page-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #E8F4FF;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+.page-header .subtitle {
+  font-size: 14px;
+  font-weight: 400;
+  color: #6E7681;
+}
+
+/* === Anchor Nav === */
+.anchor-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10,14,20,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid #30363D;
+  padding: 12px 0;
+  margin-bottom: 32px;
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.anchor-nav::-webkit-scrollbar { display: none; }
+.anchor-nav a {
+  font-size: 13px;
+  font-weight: 500;
+  color: #8B949E;
+  text-decoration: none;
+  white-space: nowrap;
+  padding: 4px 0;
+  transition: color 150ms ease;
+  border-bottom: 2px solid transparent;
+}
+.anchor-nav a:hover,
+.anchor-nav a.active {
+  color: #4DA8FF;
+  border-bottom-color: #4DA8FF;
+}
+
+/* === Component Section === */
+.component-section {
+  padding-bottom: 32px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid #30363D;
+}
+.component-section:last-of-type {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #E8F4FF;
+  margin-bottom: 4px;
+}
+.section-desc {
+  font-size: 13px;
+  font-weight: 400;
+  color: #8B949E;
+  margin-bottom: 24px;
+}
+
+/* === State Row === */
+.state-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  align-items: flex-start;
+}
+.state-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 80px;
+}
+.state-item .state-label {
+  font-size: 12px;
+  font-weight: 400;
+  color: #6E7681;
+}
+
+/* === Variant Row === */
+.variant-row {
+  margin-bottom: 20px;
+}
+.variant-row:last-child { margin-bottom: 24px; }
+.variant-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #8B949E;
+  margin-bottom: 8px;
+}
+
+/* === Dev Spec Table === */
+.spec-table-wrap {
+  overflow-x: auto;
+  margin-top: 8px;
+}
+.spec-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #1C2128;
+  border: 1px solid #30363D;
+  border-radius: 6px;
+  font-size: 13px;
+}
+.spec-table thead th {
+  background: rgba(77,168,255,0.06);
+  color: #4DA8FF;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid #30363D;
+  white-space: nowrap;
+}
+.spec-table tbody td {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(48,54,61,0.5);
+  color: #E8F4FF;
+  vertical-align: top;
+}
+.spec-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.spec-table tbody td:first-child {
+  color: #8B949E;
+  white-space: nowrap;
+}
+.spec-table .code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: #E8F4FF;
+}
+.spec-table .empty {
+  color: #6E7681;
+}
+
+/* === Footer === */
+.page-footer {
+  text-align: center;
+  padding: 32px 0 16px;
+  color: #6E7681;
+  font-size: 12px;
+}
+
+/* ============================== */
+/* ===== COMPONENT STYLES ======= */
+/* ============================== */
+
+/* --- Button --- */
+.btn-demo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: default;
+  transition: all 150ms ease;
+  white-space: nowrap;
+  outline: none;
+}
+.btn-md { height: 40px; padding: 0 16px; }
+.btn-lg { height: 48px; padding: 0 24px; }
+
+.btn-primary {
+  background: #4DA8FF;
+  color: #0A0E14;
+  border: none;
+}
+.btn-primary:hover { background: #69B9FF; }
+.btn-primary.active { transform: scale(0.97); }
+.btn-primary.disabled { background: rgba(77,168,255,0.4); color: rgba(10,14,20,0.6); }
+
+.btn-secondary {
+  background: transparent;
+  color: #E8F4FF;
+  border: 1px solid #30363D;
+}
+.btn-secondary:hover { border-color: #4DA8FF; }
+.btn-secondary.active { background: rgba(77,168,255,0.08); border-color: #4DA8FF; }
+.btn-secondary.disabled { border-color: rgba(48,54,61,0.5); color: rgba(139,148,158,0.5); }
+
+.btn-ghost {
+  background: transparent;
+  color: #8B949E;
+  border: none;
+}
+.btn-ghost:hover { color: #4DA8FF; }
+.btn-ghost.active { background: rgba(77,168,255,0.08); color: #4DA8FF; }
+.btn-ghost.disabled { color: rgba(139,148,158,0.4); }
+
+/* --- Input --- */
+.input-demo {
+  display: inline-flex;
+  align-items: center;
+  background: #1C2128;
+  border: 1px solid #30363D;
+  border-radius: 6px;
+  height: 40px;
+  padding: 0 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: #E8F4FF;
+  width: 280px;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.input-demo input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: inherit;
+  font: inherit;
+  width: 100%;
+}
+.input-demo input::placeholder { color: #8B949E; }
+
+.input-demo .icon-left {
+  margin-right: 8px;
+  color: #8B949E;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.input-demo.focus {
+  border-color: #4DA8FF;
+  box-shadow: 0 0 0 3px rgba(77,168,255,0.15);
+}
+.input-demo.error {
+  border-color: #EF4444;
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.15);
+}
+.input-demo.error .icon-right {
+  margin-left: 8px;
+  color: #EF4444;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+.input-demo.disabled {
+  background: rgba(28,33,40,0.6);
+  border-color: rgba(48,54,61,0.5);
+  color: rgba(139,148,158,0.5);
+}
+.input-demo.disabled input::placeholder { color: rgba(139,148,158,0.4); }
+
+/* --- Select --- */
+.select-demo-wrap { position: relative; display: inline-block; }
+.select-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #1C2128;
+  border: 1px solid #30363D;
+  border-radius: 6px;
+  height: 40px;
+  padding: 0 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: #E8F4FF;
+  width: 280px;
+  cursor: default;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.select-trigger .chevron {
+  flex-shrink: 0;
+  color: #8B949E;
+  transition: transform 200ms ease;
+  margin-left: 8px;
+}
+.select-trigger.focus {
+  border-color: #4DA8FF;
+  box-shadow: 0 0 0 3px rgba(77,168,255,0.15);
+}
+.select-trigger.open {
+  border-color: #4DA8FF;
+  box-shadow: 0 0 0 3px rgba(77,168,255,0.15);
+}
+.select-trigger.open .chevron { transform: rotate(180deg); color: #4DA8FF; }
+.select-trigger.disabled {
+  background: rgba(28,33,40,0.6);
+  border-color: rgba(48,54,61,0.5);
+  color: rgba(139,148,158,0.5);
+}
+
+.select-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  background: #1C2128;
+  border: 1px solid #30363D;
+  border-radius: 8px;
+  box-shadow: 0px 4px 16px rgba(77,168,255,0.08);
+  padding: 4px 0;
+  z-index: 10;
+}
+.select-menu-item {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: #E8F4FF;
+  cursor: default;
+  transition: background 100ms ease;
+}
+.select-menu-item:hover { background: rgba(77,168,255,0.08); }
+.select-menu-item.selected { color: #4DA8FF; background: rgba(77,168,255,0.06); }
+
+/* --- Data Card --- */
+.data-card-demo {
+  background: #1C2128;
+  border-left: 3px solid #4DA8FF;
+  border-radius: 8px;
+  padding: 16px;
+  width: 240px;
+  transition: box-shadow 150ms ease, transform 150ms ease, outline 150ms ease;
+}
+.data-card-demo .card-label {
+  font-size: 12px;
+  font-weight: 400;
+  color: #8B949E;
+  margin-bottom: 4px;
+}
+.data-card-demo .card-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 32px;
+  font-weight: 700;
+  color: #E8F4FF;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+.data-card-demo .card-trend {
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.data-card-demo .card-trend.up { color: #22C55E; }
+.data-card-demo .card-trend.down { color: #EF4444; }
+.data-card-demo .card-sparkline {
+  margin-top: 8px;
+}
+.data-card-demo.hover {
+  box-shadow: 0px 4px 16px rgba(77,168,255,0.08);
+  transform: translateY(-1px);
+}
+.data-card-demo.selected {
+  outline: 1px solid rgba(77,168,255,0.3);
+  outline-offset: -1px;
+}
+.data-card-demo.disabled {
+  opacity: 0.5;
+  border-left-color: rgba(77,168,255,0.3);
+}
+
+/* --- Content Card --- */
+.content-card-demo {
+  background: #1C2128;
+  border: 1px solid #30363D;
+  border-radius: 8px;
+  padding: 16px;
+  width: 280px;
+  transition: border-color 150ms ease, outline 150ms ease;
+}
+.content-card-demo .card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #E8F4FF;
+  margin-bottom: 6px;
+}
+.content-card-demo .card-body {
+  font-size: 14px;
+  font-weight: 400;
+  color: #8B949E;
+  line-height: 1.5;
+}
+.content-card-demo.hover { border-color: #4DA8FF; }
+.content-card-demo.selected {
+  border-color: #4DA8FF;
+  outline: 1px solid rgba(77,168,255,0.3);
+  outline-offset: -1px;
+}
+.content-card-demo.disabled {
+  border-color: rgba(48,54,61,0.5);
+  opacity: 0.5;
+}
+
+/* --- Modal --- */
+.modal-overlay {
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  width: 100%;
+  height: 320px;
+  position: relative;
+}
+.modal-box {
+  background: #1C2128;
+  border: 1px solid #30363D;
+  border-radius: 12px;
+  max-width: 480px;
+  width: 100%;
+  padding: 24px;
+  position: relative;
+}
+.modal-box .modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8B949E;
+  cursor: default;
+  font-size: 16px;
+  line-height: 1;
+}
+.modal-box .modal-close:hover { color: #E8F4FF; }
+.modal-box .modal-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #E8F4FF;
+  margin-bottom: 12px;
+  padding-right: 24px;
+}
+.modal-box .modal-body {
+  font-size: 14px;
+  color: #8B949E;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+.modal-box .modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* --- Tag/Badge --- */
+.tag-demo {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 9999px;
+  padding: 2px 8px;
+  height: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  white-space: nowrap;
+  transition: transform 150ms ease, filter 150ms ease;
+}
+.tag-default {
+  background: rgba(77,168,255,0.12);
+  color: #4DA8FF;
+}
+.tag-success {
+  background: rgba(34,197,94,0.12);
+  color: #22C55E;
+}
+.tag-warning {
+  background: rgba(234,179,8,0.12);
+  color: #EAB308;
+}
+.tag-demo:hover { filter: brightness(1.2); }
+.tag-demo.active { transform: scale(0.97); }
+.tag-demo.disabled { opacity: 0.4; }
+.tag-demo .tag-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  cursor: default;
+  font-size: 10px;
+  line-height: 1;
+  opacity: 0.7;
+}
+
+/* --- Avatar --- */
+.avatar-demo {
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  border: 2px solid #30363D;
+  background: linear-gradient(135deg, #4DA8FF, #7B61FF);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+  transition: box-shadow 150ms ease;
+}
+.avatar-demo.sm { width: 32px; height: 32px; }
+.avatar-demo.md { width: 40px; height: 40px; }
+.avatar-demo.lg { width: 56px; height: 56px; }
+.avatar-demo .avatar-letter {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0A0E14;
+}
+.avatar-demo.lg .avatar-letter { font-size: 20px; }
+.avatar-demo.sm .avatar-letter { font-size: 11px; }
+.avatar-demo .online-dot {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: #22C55E;
+  border: 2px solid #0A0E14;
+}
+.avatar-demo:hover {
+  box-shadow: 0 0 0 2px #4DA8FF;
+}
+.avatar-demo.disabled {
+  opacity: 0.4;
+  filter: grayscale(100%);
+}
+.avatar-group {
+  display: flex;
+  align-items: center;
+}
+.avatar-group .avatar-demo + .avatar-demo {
+  margin-left: -8px;
+}
+
+/* --- Toggle --- */
+.toggle-demo {
+  width: 40px;
+  height: 20px;
+  border-radius: 10px;
+  position: relative;
+  cursor: default;
+  transition: background 200ms ease;
+}
+.toggle-demo .toggle-thumb {
+  position: absolute;
+  top: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  transition: left 200ms ease, background 200ms ease;
+}
+.toggle-demo.off {
+  background: #30363D;
+}
+.toggle-demo.off .toggle-thumb {
+  left: 2px;
+  background: #8B949E;
+}
+.toggle-demo.on {
+  background: #4DA8FF;
+}
+.toggle-demo.on .toggle-thumb {
+  left: 22px;
+  background: #E8F4FF;
+}
+.toggle-demo.disabled { opacity: 0.5; }
+
+/* --- Utility: label row for variants --- */
+.variant-state-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.variant-state-row .state-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* --- Row label inside state display --- */
+.row-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #8B949E;
+  width: 100px;
+  flex-shrink: 0;
+}
+
+/* === Section for modal states thumbnails === */
+.modal-states-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+.modal-thumb {
+  width: 120px;
+  height: 80px;
+  border-radius: 6px;
+  background: rgba(28,33,40,0.6);
+  border: 1px solid #30363D;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+}
+.modal-thumb .thumb-label {
+  font-size: 10px;
+  color: #8B949E;
+}
+.modal-thumb .thumb-box {
+  width: 60px;
+  height: 36px;
+  border-radius: 6px;
+  background: #1C2128;
+  border: 1px solid #30363D;
+}
+.modal-thumb.opening .thumb-box {
+  opacity: 0.7;
+  transform: scale(0.9);
+}
+.modal-thumb.closing .thumb-box {
+  opacity: 0.7;
+  transform: scale(0.95);
+}
+
+/* === Scrollbar (webkit) === */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #30363D; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+  <!-- ===== HEADER ===== -->
+  <header class="page-header">
+    <h1>SparkForge UI 组件规格</h1>
+    <p class="subtitle">冰焰版 v2 · 设计令牌参照</p>
+  </header>
+
+  <!-- ===== ANCHOR NAV ===== -->
+  <nav class="anchor-nav" id="anchorNav">
+    <a href="#buttons">按钮</a>
+    <a href="#input">输入框</a>
+    <a href="#select">下拉选择框</a>
+    <a href="#datacard">数据卡片</a>
+    <a href="#contentcard">内容卡片</a>
+    <a href="#modal">模态框</a>
+    <a href="#tags">标签/徽章</a>
+    <a href="#avatar">头像</a>
+    <a href="#toggle">开关</a>
+  </nav>
+
+  <!-- ============================== -->
+  <!-- 1. BUTTON                      -->
+  <!-- ============================== -->
+  <section class="component-section" id="buttons">
+    <h2 class="section-title">按钮 (Button)</h2>
+    <p class="section-desc">三种视觉变体（主按钮、次级按钮、幽灵按钮），各支持 md (40px) 与 lg (48px) 两种尺寸。</p>
+
+    <!-- Primary -->
+    <div class="variant-row">
+      <div class="variant-label">主按钮 (Primary)</div>
+      <div class="state-row">
+        <div class="state-item">
+          <button class="btn-demo btn-md btn-primary">确认提交</button>
+          <span class="state-label">Default</span>
+        </div>
+        <div class="state-item">
+          <button class="btn-demo btn-md btn-primary hover">确认提交</button>
+          <span class="state-label">Hover</span>
+        </div>
+        <div class="state-item">
+          <button class="btn-demo btn-md btn-primary active">确认提交</button>
+          <span class="state-label">Active</span>
+        </div>
+        <div class="state-item">
+          <button class="btn-demo btn-md btn-primary disabled">确认提交</button>
+          <span class="state-label">Disabled</span>
+        </div>
+      </div>
+      <div class="state-row">
+        <div class="state-item">
+          <button class="btn-demo btn-lg btn-primary">确认提交</button>
+          <span class="state-label">Default lg</span>
+        </div>
+        <div class="state-item">
+          <button class="btn-demo btn-lg btn-primary hover">确认提交</button>
+          <span class="state-label">Hover lg</span>
+        </div>
+        <div class="state-item">
+          <button class="btn-demo btn-lg btn-primary active">确认提交</button>
+          <span class="state-label">Active lg</span>
+        </div>
+        <div class="state-item">
+          <button class="btn-demo btn-lg btn-primary disabled">确认提交</button>
+          <span class="state-label">Disabled lg</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Secondary -->
+    <div class="variant-row">
+      <div class="variant-label">次级按钮 (Secondary)</div>
+      <div class="state-row">
+        <div class="state-item">
+          <button class="btn-demo btn-md btn-secondary">取消</button>
+          <span class="state-label">Default</span>
+        </div>
+        <div class="state-item">
+          <button class="btn-demo btn-md btn-secondary hover">取消</button>
+          <span class="state-label">Hover</span>
+        </div>
+        <div class="state-item">
+          <button class="btn-demo btn-md btn-secondary active">取消</button>
+          <span class="state-label">Active</span>
+        </div>
+        <div class="state-item">
+          <button class="btn-demo btn-md btn-secondary disabled">取消</button>
+          <span class="state-label">Disabled</span>
+        </div>
+      </div>
+      <div class="state-row">
+        <div class="state-item">
+          <button class="btn-demo btn-lg btn-secondary">取消</button>
+          <span class="state-label">Default lg</span>
+        </div>
+        <div class="state-item">
+          <button class="btn-demo btn-lg btn-secondary hover">取消</button>
+          <span class="state-label">Hover lg</span>
+        </div>
+        <div class="state-item">
+          <button class="btn-demo btn-lg btn-secondary active">取消</button>
+          <span class="state-label">Active lg</span>
+        </div>
+        <div class="state-item">
+          <button class="btn-demo btn-lg btn-secondary disabled">取消</button>
+          <span class="state-label">Disabled lg</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ghost -->
+    <div class="variant-row">
+      <div class="variant-label">幽灵按钮 (Ghost)</div>
+      <div class="state-row">
+        <div class="state-item">
+          <button class="btn-demo btn-md btn-ghost">了解更多</button>
+          <span class="state-label">Default</span>
+        </div>
+        <div class="state-item">
+          <button class="btn-demo btn-md btn-ghost hover">了解更多</button>
+          <span class="state-label">Hover</span>
+        </div>
+        <div class="state-item">
+          <button class="btn-demo btn-md btn-ghost active">了解更多</button>
+          <span class="state-label">Active</span>
+        </div>
+        <div class="state-item">
+          <button class="btn-demo btn-md btn-ghost disabled">了解更多</button>
+          <span class="state-label">Disabled</span>
+        </div>
+      </div>
+      <div class="state-row">
+        <div class="state-item">
+          <button class="btn-demo btn-lg btn-ghost">了解更多</button>
+          <span class="state-label">Default lg</span>
+        </div>
+        <div class="state-item">
+          <button class="btn-demo btn-lg btn-ghost hover">了解更多</button>
+          <span class="state-label">Hover lg</span>
+        </div>
+        <div class="state-item">
+          <button class="btn-demo btn-lg btn-ghost active">了解更多</button>
+          <span class="state-label">Active lg</span>
+        </div>
+        <div class="state-item">
+          <button class="btn-demo btn-lg btn-ghost disabled">了解更多</button>
+          <span class="state-label">Disabled lg</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dev Spec Tables -->
+    <div class="spec-table-wrap">
+      <table class="spec-table">
+        <thead><tr><th>属性</th><th>Primary Default</th><th>Primary Hover</th><th>Primary Active</th><th>Primary Disabled</th></tr></thead>
+        <tbody>
+          <tr><td>背景色</td><td class="code">#4DA8FF</td><td class="code">#69B9FF</td><td class="code">#4DA8FF</td><td class="code">rgba(77,168,255,0.4)</td></tr>
+          <tr><td>文字色</td><td class="code">#0A0E14</td><td class="code">#0A0E14</td><td class="code">#0A0E14</td><td class="code">rgba(10,14,20,0.6)</td></tr>
+          <tr><td>边框</td><td class="code">none</td><td class="code">none</td><td class="code">none</td><td class="code">none</td></tr>
+          <tr><td>圆角</td><td class="code">6px</td><td class="code">6px</td><td class="code">6px</td><td class="code">6px</td></tr>
+          <tr><td>内边距</td><td class="code">0 16px / 0 24px</td><td class="empty">—</td><td class="empty">—</td><td class="empty">—</td></tr>
+          <tr><td>高度</td><td class="code">40px (md) / 48px (lg)</td><td class="empty">—</td><td class="empty">—</td><td class="empty">—</td></tr>
+          <tr><td>字号</td><td class="code">14px</td><td class="empty">—</td><td class="empty">—</td><td class="empty">—</td></tr>
+          <tr><td>字重</td><td class="code">500</td><td class="empty">—</td><td class="empty">—</td><td class="empty">—</td></tr>
+          <tr><td>变换</td><td class="code">none</td><td class="code">none</td><td class="code">scale(0.97)</td><td class="code">none</td></tr>
+          <tr><td>阴影</td><td class="code">none</td><td class="code">none</td><td class="code">none</td><td class="code">none</td></tr>
+          <tr><td>过渡</td><td class="code">150ms ease</td><td class="empty">—</td><td class="empty">—</td><td class="empty">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="spec-table-wrap" style="margin-top:8px;">
+      <table class="spec-table">
+        <thead><tr><th>属性</th><th>Secondary Default</th><th>Secondary Hover</th><th>Secondary Active</th><th>Secondary Disabled</th></tr></thead>
+        <tbody>
+          <tr><td>背景色</td><td class="code">transparent</td><td class="code">transparent</td><td class="code">rgba(77,168,255,0.08)</td><td class="code">transparent</td></tr>
+          <tr><td>文字色</td><td class="code">#E8F4FF</td><td class="code">#E8F4FF</td><td class="code">#E8F4FF</td><td class="code">rgba(139,148,158,0.5)</td></tr>
+          <tr><td>边框</td><td class="code">1px solid #30363D</td><td class="code">1px solid #4DA8FF</td><td class="code">1px solid #4DA8FF</td><td class="code">1px solid rgba(48,54,61,0.5)</td></tr>
+          <tr><td>圆角</td><td class="code">6px</td><td class="code">6px</td><td class="code">6px</td><td class="code">6px</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="spec-table-wrap" style="margin-top:8px;">
+      <table class="spec-table">
+        <thead><tr><th>属性</th><th>Ghost Default</th><th>Ghost Hover</th><th>Ghost Active</th><th>Ghost Disabled</th></tr></thead>
+        <tbody>
+          <tr><td>背景色</td><td class="code">transparent</td><td class="code">transparent</td><td class="code">rgba(77,168,255,0.08)</td><td class="code">transparent</td></tr>
+          <tr><td>文字色</td><td class="code">#8B949E</td><td class="code">#4DA8FF</td><td class="code">#4DA8FF</td><td class="code">rgba(139,148,158,0.4)</td></tr>
+          <tr><td>边框</td><td class="code">none</td><td class="code">none</td><td class="code">none</td><td class="code">none</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============================== -->
+  <!-- 2. INPUT                       -->
+  <!-- ============================== -->
+  <section class="component-section" id="input">
+    <h2 class="section-title">输入框 (Input)</h2>
+    <p class="section-desc">单行文本输入，支持带图标、聚焦高亮、错误提示及禁用状态。</p>
+
+    <div class="state-row">
+      <div class="state-item">
+        <div class="input-demo">
+          <input type="text" placeholder="请输入邮箱地址">
+        </div>
+        <span class="state-label">Default</span>
+      </div>
+      <div class="state-item">
+        <div class="input-demo focus">
+          <input type="text" value="user@example.com">
+        </div>
+        <span class="state-label">Focus</span>
+      </div>
+      <div class="state-item">
+        <div class="input-demo error">
+          <input type="text" value="invalid-email" style="color:#EF4444;">
+          <span class="icon-right">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#EF4444" stroke-width="1.2"/><path d="M5 5l6 6M11 5l-6 6" stroke="#EF4444" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </span>
+        </div>
+        <span class="state-label">Error</span>
+      </div>
+      <div class="state-item">
+        <div class="input-demo disabled">
+          <input type="text" value="已禁用" disabled style="color:rgba(139,148,158,0.5);">
+        </div>
+        <span class="state-label">Disabled</span>
+      </div>
+    </div>
+    <div class="state-row">
+      <div class="state-item">
+        <div class="input-demo">
+          <span class="icon-left">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="#8B949E" stroke-width="1.2"/><path d="M11 11l3 3" stroke="#8B949E" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </span>
+          <input type="text" placeholder="搜索...">
+        </div>
+        <span class="state-label">Default + Icon</span>
+      </div>
+    </div>
+
+    <div class="spec-table-wrap">
+      <table class="spec-table">
+        <thead><tr><th>属性</th><th>Default</th><th>Focus</th><th>Error</th><th>Disabled</th></tr></thead>
+        <tbody>
+          <tr><td>背景色</td><td class="code">#1C2128</td><td class="code">#1C2128</td><td class="code">#1C2128</td><td class="code">rgba(28,33,40,0.6)</td></tr>
+          <tr><td>文字色</td><td class="code">#E8F4FF</td><td class="code">#E8F4FF</td><td class="code">#E8F4FF</td><td class="code">rgba(139,148,158,0.5)</td></tr>
+          <tr><td>占位符</td><td class="code">#8B949E</td><td class="code">#8B949E</td><td class="code">#8B949E</td><td class="code">rgba(139,148,158,0.4)</td></tr>
+          <tr><td>边框</td><td class="code">1px solid #30363D</td><td class="code">1px solid #4DA8FF</td><td class="code">1px solid #EF4444</td><td class="code">1px solid rgba(48,54,61,0.5)</td></tr>
+          <tr><td>外发光</td><td class="code">none</td><td class="code">0 0 0 3px rgba(77,168,255,0.15)</td><td class="code">0 0 0 3px rgba(239,68,68,0.15)</td><td class="code">none</td></tr>
+          <tr><td>圆角</td><td class="code">6px</td><td class="code">6px</td><td class="code">6px</td><td class="code">6px</td></tr>
+          <tr><td>高度</td><td class="code">40px</td><td class="code">40px</td><td class="code">40px</td><td class="code">40px</td></tr>
+          <tr><td>内边距</td><td class="code">0 12px</td><td class="code">0 12px</td><td class="code">0 12px</td><td class="code">0 12px</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============================== -->
+  <!-- 3. SELECT                      -->
+  <!-- ============================== -->
+  <section class="component-section" id="select">
+    <h2 class="section-title">下拉选择框 (Select)</h2>
+    <p class="section-desc">点击触发器展开下拉菜单，含 4 个状态及菜单面板展开样式。</p>
+
+    <div class="state-row">
+      <div class="state-item">
+        <div class="select-demo-wrap">
+          <div class="select-trigger">
+            <span>全部信号源</span>
+            <span class="chevron">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </div>
+        </div>
+        <span class="state-label">Default</span>
+      </div>
+      <div class="state-item">
+        <div class="select-demo-wrap">
+          <div class="select-trigger focus">
+            <span>全部信号源</span>
+            <span class="chevron">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </div>
+        </div>
+        <span class="state-label">Focus</span>
+      </div>
+      <div class="state-item">
+        <div class="select-demo-wrap">
+          <div class="select-trigger open">
+            <span>全部信号源</span>
+            <span class="chevron">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </div>
+          <div class="select-menu">
+            <div class="select-menu-item selected">全部信号源</div>
+            <div class="select-menu-item">Hacker News</div>
+            <div class="select-menu-item">Product Hunt</div>
+            <div class="select-menu-item">TechCrunch</div>
+          </div>
+        </div>
+        <span class="state-label">Open</span>
+      </div>
+      <div class="state-item">
+        <div class="select-demo-wrap">
+          <div class="select-trigger disabled">
+            <span>全部信号源</span>
+            <span class="chevron">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </div>
+        </div>
+        <span class="state-label">Disabled</span>
+      </div>
+    </div>
+
+    <div class="spec-table-wrap">
+      <table class="spec-table">
+        <thead><tr><th>属性</th><th>Default</th><th>Focus</th><th>Open (Trigger)</th><th>Open (Menu)</th><th>Disabled</th></tr></thead>
+        <tbody>
+          <tr><td>触发背景</td><td class="code">#1C2128</td><td class="code">#1C2128</td><td class="code">#1C2128</td><td class="empty">—</td><td class="code">rgba(28,33,40,0.6)</td></tr>
+          <tr><td>菜单背景</td><td class="empty">—</td><td class="empty">—</td><td class="empty">—</td><td class="code">#1C2128</td><td class="empty">—</td></tr>
+          <tr><td>菜单边框</td><td class="empty">—</td><td class="empty">—</td><td class="empty">—</td><td class="code">1px solid #30363D</td><td class="empty">—</td></tr>
+          <tr><td>菜单阴影</td><td class="empty">—</td><td class="empty">—</td><td class="empty">—</td><td class="code">0px 4px 16px rgba(77,168,255,0.08)</td><td class="empty">—</td></tr>
+          <tr><td>菜单圆角</td><td class="empty">—</td><td class="empty">—</td><td class="empty">—</td><td class="code">8px</td><td class="empty">—</td></tr>
+          <tr><td>选项悬停</td><td class="empty">—</td><td class="empty">—</td><td class="empty">—</td><td class="code">rgba(77,168,255,0.08)</td><td class="empty">—</td></tr>
+          <tr><td>选项高度</td><td class="empty">—</td><td class="empty">—</td><td class="empty">—</td><td class="code">36px</td><td class="empty">—</td></tr>
+          <tr><td>Chevron</td><td class="code">#8B949E</td><td class="code">#8B949E</td><td class="code">#4DA8FF</td><td class="empty">—</td><td class="code">rgba(139,148,158,0.4)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============================== -->
+  <!-- 4. DATA CARD                   -->
+  <!-- ============================== -->
+  <section class="component-section" id="datacard">
+    <h2 class="section-title">数据指标卡片 (Data Card)</h2>
+    <p class="section-desc">用于展示关键指标数值，含趋势指示和迷你趋势图。</p>
+
+    <div class="state-row">
+      <div class="state-item">
+        <div class="data-card-demo">
+          <div class="card-label">活跃信号</div>
+          <div class="card-value">1,284</div>
+          <div class="card-trend up">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 2v8M4 6l2 2 2-2" stroke="#22C55E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>↑ 12.5%</span>
+          </div>
+          <div class="card-sparkline">
+            <svg width="208" height="32" viewBox="0 0 208 32" fill="none">
+              <polyline points="0,28 34,20 69,24 103,12 138,16 172,8 208,4" stroke="#4DA8FF" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <polygon points="0,28 34,20 69,24 103,12 138,16 172,8 208,4 208,32 0,32" fill="rgba(77,168,255,0.1)"/>
+            </svg>
+          </div>
+        </div>
+        <span class="state-label">Default</span>
+      </div>
+      <div class="state-item">
+        <div class="data-card-demo hover">
+          <div class="card-label">活跃信号</div>
+          <div class="card-value">1,284</div>
+          <div class="card-trend up">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 2v8M4 6l2 2 2-2" stroke="#22C55E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>↑ 12.5%</span>
+          </div>
+          <div class="card-sparkline">
+            <svg width="208" height="32" viewBox="0 0 208 32" fill="none">
+              <polyline points="0,28 34,20 69,24 103,12 138,16 172,8 208,4" stroke="#4DA8FF" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <polygon points="0,28 34,20 69,24 103,12 138,16 172,8 208,4 208,32 0,32" fill="rgba(77,168,255,0.1)"/>
+            </svg>
+          </div>
+        </div>
+        <span class="state-label">Hover</span>
+      </div>
+      <div class="state-item">
+        <div class="data-card-demo selected">
+          <div class="card-label">活跃信号</div>
+          <div class="card-value">1,284</div>
+          <div class="card-trend up">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 2v8M4 6l2 2 2-2" stroke="#22C55E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>↑ 12.5%</span>
+          </div>
+          <div class="card-sparkline">
+            <svg width="208" height="32" viewBox="0 0 208 32" fill="none">
+              <polyline points="0,28 34,20 69,24 103,12 138,16 172,8 208,4" stroke="#4DA8FF" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <polygon points="0,28 34,20 69,24 103,12 138,16 172,8 208,4 208,32 0,32" fill="rgba(77,168,255,0.1)"/>
+            </svg>
+          </div>
+        </div>
+        <span class="state-label">Selected</span>
+      </div>
+      <div class="state-item">
+        <div class="data-card-demo disabled">
+          <div class="card-label">活跃信号</div>
+          <div class="card-value">1,284</div>
+          <div class="card-trend down">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 10V2M4 6l2-2 2 2" stroke="#EF4444" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>↓ 3.2%</span>
+          </div>
+        </div>
+        <span class="state-label">Disabled</span>
+      </div>
+    </div>
+
+    <div class="spec-table-wrap">
+      <table class="spec-table">
+        <thead><tr><th>属性</th><th>Default</th><th>Hover</th><th>Selected</th><th>Disabled</th></tr></thead>
+        <tbody>
+          <tr><td>背景色</td><td class="code">#1C2128</td><td class="code">#1C2128</td><td class="code">#1C2128</td><td class="code">rgba(28,33,40,0.5)</td></tr>
+          <tr><td>左边框</td><td class="code">3px solid #4DA8FF</td><td class="code">3px solid #4DA8FF</td><td class="code">3px solid #4DA8FF</td><td class="code">3px solid rgba(77,168,255,0.3)</td></tr>
+          <tr><td>圆角</td><td class="code">8px</td><td class="code">8px</td><td class="code">8px</td><td class="code">8px</td></tr>
+          <tr><td>内边距</td><td class="code">16px</td><td class="code">16px</td><td class="code">16px</td><td class="code">16px</td></tr>
+          <tr><td>标签字号</td><td class="code">12px</td><td class="code">12px</td><td class="code">12px</td><td class="code">12px</td></tr>
+          <tr><td>标签颜色</td><td class="code">#8B949E</td><td class="code">#8B949E</td><td class="code">#8B949E</td><td class="code">#8B949E</td></tr>
+          <tr><td>数字字号</td><td class="code">32px</td><td class="code">32px</td><td class="code">32px</td><td class="code">32px</td></tr>
+          <tr><td>数字颜色</td><td class="code">#E8F4FF</td><td class="code">#E8F4FF</td><td class="code">#E8F4FF</td><td class="code">#E8F4FF</td></tr>
+          <tr><td>数字字体</td><td class="code">JetBrains Mono</td><td class="code">JetBrains Mono</td><td class="code">JetBrains Mono</td><td class="code">JetBrains Mono</td></tr>
+          <tr><td>阴影</td><td class="code">none</td><td class="code">0px 4px 16px rgba(77,168,255,0.08)</td><td class="code">none</td><td class="code">none</td></tr>
+          <tr><td>变换</td><td class="code">none</td><td class="code">translateY(-1px)</td><td class="code">none</td><td class="code">none</td></tr>
+          <tr><td>轮廓</td><td class="code">none</td><td class="code">none</td><td class="code">1px solid rgba(77,168,255,0.3)</td><td class="code">none</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============================== -->
+  <!-- 5. CONTENT CARD                -->
+  <!-- ============================== -->
+  <section class="component-section" id="contentcard">
+    <h2 class="section-title">普通内容卡片 (Content Card)</h2>
+    <p class="section-desc">承载文字内容的通用卡片，适用于列表项、摘要展示等场景。</p>
+
+    <div class="state-row">
+      <div class="state-item">
+        <div class="content-card-demo">
+          <div class="card-title">信号分析报告</div>
+          <div class="card-body">过去 7 天共检测到 128 条高价值信号，其中 32 条来自 Hacker News。</div>
+        </div>
+        <span class="state-label">Default</span>
+      </div>
+      <div class="state-item">
+        <div class="content-card-demo hover">
+          <div class="card-title">信号分析报告</div>
+          <div class="card-body">过去 7 天共检测到 128 条高价值信号，其中 32 条来自 Hacker News。</div>
+        </div>
+        <span class="state-label">Hover</span>
+      </div>
+      <div class="state-item">
+        <div class="content-card-demo selected">
+          <div class="card-title">信号分析报告</div>
+          <div class="card-body">过去 7 天共检测到 128 条高价值信号，其中 32 条来自 Hacker News。</div>
+        </div>
+        <span class="state-label">Selected</span>
+      </div>
+      <div class="state-item">
+        <div class="content-card-demo disabled">
+          <div class="card-title">信号分析报告</div>
+          <div class="card-body">过去 7 天共检测到 128 条高价值信号，其中 32 条来自 Hacker News。</div>
+        </div>
+        <span class="state-label">Disabled</span>
+      </div>
+    </div>
+
+    <div class="spec-table-wrap">
+      <table class="spec-table">
+        <thead><tr><th>属性</th><th>Default</th><th>Hover</th><th>Selected</th><th>Disabled</th></tr></thead>
+        <tbody>
+          <tr><td>背景色</td><td class="code">#1C2128</td><td class="code">#1C2128</td><td class="code">#1C2128</td><td class="code">rgba(28,33,40,0.5)</td></tr>
+          <tr><td>边框</td><td class="code">1px solid #30363D</td><td class="code">1px solid #4DA8FF</td><td class="code">1px solid #4DA8FF</td><td class="code">1px solid rgba(48,54,61,0.5)</td></tr>
+          <tr><td>圆角</td><td class="code">8px</td><td class="code">8px</td><td class="code">8px</td><td class="code">8px</td></tr>
+          <tr><td>内边距</td><td class="code">16px</td><td class="code">16px</td><td class="code">16px</td><td class="code">16px</td></tr>
+          <tr><td>标题字号</td><td class="code">16px</td><td class="code">16px</td><td class="code">16px</td><td class="code">16px</td></tr>
+          <tr><td>标题颜色</td><td class="code">#E8F4FF</td><td class="code">#E8F4FF</td><td class="code">#E8F4FF</td><td class="code">#E8F4FF</td></tr>
+          <tr><td>正文字号</td><td class="code">14px</td><td class="code">14px</td><td class="code">14px</td><td class="code">14px</td></tr>
+          <tr><td>正文颜色</td><td class="code">#8B949E</td><td class="code">#8B949E</td><td class="code">#8B949E</td><td class="code">#8B949E</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============================== -->
+  <!-- 6. MODAL                       -->
+  <!-- ============================== -->
+  <section class="component-section" id="modal">
+    <h2 class="section-title">模态框 (Modal)</h2>
+    <p class="section-desc">居中弹出的对话框，含遮罩层、关闭按钮和底部操作区。</p>
+
+    <div class="modal-overlay">
+      <div class="modal-box">
+        <span class="modal-close">&times;</span>
+        <div class="modal-title">确认删除信号?</div>
+        <div class="modal-body">此操作不可撤销。删除后，该信号将从所有追踪列表中永久移除，相关历史数据将无法恢复。</div>
+        <div class="modal-actions">
+          <button class="btn-demo btn-md btn-secondary">取消</button>
+          <button class="btn-demo btn-md btn-primary">确认删除</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-states-row">
+      <div class="modal-thumb">
+        <div class="thumb-box" style="opacity:0.3;"></div>
+        <span class="thumb-label">Closed</span>
+      </div>
+      <div class="modal-thumb">
+        <div class="thumb-box"></div>
+        <span class="thumb-label">Open</span>
+      </div>
+      <div class="modal-thumb opening">
+        <div class="thumb-box"></div>
+        <span class="thumb-label">Opening</span>
+      </div>
+      <div class="modal-thumb closing">
+        <div class="thumb-box"></div>
+        <span class="thumb-label">Closing</span>
+      </div>
+    </div>
+
+    <div class="spec-table-wrap" style="margin-top:16px;">
+      <table class="spec-table">
+        <thead><tr><th>属性</th><th>值</th></tr></thead>
+        <tbody>
+          <tr><td>遮罩背景</td><td class="code">rgba(0,0,0,0.6)</td></tr>
+          <tr><td>遮罩模糊</td><td class="code">backdrop-filter: blur(4px)</td></tr>
+          <tr><td>弹窗背景</td><td class="code">#1C2128</td></tr>
+          <tr><td>弹窗边框</td><td class="code">1px solid #30363D</td></tr>
+          <tr><td>弹窗圆角</td><td class="code">12px</td></tr>
+          <tr><td>弹窗最大宽</td><td class="code">480px</td></tr>
+          <tr><td>弹窗内边距</td><td class="code">24px</td></tr>
+          <tr><td>标题字号</td><td class="code">20px</td></tr>
+          <tr><td>标题字重</td><td class="code">600</td></tr>
+          <tr><td>内容字号</td><td class="code">14px</td></tr>
+          <tr><td>内容颜色</td><td class="code">#8B949E</td></tr>
+          <tr><td>关闭按钮色</td><td class="code">#8B949E</td></tr>
+          <tr><td>关闭悬停色</td><td class="code">#E8F4FF</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============================== -->
+  <!-- 7. TAG / BADGE                  -->
+  <!-- ============================== -->
+  <section class="component-section" id="tags">
+    <h2 class="section-title">标签/徽章 (Tag/Badge)</h2>
+    <p class="section-desc">三种语义颜色变体（默认、成功、警告），支持关闭操作。</p>
+
+    <!-- Default tags -->
+    <div class="variant-row">
+      <div class="variant-label">默认 (Default)</div>
+      <div class="state-row">
+        <div class="state-item"><span class="tag-demo tag-default">信息</span><span class="state-label">Default</span></div>
+        <div class="state-item"><span class="tag-demo tag-default hover">信息</span><span class="state-label">Hover</span></div>
+        <div class="state-item"><span class="tag-demo tag-default active">信息</span><span class="state-label">Active</span></div>
+        <div class="state-item"><span class="tag-demo tag-default disabled">信息</span><span class="state-label">Disabled</span></div>
+      </div>
+    </div>
+    <!-- Success tags -->
+    <div class="variant-row">
+      <div class="variant-label">成功 (Success)</div>
+      <div class="state-row">
+        <div class="state-item"><span class="tag-demo tag-success">已通过</span><span class="state-label">Default</span></div>
+        <div class="state-item"><span class="tag-demo tag-success hover">已通过</span><span class="state-label">Hover</span></div>
+        <div class="state-item"><span class="tag-demo tag-success active">已通过</span><span class="state-label">Active</span></div>
+        <div class="state-item"><span class="tag-demo tag-success disabled">已通过</span><span class="state-label">Disabled</span></div>
+      </div>
+    </div>
+    <!-- Warning tags -->
+    <div class="variant-row">
+      <div class="variant-label">警告 (Warning)</div>
+      <div class="state-row">
+        <div class="state-item"><span class="tag-demo tag-warning">注意</span><span class="state-label">Default</span></div>
+        <div class="state-item"><span class="tag-demo tag-warning hover">注意</span><span class="state-label">Hover</span></div>
+        <div class="state-item"><span class="tag-demo tag-warning active">注意</span><span class="state-label">Active</span></div>
+        <div class="state-item"><span class="tag-demo tag-warning disabled">注意</span><span class="state-label">Disabled</span></div>
+      </div>
+    </div>
+    <!-- With close -->
+    <div class="variant-row">
+      <div class="variant-label">带关闭按钮</div>
+      <div class="state-row">
+        <div class="state-item"><span class="tag-demo tag-default">信息<span class="tag-close">&times;</span></span><span class="state-label">Default</span></div>
+        <div class="state-item"><span class="tag-demo tag-success">已通过<span class="tag-close">&times;</span></span><span class="state-label">Success</span></div>
+        <div class="state-item"><span class="tag-demo tag-warning">注意<span class="tag-close">&times;</span></span><span class="state-label">Warning</span></div>
+      </div>
+    </div>
+
+    <div class="spec-table-wrap">
+      <table class="spec-table">
+        <thead><tr><th>属性</th><th>Default</th><th>Success</th><th>Warning</th></tr></thead>
+        <tbody>
+          <tr><td>背景色</td><td class="code">rgba(77,168,255,0.12)</td><td class="code">rgba(34,197,94,0.12)</td><td class="code">rgba(234,179,8,0.12)</td></tr>
+          <tr><td>文字色</td><td class="code">#4DA8FF</td><td class="code">#22C55E</td><td class="code">#EAB308</td></tr>
+          <tr><td>圆角</td><td class="code">9999px</td><td class="code">9999px</td><td class="code">9999px</td></tr>
+          <tr><td>内边距</td><td class="code">2px 8px</td><td class="code">2px 8px</td><td class="code">2px 8px</td></tr>
+          <tr><td>高度</td><td class="code">20px</td><td class="code">20px</td><td class="code">20px</td></tr>
+          <tr><td>字号</td><td class="code">12px</td><td class="code">12px</td><td class="code">12px</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="spec-table-wrap" style="margin-top:8px;">
+      <table class="spec-table">
+        <thead><tr><th>状态</th><th>背景变化</th><th>文字变化</th><th>变换</th></tr></thead>
+        <tbody>
+          <tr><td>hover</td><td class="code">同上 (brightness +5%)</td><td class="code">同上</td><td class="code">none</td></tr>
+          <tr><td>active</td><td class="code">同上</td><td class="code">同上</td><td class="code">scale(0.97)</td></tr>
+          <tr><td>disabled</td><td class="code">同上</td><td class="code">同上</td><td class="code">opacity 0.4</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============================== -->
+  <!-- 8. AVATAR                      -->
+  <!-- ============================== -->
+  <section class="component-section" id="avatar">
+    <h2 class="section-title">头像 (Avatar)</h2>
+    <p class="section-desc">三种尺寸、在线状态指示、悬停高亮和头像组重叠排列。</p>
+
+    <!-- Sizes -->
+    <div class="variant-row">
+      <div class="variant-label">尺寸</div>
+      <div class="state-row">
+        <div class="state-item">
+          <div class="avatar-demo sm"><span class="avatar-letter">Q</span></div>
+          <span class="state-label">SM 32px</span>
+        </div>
+        <div class="state-item">
+          <div class="avatar-demo md"><span class="avatar-letter">Q</span></div>
+          <span class="state-label">MD 40px</span>
+        </div>
+        <div class="state-item">
+          <div class="avatar-demo lg"><span class="avatar-letter">Q</span></div>
+          <span class="state-label">LG 56px</span>
+        </div>
+      </div>
+    </div>
+    <!-- States -->
+    <div class="variant-row">
+      <div class="variant-label">状态</div>
+      <div class="state-row">
+        <div class="state-item">
+          <div class="avatar-demo md"><span class="avatar-letter">Q</span></div>
+          <span class="state-label">Default</span>
+        </div>
+        <div class="state-item">
+          <div class="avatar-demo md" style="box-shadow:0 0 0 2px #4DA8FF;"><span class="avatar-letter">Q</span></div>
+          <span class="state-label">Hover</span>
+        </div>
+        <div class="state-item">
+          <div class="avatar-demo md disabled"><span class="avatar-letter">Q</span></div>
+          <span class="state-label">Disabled</span>
+        </div>
+      </div>
+    </div>
+    <!-- Online -->
+    <div class="variant-row">
+      <div class="variant-label">在线状态</div>
+      <div class="state-row">
+        <div class="state-item">
+          <div class="avatar-demo md"><span class="avatar-letter">Q</span><span class="online-dot"></span></div>
+          <span class="state-label">Online</span>
+        </div>
+        <div class="state-item">
+          <div class="avatar-demo lg"><span class="avatar-letter">Q</span><span class="online-dot"></span></div>
+          <span class="state-label">Online lg</span>
+        </div>
+      </div>
+    </div>
+    <!-- Group -->
+    <div class="variant-row">
+      <div class="variant-label">头像组</div>
+      <div class="state-row">
+        <div class="state-item">
+          <div class="avatar-group">
+            <div class="avatar-demo md" style="background:linear-gradient(135deg,#4DA8FF,#7B61FF);"><span class="avatar-letter">Q</span></div>
+            <div class="avatar-demo md" style="background:linear-gradient(135deg,#22C55E,#4DA8FF);"><span class="avatar-letter">K</span></div>
+            <div class="avatar-demo md" style="background:linear-gradient(135deg,#EAB308,#EF4444);"><span class="avatar-letter">Z</span></div>
+          </div>
+          <span class="state-label">3 users</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="spec-table-wrap">
+      <table class="spec-table">
+        <thead><tr><th>属性</th><th>值</th></tr></thead>
+        <tbody>
+          <tr><td>形状</td><td class="code">圆形 (border-radius 9999px)</td></tr>
+          <tr><td>边框</td><td class="code">2px solid #30363D</td></tr>
+          <tr><td>SM 尺寸</td><td class="code">32px</td></tr>
+          <tr><td>MD 尺寸</td><td class="code">40px</td></tr>
+          <tr><td>LG 尺寸</td><td class="code">56px</td></tr>
+          <tr><td>在线指示</td><td class="code">8px 圆点, #22C55E, border 2px #0A0E14</td></tr>
+          <tr><td>Hover</td><td class="code">box-shadow 0 0 0 2px #4DA8FF</td></tr>
+          <tr><td>Group 重叠</td><td class="code">margin-left -8px</td></tr>
+          <tr><td>禁用</td><td class="code">opacity 0.4, grayscale 100%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============================== -->
+  <!-- 9. TOGGLE                      -->
+  <!-- ============================== -->
+  <section class="component-section" id="toggle">
+    <h2 class="section-title">开关 (Toggle)</h2>
+    <p class="section-desc">二态切换控件，含 off、on 和禁用状态。</p>
+
+    <div class="state-row">
+      <div class="state-item">
+        <div class="toggle-demo off"><div class="toggle-thumb"></div></div>
+        <span class="state-label">Off</span>
+      </div>
+      <div class="state-item">
+        <div class="toggle-demo on"><div class="toggle-thumb"></div></div>
+        <span class="state-label">On</span>
+      </div>
+      <div class="state-item">
+        <div class="toggle-demo off disabled"><div class="toggle-thumb"></div></div>
+        <span class="state-label">Disabled Off</span>
+      </div>
+      <div class="state-item">
+        <div class="toggle-demo on disabled"><div class="toggle-thumb"></div></div>
+        <span class="state-label">Disabled On</span>
+      </div>
+    </div>
+
+    <div class="spec-table-wrap">
+      <table class="spec-table">
+        <thead><tr><th>属性</th><th>Off</th><th>On</th><th>Disabled Off</th><th>Disabled On</th></tr></thead>
+        <tbody>
+          <tr><td>Track 背景</td><td class="code">#30363D</td><td class="code">#4DA8FF</td><td class="code">#30363D</td><td class="code">#4DA8FF</td></tr>
+          <tr><td>Track 宽度</td><td class="code">40px</td><td class="code">40px</td><td class="code">40px</td><td class="code">40px</td></tr>
+          <tr><td>Track 高度</td><td class="code">20px</td><td class="code">20px</td><td class="code">20px</td><td class="code">20px</td></tr>
+          <tr><td>Track 圆角</td><td class="code">10px</td><td class="code">10px</td><td class="code">10px</td><td class="code">10px</td></tr>
+          <tr><td>Thumb 颜色</td><td class="code">#8B949E</td><td class="code">#E8F4FF</td><td class="code">#8B949E</td><td class="code">#E8F4FF</td></tr>
+          <tr><td>Thumb 大小</td><td class="code">16px</td><td class="code">16px</td><td class="code">16px</td><td class="code">16px</td></tr>
+          <tr><td>Thumb 位置</td><td class="code">left 2px</td><td class="code">left 22px</td><td class="code">left 2px</td><td class="code">left 22px</td></tr>
+          <tr><td>透明度</td><td class="code">1</td><td class="code">1</td><td class="code">0.5</td><td class="code">0.5</td></tr>
+          <tr><td>过渡</td><td class="code">200ms ease</td><td class="code">200ms ease</td><td class="code">none</td><td class="code">none</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="page-footer">
+    SparkForge 冰焰版 Design System v2 · 生成于 2026-07-01
+  </footer>
+
+</div>
+
+<script>
+// === Scroll-spy for anchor nav ===
+(function() {
+  var nav = document.getElementById('anchorNav');
+  var links = nav.querySelectorAll('a');
+  var sections = [];
+  links.forEach(function(link) {
+    var id = link.getAttribute('href').substring(1);
+    var el = document.getElementById(id);
+    if (el) sections.push({ link: link, el: el });
+  });
+
+  function update() {
+    var scrollY = window.scrollY || window.pageYOffset;
+    var current = null;
+    sections.forEach(function(s) {
+      if (s.el.offsetTop - 80 <= scrollY) current = s;
+    });
+    links.forEach(function(l) { l.classList.remove('active'); });
+    if (current) current.link.classList.add('active');
+  }
+
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+
+  // Smooth scroll
+  links.forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      var id = this.getAttribute('href').substring(1);
+      var target = document.getElementById(id);
+      if (target) {
+        window.scrollTo({ top: target.offsetTop - 60, behavior: 'smooth' });
+      }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

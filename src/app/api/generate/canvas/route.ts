@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getSupabaseAdmin } from '@/lib/supabase'
 
 const DEEPSEEK_API = 'https://api.deepseek.com/v1/chat/completions'
 
 export async function POST(request: NextRequest) {
   const apiKey = process.env.DEEPSEEK_API_KEY
-  
+
   if (!apiKey) {
     return NextResponse.json(
       { success: false, error: 'DeepSeek API key not configured' },
@@ -12,7 +13,25 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const { signalTitle, signalDescription } = await request.json()
+  // Token 认证
+  const authHeader = request.headers.get('authorization')
+  const token = authHeader?.split(' ')[1]
+  if (!token) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const supabaseAdmin = await getSupabaseAdmin()
+  if (!supabaseAdmin) {
+    return NextResponse.json({ error: 'Database unavailable' }, { status: 500 })
+  }
+
+  const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token)
+  if (userError || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const userId = user.id
+
+  const { signalTitle, signalDescription, signalId } = await request.json()
 
   if (!signalTitle) {
     return NextResponse.json(
@@ -138,6 +157,25 @@ export async function POST(request: NextRequest) {
         },
         actionPlan: ['Day 1-7: MVP开发', 'Day 8-14: 用户获取'],
         summary: 'AI 解析失败，使用默认模板',
+      }
+    }
+
+    // 持久化到 CanvasReport 表
+    if (supabaseAdmin) {
+      try {
+        const { error: insertError } = await supabaseAdmin.from('CanvasReport').insert({
+          id: crypto.randomUUID(),
+          userId,
+          signalId: signalId || '',
+          result: result,
+          status: 'COMPLETED',
+          updatedAt: new Date().toISOString(),
+        })
+        if (insertError) {
+          console.error('Failed to persist canvas result (insertError):', insertError)
+        }
+      } catch (err) {
+        console.error('Failed to persist canvas result (exception):', err)
       }
     }
 

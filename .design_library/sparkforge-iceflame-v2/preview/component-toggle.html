@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toggle / 开关 - SparkForge 冰焰版</title>
+  <link rel="stylesheet" href="../colors_and_type.css">
+  <style>
+    body {
+      background-color: var(--color-background);
+      position: relative;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: var(--atmosphere-glow);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .page-wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px;
+    }
+    .section { margin-bottom: 48px; }
+    .state-label {
+      color: var(--color-on-surface-variant);
+      font-size: var(--font-size-xs);
+      margin-bottom: 12px;
+      font-weight: var(--font-weight-medium);
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .toggle-demo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .toggle-demo .toggle-label {
+      color: var(--color-muted-foreground);
+      font-size: 11px;
+      font-family: var(--font-mono);
+    }
+
+    /* Toggle base */
+    .toggle {
+      position: relative;
+      width: 40px;
+      height: 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 200ms ease;
+      flex-shrink: 0;
+    }
+
+    /* Thumb */
+    .toggle::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      transition: transform 200ms ease, background-color 200ms ease;
+    }
+
+    /* Off state */
+    .toggle--off {
+      background-color: #30363D;
+    }
+    .toggle--off::after {
+      background-color: #8B949E;
+      transform: translateX(0);
+    }
+
+    /* On state */
+    .toggle--on {
+      background-color: #4DA8FF;
+    }
+    .toggle--on::after {
+      background-color: #E8F4FF;
+      transform: translateX(20px);
+    }
+
+    /* Disabled */
+    .toggle--disabled-off,
+    .toggle--disabled-on {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .toggle--disabled-off {
+      background-color: #30363D;
+    }
+    .toggle--disabled-off::after {
+      background-color: #8B949E;
+      transform: translateX(0);
+    }
+    .toggle--disabled-on {
+      background-color: #4DA8FF;
+    }
+    .toggle--disabled-on::after {
+      background-color: #E8F4FF;
+      transform: translateX(20px);
+    }
+
+    /* Interactive demo */
+    .toggle-interactive {
+      position: relative;
+      width: 40px;
+      height: 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 200ms ease;
+      background-color: #30363D;
+      flex-shrink: 0;
+    }
+    .toggle-interactive::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background-color: #8B949E;
+      transition: transform 200ms ease, background-color 200ms ease;
+    }
+    .toggle-interactive.is-on {
+      background-color: #4DA8FF;
+    }
+    .toggle-interactive.is-on::after {
+      background-color: #E8F4FF;
+      transform: translateX(20px);
+    }
+
+    /* Dev spec table */
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 24px;
+      font-size: var(--font-size-sm);
+    }
+    .spec-table th,
+    .spec-table td {
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .spec-table thead th {
+      background: var(--color-surface);
+      color: var(--color-foreground);
+      font-weight: var(--font-weight-semibold);
+    }
+    .spec-table tbody td {
+      color: var(--color-on-surface-variant);
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+    }
+    .spec-table tbody tr:hover td {
+      background: rgba(77, 168, 255, 0.04);
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+
+    <h2 class="sf-h2" style="margin-bottom: 4px;">Toggle / 开关</h2>
+    <p class="sf-body" style="color: var(--color-on-surface-variant); margin-bottom: 32px;">用于布尔值切换，支持开启、关闭及禁用状态，带平滑动画过渡。</p>
+
+    <!-- 4 static states -->
+    <div class="section">
+      <p class="state-label">四种状态</p>
+      <div class="row">
+        <div class="toggle-demo">
+          <div class="toggle toggle--off"></div>
+          <span class="toggle-label">off</span>
+        </div>
+        <div class="toggle-demo">
+          <div class="toggle toggle--on"></div>
+          <span class="toggle-label">on</span>
+        </div>
+        <div class="toggle-demo">
+          <div class="toggle toggle--disabled-off"></div>
+          <span class="toggle-label">disabled-off</span>
+        </div>
+        <div class="toggle-demo">
+          <div class="toggle toggle--disabled-on"></div>
+          <span class="toggle-label">disabled-on</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interactive demo -->
+    <div class="section">
+      <p class="state-label">交互演示 (点击切换)</p>
+      <div class="row">
+        <div class="toggle-demo">
+          <div class="toggle-interactive" id="toggleDemo" onclick="this.classList.toggle('is-on')"></div>
+          <span class="toggle-label">点击切换</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dev Spec Table -->
+    <div class="section">
+      <h3 class="sf-h4" style="color: var(--color-foreground); margin-bottom: 12px;">开发规格</h3>
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>属性</th>
+            <th>off</th>
+            <th>on</th>
+            <th>disabled-off</th>
+            <th>disabled-on</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>轨道宽度</td>
+            <td colspan="4">40px</td>
+          </tr>
+          <tr>
+            <td>轨道高度</td>
+            <td colspan="4">20px</td>
+          </tr>
+          <tr>
+            <td>轨道圆角</td>
+            <td colspan="4">10px</td>
+          </tr>
+          <tr>
+            <td>滑块尺寸</td>
+            <td colspan="4">16 &times; 16px (圆形)</td>
+          </tr>
+          <tr>
+            <td>滑块位置</td>
+            <td>left: 2px</td>
+            <td>left: 2px + translateX(20px)</td>
+            <td>left: 2px</td>
+            <td>left: 2px + translateX(20px)</td>
+          </tr>
+          <tr>
+            <td>轨道背景</td>
+            <td>#30363D</td>
+            <td>#4DA8FF</td>
+            <td>#30363D</td>
+            <td>#4DA8FF</td>
+          </tr>
+          <tr>
+            <td>滑块颜色</td>
+            <td>#8B949E</td>
+            <td>#E8F4FF</td>
+            <td>#8B949E</td>
+            <td>#E8F4FF</td>
+          </tr>
+          <tr>
+            <td>opacity</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0.5</td>
+            <td>0.5</td>
+          </tr>
+          <tr>
+            <td>cursor</td>
+            <td>pointer</td>
+            <td>pointer</td>
+            <td>not-allowed</td>
+            <td>not-allowed</td>
+          </tr>
+          <tr>
+            <td>transition</td>
+            <td colspan="4">200ms ease</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</body>
+</html>

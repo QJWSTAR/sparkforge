@@ -1,0 +1,41 @@
+{
+  "slug": "select",
+  "schemaVersion": 2,
+  "name": "下拉选择",
+  "category": "forms",
+  "sourceKind": "from-scratch",
+  "confidence": "medium",
+  "variants": [
+    {
+      "name": "default",
+      "states": {
+        "default": {
+          "backgroundColor": "#1C2128",
+          "border": "1px solid #30363D",
+          "color": "#E8F4FF",
+          "borderRadius": "6px",
+          "padding": "0 12px",
+          "height": "40px",
+          "fontSize": "14px",
+          "fontWeight": "400",
+          "fontFamily": "Inter"
+        },
+        "focus": {
+          "border": "1px solid #4DA8FF",
+          "boxShadow": "0 0 0 3px rgba(77,168,255,0.15)"
+        },
+        "open": {
+          "backgroundColor": "#1C2128",
+          "border": "1px solid #30363D",
+          "borderRadius": "8px"
+        },
+        "disabled": {
+          "opacity": "0.4"
+        }
+      }
+    }
+  ],
+  "anatomy": ["select-trigger", "chevron-icon", "dropdown-menu", "dropdown-item"],
+  "usageHints": { "priorityHint": "medium" },
+  "keyInsightSeed": "Dropdown select with card-colored menu, subtle hover highlight, and consistent focus glow matching the input component."
+}

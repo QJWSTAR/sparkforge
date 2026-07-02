@@ -1,0 +1,31 @@
+{
+  "data": [
+    {
+      "id": "page-dashboard",
+      "title": "信号仪表板",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1782906000000,
+      "canvasData": {
+        "x": 0,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/dashboard.html"
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": false,
+    "deviceType": "desktop",
+    "designLibrary": {
+      "name": "sparkforge-iceflame-v2",
+      "id": null,
+      "version": null,
+      "versionSource": null,
+      "path": "../.design_library/sparkforge-iceflame-v2",
+      "scope": "project"
+    }
+  }
+}

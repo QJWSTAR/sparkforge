@@ -108,12 +108,16 @@ export function useAuth() {
       })
 
       try {
-        const { error: insertError } = await supabase
-          .from('profiles')
-          .upsert({ id: userId, email, name: name || null }, { onConflict: 'id' })
-
-        if (insertError) {
-          console.error('[Auth] Failed to insert profile:', insertError.message)
+        const token = data.session?.access_token
+        if (token) {
+          await fetch('/api/auth/profile', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({ name: name || null }),
+          })
         }
       } catch (err) {
         console.error('[Auth] Profile insert error:', err)

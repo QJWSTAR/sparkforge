@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "components": [
+    { "slug": "button", "name": "按钮" },
+    { "slug": "input", "name": "输入框" },
+    { "slug": "select", "name": "下拉选择框" },
+    { "slug": "data-card", "name": "数据指标卡片" },
+    { "slug": "content-card", "name": "普通内容卡片" },
+    { "slug": "modal", "name": "模态框" },
+    { "slug": "tag", "name": "标签/徽章" },
+    { "slug": "avatar", "name": "头像" },
+    { "slug": "toggle", "name": "开关" }
+  ]
+}

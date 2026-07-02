@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 import { getSupabase, getSupabaseAdmin } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
-  const cookieStore = await cookies()
-
   const authHeader = request.headers.get('authorization')
   if (!authHeader?.startsWith('Bearer ')) {
     return NextResponse.json(
@@ -84,8 +81,6 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  const cookieStore = await cookies()
-
   const authHeader = request.headers.get('authorization')
   if (!authHeader?.startsWith('Bearer ')) {
     return NextResponse.json(
@@ -163,8 +158,6 @@ export async function DELETE(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const cookieStore = await cookies()
-
   const authHeader = request.headers.get('authorization')
   if (!authHeader?.startsWith('Bearer ')) {
     return NextResponse.json(
@@ -202,10 +195,10 @@ export async function GET(request: NextRequest) {
 
   const supabaseAdmin = await getSupabaseAdmin()
   if (!supabaseAdmin) {
-    return NextResponse.json({
-      success: true,
-      data: { subscribedSignals: [] },
-    })
+    return NextResponse.json(
+      { success: false, error: 'Database unavailable' },
+      { status: 500 }
+    )
   }
 
   try {
@@ -227,9 +220,9 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     console.error('Failed to get subscriptions:', error)
-    return NextResponse.json({
-      success: true,
-      data: { subscribedSignals: [] },
-    })
+    return NextResponse.json(
+      { success: false, error: 'Failed to get subscriptions' },
+      { status: 500 }
+    )
   }
 }

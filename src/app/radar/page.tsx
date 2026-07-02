@@ -57,13 +57,26 @@ export default function RadarPage() {
     selectedSources.includes('all') ||
     ALL_SOURCES.filter((s) => s !== 'all').every((s) => selectedSources.includes(s))
 
+  // Map frontend sortBy to API-accepted values
+  const apiSortBy = useMemo(() => {
+    const mapping: Record<string, string> = {
+      'score-desc': 'score',
+      'hot-desc': 'hot',
+      'newest': 'newest',
+      'novelty-desc': 'score',
+      'business-desc': 'score',
+      'local-desc': 'score',
+    }
+    return mapping[sortBy] || 'score'
+  }, [sortBy])
+
   // Fetch signals from API, fall back to mockSignals on error/empty
   useEffect(() => {
     const fetchSignals = async () => {
       setLoading(true)
       try {
         const params = new URLSearchParams({
-          sortBy,
+          sortBy: apiSortBy,
           limit: '50',
         })
         if (!showAllSources) {
@@ -76,6 +89,12 @@ export default function RadarPage() {
         if (searchQuery) params.set('search', searchQuery)
 
         const res = await fetch(`/api/signals?${params}`)
+        if (!res.ok) {
+          console.error('Failed to fetch signals:', res.status)
+          setSignals(mockSignals)
+          setLoading(false)
+          return
+        }
         const data = await res.json()
 
         if (data.success && data.data?.length > 0) {
@@ -92,7 +111,7 @@ export default function RadarPage() {
     }
 
     fetchSignals()
-  }, [selectedSources, sortBy, minScore, searchQuery, showAllSources])
+  }, [selectedSources, apiSortBy, minScore, searchQuery, showAllSources])
 
   // Client-side filtering + sorting
   const filteredSignals = useMemo(() => {

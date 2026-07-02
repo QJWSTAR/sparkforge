@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SparkForge 冰焰版 — 模态框组件预览</title>
+  <link rel="stylesheet" href="../colors_and_type.css">
+  <style>
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: var(--atmosphere-glow);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body { position: relative; z-index: 1; }
+
+    .preview-container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: var(--page-padding);
+    }
+
+    .section-title {
+      margin-bottom: var(--space-4);
+    }
+    .section-desc {
+      color: var(--color-on-surface-variant);
+      margin-bottom: var(--space-6);
+    }
+
+    .states-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: var(--space-8);
+      margin-bottom: var(--space-10);
+    }
+
+    .state-item {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    .state-label {
+      font-family: var(--font-body);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-muted-foreground);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* Modal Demo Slots (miniature) */
+    .modal-slot {
+      position: relative;
+      width: 100%;
+      height: 220px;
+      background: var(--color-surface-dim);
+      border-radius: var(--radius-card);
+      border: 1px solid var(--color-border);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-slot-bg-text {
+      font-family: var(--font-body);
+      font-size: var(--font-size-xs);
+      color: var(--color-muted-foreground);
+      position: absolute;
+    }
+
+    /* Overlay */
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Modal */
+    .modal {
+      background: #1C2128;
+      border: 1px solid #30363D;
+      border-radius: var(--radius-modal);
+      max-width: 480px;
+      width: 90%;
+      padding: var(--space-6);
+      transform-origin: center;
+    }
+
+    .modal .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-4);
+    }
+
+    .modal .modal-title {
+      font-family: var(--font-body);
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      color: #E8F4FF;
+    }
+
+    .modal .modal-close {
+      font-family: var(--font-body);
+      font-size: var(--font-size-sm);
+      color: #8B949E;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: var(--space-1);
+      line-height: 1;
+      transition: color 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal .modal-close:hover {
+      color: #E8F4FF;
+    }
+    .modal .modal-close svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .modal .modal-body {
+      font-family: var(--font-body);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-regular);
+      color: #8B949E;
+      line-height: var(--line-height-relaxed);
+      margin-bottom: var(--space-6);
+    }
+
+    .modal .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--space-3);
+    }
+
+    /* Buttons */
+    .btn {
+      font-family: var(--font-body);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-medium);
+      border-radius: var(--radius-button);
+      padding: var(--space-2) var(--space-4);
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+      border: none;
+      line-height: var(--size-button-md);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: #4DA8FF;
+      color: #0A0E14;
+    }
+    .btn-primary:hover {
+      background: #69B9FF;
+    }
+    .btn-secondary {
+      background: transparent;
+      color: #E8F4FF;
+      border: 1px solid #30363D;
+    }
+    .btn-secondary:hover {
+      border-color: #4DA8FF;
+      color: #E8F4FF;
+    }
+
+    /* State: Closed */
+    .modal-overlay.state-closed {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* State: Opening */
+    .modal-overlay.state-opening {
+      animation: fadeIn 0.3s ease forwards;
+    }
+    .modal-overlay.state-opening .modal {
+      animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* State: Open */
+    .modal-overlay.state-open {
+      opacity: 1;
+    }
+
+    /* State: Closing */
+    .modal-overlay.state-closing {
+      animation: fadeOut 0.25s ease forwards;
+    }
+    .modal-overlay.state-closing .modal {
+      animation: scaleOut 0.25s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes scaleOut {
+      from { opacity: 1; transform: scale(1); }
+      to { opacity: 0; transform: scale(0.95); }
+    }
+
+    /* Scale down the modal inside miniature slots */
+    .modal-slot .modal {
+      transform: scale(0.78);
+    }
+    .modal-slot .modal .modal-body {
+      font-size: 11px;
+      margin-bottom: var(--space-3);
+    }
+    .modal-slot .modal .modal-title {
+      font-size: 15px;
+    }
+    .modal-slot .modal .modal-header {
+      margin-bottom: var(--space-2);
+    }
+    .modal-slot .modal .modal-footer {
+      margin-bottom: 0;
+    }
+    .modal-slot .btn {
+      font-size: 11px;
+      line-height: 28px;
+      padding: var(--space-1) var(--space-3);
+    }
+
+    /* Dev Spec Table */
+    .spec-table-wrap {
+      margin-bottom: var(--space-10);
+      overflow-x: auto;
+    }
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-body);
+      font-size: var(--font-size-sm);
+    }
+    .spec-table th,
+    .spec-table td {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      padding: var(--space-2) var(--space-3);
+      text-align: left;
+      color: var(--color-on-surface-variant);
+    }
+    .spec-table th {
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-foreground);
+      background: var(--color-surface-dim);
+      white-space: nowrap;
+    }
+    .spec-table td code {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--color-primary);
+      background: var(--primary-muted);
+      padding: 1px 5px;
+      border-radius: var(--radius-sm);
+    }
+  </style>
+</head>
+<body>
+  <div class="preview-container">
+
+    <!-- Page Title -->
+    <h2 class="sf-h2 section-title">模态框 Modal</h2>
+    <p class="section-desc">用于中断式交互确认、表单输入或重要提示信息。支持遮罩层淡入淡出与缩放过渡动画。</p>
+
+    <!-- States Grid -->
+    <div class="states-grid">
+
+      <!-- Closed -->
+      <div class="state-item">
+        <span class="state-label">Closed</span>
+        <div class="modal-slot">
+          <span class="modal-slot-bg-text">页面内容区域</span>
+          <div class="modal-overlay state-closed">
+            <div class="modal">
+              <div class="modal-header">
+                <span class="modal-title">确认删除</span>
+                <button class="modal-close">
+                  <svg viewBox="0 0 18 18" fill="none"><path d="M4 4L14 14M14 4L4 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+              <div class="modal-body">此操作不可撤销，确定要删除该项目吗？</div>
+              <div class="modal-footer">
+                <button class="btn btn-secondary">取消</button>
+                <button class="btn btn-primary">确认删除</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Opening -->
+      <div class="state-item">
+        <span class="state-label">Opening</span>
+        <div class="modal-slot">
+          <span class="modal-slot-bg-text">页面内容区域</span>
+          <div class="modal-overlay state-opening">
+            <div class="modal">
+              <div class="modal-header">
+                <span class="modal-title">确认删除</span>
+                <button class="modal-close">
+                  <svg viewBox="0 0 18 18" fill="none"><path d="M4 4L14 14M14 4L4 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+              <div class="modal-body">此操作不可撤销，确定要删除该项目吗？</div>
+              <div class="modal-footer">
+                <button class="btn btn-secondary">取消</button>
+                <button class="btn btn-primary">确认删除</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Open -->
+      <div class="state-item">
+        <span class="state-label">Open</span>
+        <div class="modal-slot">
+          <span class="modal-slot-bg-text">页面内容区域</span>
+          <div class="modal-overlay state-open">
+            <div class="modal">
+              <div class="modal-header">
+                <span class="modal-title">确认删除</span>
+                <button class="modal-close">
+                  <svg viewBox="0 0 18 18" fill="none"><path d="M4 4L14 14M14 4L4 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+              <div class="modal-body">此操作不可撤销，确定要删除该项目吗？</div>
+              <div class="modal-footer">
+                <button class="btn btn-secondary">取消</button>
+                <button class="btn btn-primary">确认删除</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Closing -->
+      <div class="state-item">
+        <span class="state-label">Closing</span>
+        <div class="modal-slot">
+          <span class="modal-slot-bg-text">页面内容区域</span>
+          <div class="modal-overlay state-closing">
+            <div class="modal">
+              <div class="modal-header">
+                <span class="modal-title">确认删除</span>
+                <button class="modal-close">
+                  <svg viewBox="0 0 18 18" fill="none"><path d="M4 4L14 14M14 4L4 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+              <div class="modal-body">此操作不可撤销，确定要删除该项目吗？</div>
+              <div class="modal-footer">
+                <button class="btn btn-secondary">取消</button>
+                <button class="btn btn-primary">确认删除</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Dev Spec Table -->
+    <h3 class="sf-h3" style="margin-bottom: var(--space-3);">开发规格</h3>
+    <div class="spec-table-wrap">
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>属性</th>
+            <th>Closed</th>
+            <th>Opening</th>
+            <th>Open</th>
+            <th>Closing</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>overlay 可见性</td>
+            <td><code>hidden</code></td>
+            <td><code>visible</code></td>
+            <td><code>visible</code></td>
+            <td><code>visible</code></td>
+          </tr>
+          <tr>
+            <td>overlay opacity</td>
+            <td><code>0</code></td>
+            <td><code>0 → 1 (300ms ease)</code></td>
+            <td><code>1</code></td>
+            <td><code>1 → 0 (250ms ease)</code></td>
+          </tr>
+          <tr>
+            <td>modal scale</td>
+            <td>—</td>
+            <td><code>0.95 → 1 (300ms cubic-bezier)</code></td>
+            <td><code>1</code></td>
+            <td><code>1 → 0.95 (250ms ease)</code></td>
+          </tr>
+          <tr>
+            <td>遮罩层背景</td>
+            <td colspan="4"><code>rgba(0,0,0,0.6)</code></td>
+          </tr>
+          <tr>
+            <td>modal background</td>
+            <td colspan="4"><code>#1C2128</code></td>
+          </tr>
+          <tr>
+            <td>modal border</td>
+            <td colspan="4"><code>1px solid #30363D</code></td>
+          </tr>
+          <tr>
+            <td>border-radius</td>
+            <td colspan="4"><code>12px</code></td>
+          </tr>
+          <tr>
+            <td>max-width</td>
+            <td colspan="4"><code>480px</code></td>
+          </tr>
+          <tr>
+            <td>padding</td>
+            <td colspan="4"><code>24px</code></td>
+          </tr>
+          <tr>
+            <td>title 字体</td>
+            <td colspan="4"><code>20px/600 Inter, #E8F4FF</code></td>
+          </tr>
+          <tr>
+            <td>内容字体</td>
+            <td colspan="4"><code>14px/400 Inter, #8B949E</code></td>
+          </tr>
+          <tr>
+            <td>关闭按钮文字色</td>
+            <td colspan="4"><code>#8B949E</code> (hover <code>#E8F4FF</code>)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</body>
+</html>

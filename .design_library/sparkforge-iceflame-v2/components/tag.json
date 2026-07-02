@@ -1,0 +1,85 @@
+{
+  "slug": "tag",
+  "schemaVersion": 2,
+  "name": "标签",
+  "category": "data-display",
+  "sourceKind": "from-scratch",
+  "confidence": "medium",
+  "variants": [
+    {
+      "name": "default",
+      "states": {
+        "default": {
+          "backgroundColor": "rgba(77,168,255,0.12)",
+          "color": "#4DA8FF",
+          "borderRadius": "9999px",
+          "padding": "2px 8px",
+          "height": "20px",
+          "fontSize": "12px",
+          "fontWeight": "500",
+          "fontFamily": "Inter"
+        },
+        "hover": {
+          "backgroundColor": "rgba(77,168,255,0.2)"
+        },
+        "active": {
+          "transform": "scale(0.95)"
+        },
+        "disabled": {
+          "opacity": "0.4"
+        }
+      }
+    },
+    {
+      "name": "success",
+      "states": {
+        "default": {
+          "backgroundColor": "rgba(34,197,94,0.12)",
+          "color": "#22C55E",
+          "borderRadius": "9999px",
+          "padding": "2px 8px",
+          "height": "20px",
+          "fontSize": "12px",
+          "fontWeight": "500",
+          "fontFamily": "Inter"
+        },
+        "hover": {
+          "backgroundColor": "rgba(34,197,94,0.2)"
+        },
+        "active": {
+          "transform": "scale(0.95)"
+        },
+        "disabled": {
+          "opacity": "0.4"
+        }
+      }
+    },
+    {
+      "name": "warning",
+      "states": {
+        "default": {
+          "backgroundColor": "rgba(234,179,8,0.12)",
+          "color": "#EAB308",
+          "borderRadius": "9999px",
+          "padding": "2px 8px",
+          "height": "20px",
+          "fontSize": "12px",
+          "fontWeight": "500",
+          "fontFamily": "Inter"
+        },
+        "hover": {
+          "backgroundColor": "rgba(234,179,8,0.2)"
+        },
+        "active": {
+          "transform": "scale(0.95)"
+        },
+        "disabled": {
+          "opacity": "0.4"
+        }
+      }
+    }
+  ],
+  "anatomy": ["label"],
+  "usageHints": { "priorityHint": "medium" },
+  "keyInsightSeed": "Pill-shaped status tags with color-coded translucent backgrounds matching semantic colors for quick visual scanning."
+}

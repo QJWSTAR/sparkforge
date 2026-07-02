@@ -1,0 +1,144 @@
+{
+  "slug": "button",
+  "schemaVersion": 2,
+  "name": "按钮",
+  "category": "actions",
+  "sourceKind": "from-scratch",
+  "confidence": "medium",
+  "variants": [
+    {
+      "name": "primary",
+      "states": {
+        "default-md": {
+          "backgroundColor": "#4DA8FF",
+          "color": "#0A0E14",
+          "borderRadius": "6px",
+          "padding": "0 16px",
+          "height": "40px",
+          "fontSize": "14px",
+          "fontWeight": "500",
+          "fontFamily": "Inter"
+        },
+        "hover-md": {
+          "backgroundColor": "#69B9FF"
+        },
+        "active-md": {
+          "transform": "scale(0.97)"
+        },
+        "disabled-md": {
+          "opacity": "0.4"
+        },
+        "default-lg": {
+          "backgroundColor": "#4DA8FF",
+          "color": "#0A0E14",
+          "borderRadius": "6px",
+          "padding": "0 24px",
+          "height": "48px",
+          "fontSize": "14px",
+          "fontWeight": "500",
+          "fontFamily": "Inter"
+        },
+        "hover-lg": {
+          "backgroundColor": "#69B9FF"
+        },
+        "active-lg": {
+          "transform": "scale(0.97)"
+        },
+        "disabled-lg": {
+          "opacity": "0.4"
+        }
+      }
+    },
+    {
+      "name": "secondary",
+      "states": {
+        "default-md": {
+          "backgroundColor": "transparent",
+          "color": "#E8F4FF",
+          "border": "1px solid #30363D",
+          "borderRadius": "6px",
+          "padding": "0 16px",
+          "height": "40px",
+          "fontSize": "14px",
+          "fontWeight": "500",
+          "fontFamily": "Inter"
+        },
+        "hover-md": {
+          "border": "1px solid #4DA8FF"
+        },
+        "active-md": {
+          "transform": "scale(0.97)"
+        },
+        "disabled-md": {
+          "opacity": "0.4"
+        },
+        "default-lg": {
+          "backgroundColor": "transparent",
+          "color": "#E8F4FF",
+          "border": "1px solid #30363D",
+          "borderRadius": "6px",
+          "padding": "0 24px",
+          "height": "48px",
+          "fontSize": "14px",
+          "fontWeight": "500",
+          "fontFamily": "Inter"
+        },
+        "hover-lg": {
+          "border": "1px solid #4DA8FF"
+        },
+        "active-lg": {
+          "transform": "scale(0.97)"
+        },
+        "disabled-lg": {
+          "opacity": "0.4"
+        }
+      }
+    },
+    {
+      "name": "ghost",
+      "states": {
+        "default-md": {
+          "backgroundColor": "transparent",
+          "color": "#8B949E",
+          "borderRadius": "6px",
+          "padding": "0 16px",
+          "height": "40px",
+          "fontSize": "14px",
+          "fontWeight": "500",
+          "fontFamily": "Inter"
+        },
+        "hover-md": {
+          "color": "#4DA8FF"
+        },
+        "active-md": {
+          "transform": "scale(0.97)"
+        },
+        "disabled-md": {
+          "opacity": "0.4"
+        },
+        "default-lg": {
+          "backgroundColor": "transparent",
+          "color": "#8B949E",
+          "borderRadius": "6px",
+          "padding": "0 24px",
+          "height": "48px",
+          "fontSize": "14px",
+          "fontWeight": "500",
+          "fontFamily": "Inter"
+        },
+        "hover-lg": {
+          "color": "#4DA8FF"
+        },
+        "active-lg": {
+          "transform": "scale(0.97)"
+        },
+        "disabled-lg": {
+          "opacity": "0.4"
+        }
+      }
+    }
+  ],
+  "anatomy": ["label"],
+  "usageHints": { "priorityHint": "high" },
+  "keyInsightSeed": "Three visual weights for action hierarchy: filled primary for CTA, outlined secondary for alternatives, ghost for subtle actions."
+}

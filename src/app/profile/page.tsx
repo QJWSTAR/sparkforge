@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth'
@@ -17,6 +17,12 @@ export default function ProfilePage() {
   const [hoveredUpgradeButton, setHoveredUpgradeButton] = useState(false)
   const [hoveredNavButton, setHoveredNavButton] = useState(false)
 
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.push('/login')
+    }
+  }, [loading, isAuthenticated, router])
+
   if (loading) {
     return (
       <main className="container-app py-8">
@@ -26,7 +32,6 @@ export default function ProfilePage() {
   }
 
   if (!isAuthenticated) {
-    router.push('/login')
     return null
   }
 

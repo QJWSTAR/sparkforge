@@ -63,6 +63,13 @@ export default function SignalDetailPage() {
       setError(null)
       try {
         const res = await fetch(`/api/signals/${signalId}`)
+        if (!res.ok) {
+          if (!cancelled) {
+            setError(res.status === 404 ? '信号不存在' : '加载失败，请稍后重试')
+            setLoading(false)
+          }
+          return
+        }
         const data = await res.json()
 
         if (!cancelled) {

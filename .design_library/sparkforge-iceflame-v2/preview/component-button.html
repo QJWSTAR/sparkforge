@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Button - SparkForge 冰焰版</title>
+  <link rel="stylesheet" href="../colors_and_type.css">
+  <style>
+    body {
+      margin: 0;
+      padding: var(--page-padding);
+      min-height: 100vh;
+      position: relative;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--atmosphere-glow);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px;
+    }
+    .section { margin-bottom: 48px; }
+    .section-title {
+      font-family: var(--font-body);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-on-surface-variant);
+      margin-bottom: 16px;
+    }
+    .variant-group { margin-bottom: 32px; }
+    .variant-title {
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+      color: var(--color-muted-foreground);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+    .state-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+    .state-label {
+      font-size: var(--font-size-xs);
+      color: var(--color-muted-foreground);
+      width: 60px;
+      flex-shrink: 0;
+    }
+
+    /* === Button Base === */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: var(--radius-button);
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      outline: none;
+    }
+
+    /* === Sizes === */
+    .btn-md { height: var(--size-button-md); padding: 0 16px; }
+    .btn-lg { height: var(--size-button-lg); padding: 0 24px; }
+
+    /* === Primary === */
+    .btn-primary {
+      background: var(--color-primary);
+      color: var(--color-on-primary);
+    }
+    .btn-primary:hover { background: var(--color-primary-hover); }
+    .btn-primary.active { transform: scale(0.97); }
+    .btn-primary.disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* === Secondary === */
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--color-border);
+      color: var(--color-on-surface-variant);
+    }
+    .btn-secondary:hover { border-color: var(--color-primary); }
+    .btn-secondary.active { transform: scale(0.97); }
+    .btn-secondary.disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* === Ghost === */
+    .btn-ghost {
+      background: transparent;
+      border: none;
+      color: var(--color-muted-foreground);
+    }
+    .btn-ghost:hover { color: var(--color-primary); }
+    .btn-ghost.active { transform: scale(0.97); }
+    .btn-ghost.disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* === Dev Spec Table === */
+    .spec-section { margin-top: 48px; }
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      font-size: var(--font-size-sm);
+    }
+    .spec-table th {
+      text-align: left;
+      padding: 10px 16px;
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-on-surface-variant);
+      background: var(--color-surface-dim);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .spec-table td {
+      padding: 8px 16px;
+      color: var(--color-on-surface-variant);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .spec-table tr:last-child td { border-bottom: none; }
+    .color-swatch {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      vertical-align: middle;
+      margin-right: 6px;
+      border: 1px solid var(--color-border);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <h2 class="sf-h2" style="color: var(--color-foreground); margin-bottom: 8px;">Button 按钮</h2>
+    <p class="sf-body" style="color: var(--color-muted-foreground); margin-bottom: 40px;">3 个变体 × 2 个尺寸 × 4 个状态</p>
+
+    <!-- ===== Primary ===== -->
+    <div class="variant-group">
+      <div class="variant-title">Primary</div>
+
+      <div class="section-title">尺寸 md (40px)</div>
+      <div class="state-row">
+        <span class="state-label">Default</span>
+        <button class="btn btn-primary btn-md">确认提交</button>
+      </div>
+      <div class="state-row">
+        <span class="state-label">Hover</span>
+        <button class="btn btn-primary btn-md" style="background: var(--color-primary-hover);">确认提交</button>
+      </div>
+      <div class="state-row">
+        <span class="state-label">Active</span>
+        <button class="btn btn-primary btn-md active">确认提交</button>
+      </div>
+      <div class="state-row">
+        <span class="state-label">Disabled</span>
+        <button class="btn btn-primary btn-md disabled" disabled>确认提交</button>
+      </div>
+
+      <div class="section-title" style="margin-top: 24px;">尺寸 lg (48px)</div>
+      <div class="state-row">
+        <span class="state-label">Default</span>
+        <button class="btn btn-primary btn-lg">确认提交</button>
+      </div>
+      <div class="state-row">
+        <span class="state-label">Hover</span>
+        <button class="btn btn-primary btn-lg" style="background: var(--color-primary-hover);">确认提交</button>
+      </div>
+      <div class="state-row">
+        <span class="state-label">Active</span>
+        <button class="btn btn-primary btn-lg active">确认提交</button>
+      </div>
+      <div class="state-row">
+        <span class="state-label">Disabled</span>
+        <button class="btn btn-primary btn-lg disabled" disabled>确认提交</button>
+      </div>
+    </div>
+
+    <!-- ===== Secondary ===== -->
+    <div class="variant-group">
+      <div class="variant-title">Secondary</div>
+
+      <div class="section-title">尺寸 md (40px)</div>
+      <div class="state-row">
+        <span class="state-label">Default</span>
+        <button class="btn btn-secondary btn-md">取消操作</button>
+      </div>
+      <div class="state-row">
+        <span class="state-label">Hover</span>
+        <button class="btn btn-secondary btn-md" style="border-color: var(--color-primary);">取消操作</button>
+      </div>
+      <div class="state-row">
+        <span class="state-label">Active</span>
+        <button class="btn btn-secondary btn-md active">取消操作</button>
+      </div>
+      <div class="state-row">
+        <span class="state-label">Disabled</span>
+        <button class="btn btn-secondary btn-md disabled" disabled>取消操作</button>
+      </div>
+
+      <div class="section-title" style="margin-top: 24px;">尺寸 lg (48px)</div>
+      <div class="state-row">
+        <span class="state-label">Default</span>
+        <button class="btn btn-secondary btn-lg">取消操作</button>
+      </div>
+      <div class="state-row">
+        <span class="state-label">Hover</span>
+        <button class="btn btn-secondary btn-lg" style="border-color: var(--color-primary);">取消操作</button>
+      </div>
+      <div class="state-row">
+        <span class="state-label">Active</span>
+        <button class="btn btn-secondary btn-lg active">取消操作</button>
+      </div>
+      <div class="state-row">
+        <span class="state-label">Disabled</span>
+        <button class="btn btn-secondary btn-lg disabled" disabled>取消操作</button>
+      </div>
+    </div>
+
+    <!-- ===== Ghost ===== -->
+    <div class="variant-group">
+      <div class="variant-title">Ghost</div>
+
+      <div class="section-title">尺寸 md (40px)</div>
+      <div class="state-row">
+        <span class="state-label">Default</span>
+        <button class="btn btn-ghost btn-md">了解更多</button>
+      </div>
+      <div class="state-row">
+        <span class="state-label">Hover</span>
+        <button class="btn btn-ghost btn-md" style="color: var(--color-primary);">了解更多</button>
+      </div>
+      <div class="state-row">
+        <span class="state-label">Active</span>
+        <button class="btn btn-ghost btn-md active">了解更多</button>
+      </div>
+      <div class="state-row">
+        <span class="state-label">Disabled</span>
+        <button class="btn btn-ghost btn-md disabled" disabled>了解更多</button>
+      </div>
+
+      <div class="section-title" style="margin-top: 24px;">尺寸 lg (48px)</div>
+      <div class="state-row">
+        <span class="state-label">Default</span>
+        <button class="btn btn-ghost btn-lg">了解更多</button>
+      </div>
+      <div class="state-row">
+        <span class="state-label">Hover</span>
+        <button class="btn btn-ghost btn-lg" style="color: var(--color-primary);">了解更多</button>
+      </div>
+      <div class="state-row">
+        <span class="state-label">Active</span>
+        <button class="btn btn-ghost btn-lg active">了解更多</button>
+      </div>
+      <div class="state-row">
+        <span class="state-label">Disabled</span>
+        <button class="btn btn-ghost btn-lg disabled" disabled>了解更多</button>
+      </div>
+    </div>
+
+    <!-- ===== Dev Spec Tables ===== -->
+    <div class="spec-section">
+      <h3 class="sf-h3" style="color: var(--color-foreground); margin-bottom: 16px;">Dev Spec - Primary</h3>
+      <table class="spec-table">
+        <thead>
+          <tr><th>属性</th><th>Default</th><th>Hover</th><th>Active</th><th>Disabled</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>背景色</td>
+            <td><span class="color-swatch" style="background:#4DA8FF;"></span>#4DA8FF</td>
+            <td><span class="color-swatch" style="background:#69B9FF;"></span>#69B9FF</td>
+            <td><span class="color-swatch" style="background:#4DA8FF;"></span>#4DA8FF</td>
+            <td><span class="color-swatch" style="background:#4DA8FF; opacity:0.4;"></span>#4DA8FF (opacity 0.4)</td>
+          </tr>
+          <tr>
+            <td>文字色</td>
+            <td>#0A0E14</td>
+            <td>#0A0E14</td>
+            <td>#0A0E14</td>
+            <td>#0A0E14</td>
+          </tr>
+          <tr>
+            <td>边框</td>
+            <td>none</td>
+            <td>none</td>
+            <td>none</td>
+            <td>none</td>
+          </tr>
+          <tr>
+            <td>变换</td>
+            <td>none</td>
+            <td>none</td>
+            <td>scale(0.97)</td>
+            <td>none</td>
+          </tr>
+          <tr>
+            <td>阴影</td>
+            <td>none</td>
+            <td>none</td>
+            <td>none</td>
+            <td>none</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="spec-section">
+      <h3 class="sf-h3" style="color: var(--color-foreground); margin-bottom: 16px;">Dev Spec - Secondary</h3>
+      <table class="spec-table">
+        <thead>
+          <tr><th>属性</th><th>Default</th><th>Hover</th><th>Active</th><th>Disabled</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>背景色</td>
+            <td>transparent</td>
+            <td>transparent</td>
+            <td>transparent</td>
+            <td>transparent</td>
+          </tr>
+          <tr>
+            <td>文字色</td>
+            <td>#E8F4FF</td>
+            <td>#E8F4FF</td>
+            <td>#E8F4FF</td>
+            <td>#E8F4FF</td>
+          </tr>
+          <tr>
+            <td>边框</td>
+            <td>1px solid #30363D</td>
+            <td>1px solid #4DA8FF</td>
+            <td>1px solid #30363D</td>
+            <td>1px solid #30363D</td>
+          </tr>
+          <tr>
+            <td>变换</td>
+            <td>none</td>
+            <td>none</td>
+            <td>scale(0.97)</td>
+            <td>none</td>
+          </tr>
+          <tr>
+            <td>阴影</td>
+            <td>none</td>
+            <td>none</td>
+            <td>none</td>
+            <td>none</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="spec-section">
+      <h3 class="sf-h3" style="color: var(--color-foreground); margin-bottom: 16px;">Dev Spec - Ghost</h3>
+      <table class="spec-table">
+        <thead>
+          <tr><th>属性</th><th>Default</th><th>Hover</th><th>Active</th><th>Disabled</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>背景色</td>
+            <td>transparent</td>
+            <td>transparent</td>
+            <td>transparent</td>
+            <td>transparent</td>
+          </tr>
+          <tr>
+            <td>文字色</td>
+            <td>#8B949E</td>
+            <td>#4DA8FF</td>
+            <td>#8B949E</td>
+            <td>#8B949E</td>
+          </tr>
+          <tr>
+            <td>边框</td>
+            <td>none</td>
+            <td>none</td>
+            <td>none</td>
+            <td>none</td>
+          </tr>
+          <tr>
+            <td>变换</td>
+            <td>none</td>
+            <td>none</td>
+            <td>scale(0.97)</td>
+            <td>none</td>
+          </tr>
+          <tr>
+            <td>阴影</td>
+            <td>none</td>
+            <td>none</td>
+            <td>none</td>
+            <td>none</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Shared tokens -->
+    <div class="spec-section">
+      <h3 class="sf-h3" style="color: var(--color-foreground); margin-bottom: 16px;">Dev Spec - 共享属性</h3>
+      <table class="spec-table">
+        <thead>
+          <tr><th>属性</th><th>值</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>字号</td><td>14px</td></tr>
+          <tr><td>字重</td><td>500 (Medium)</td></tr>
+          <tr><td>字体</td><td>Inter</td></tr>
+          <tr><td>圆角</td><td>6px (--radius-button)</td></tr>
+          <tr><td>md 高度</td><td>40px (--size-button-md)</td></tr>
+          <tr><td>md 内边距</td><td>0 16px</td></tr>
+          <tr><td>lg 高度</td><td>48px (--size-button-lg)</td></tr>
+          <tr><td>lg 内边距</td><td>0 24px</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</body>
+</html>

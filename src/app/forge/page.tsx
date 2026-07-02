@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { mockSignals } from '@/data/mockSignals'
 import type { Signal } from '@/types/signal'
+import { useAuth } from '@/lib/auth'
 
 interface TransformPoint {
   id: number
@@ -12,6 +13,7 @@ interface TransformPoint {
 }
 
 export default function ForgePage() {
+  const { getSessionToken } = useAuth()
   const [signals, setSignals] = useState<Signal[]>([])
   const [selectedSignal, setSelectedSignal] = useState<Signal>(mockSignals[0])
   const [targetLanguage, setTargetLanguage] = useState('zh-CN')
@@ -33,6 +35,10 @@ export default function ForgePage() {
     const fetchSignals = async () => {
       try {
         const res = await fetch('/api/signals?limit=20&sortBy=score')
+        if (!res.ok) {
+          console.error('Failed to fetch signals:', res.status)
+          return
+        }
         const data = await res.json()
 
         if (data.success && data.data?.length > 0) {
@@ -72,12 +78,15 @@ export default function ForgePage() {
     }, 400)
 
     try {
+      const token = await getSessionToken()
       const response = await fetch('/api/generate/forge', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
+          signalId: selectedSignal.id,
           signalTitle: selectedSignal.title,
           signalDescription: selectedSignal.description,
           language: targetLanguage,
@@ -85,6 +94,22 @@ export default function ForgePage() {
           customPrompt,
         }),
       })
+
+      if (!response.ok) {
+        console.error('Forge generation failed:', response.status)
+        setForgeResult({
+          techStack: 'Next.js + React + TypeScript',
+          projectStructure: ['src/', '  components/', '  pages/', '  lib/'],
+          coreFeatures: [
+            { name: '核心功能', description: '基于信号生成的核心功能', implementation: '待实现' }
+          ],
+          localizationPlan: [],
+          estimatedTime: '2-4周',
+          difficulty: '中等',
+          summary: 'AI 服务暂时不可用，使用默认方案',
+        })
+        return
+      }
 
       const result = await response.json()
       if (result.success) {

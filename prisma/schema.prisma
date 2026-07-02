@@ -3,96 +3,109 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model CanvasReport {
+  id           String       @id
+  signalId     String
+  positioning  String?
+  userPersona  String?
+  competitors  Json?
+  monetization String?
+  actionPlan   Json?
+  fullReport   Json?
+  status       CanvasStatus @default(PENDING)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime
+  result       Json?
+  userId       String?
+
+  @@index([status, createdAt])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model ForgeProject {
+  id               String      @id
+  signalId         String
+  status           ForgeStatus @default(PENDING)
+  targetLanguage   String      @default("zh-CN")
+  customPrompt     String?
+  localScore       Float?
+  outputUrl        String?
+  outputRepoUrl    String?
+  outputPreviewUrl String?
+  outputSummary    String?
+  startedAt        DateTime?
+  completedAt      DateTime?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime
+  result           Json?
+  userId           String?
+
+  @@index([status, createdAt])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model LogEntry {
+  id        String   @id
+  signalId  String?
+  forgeId   String?
+  type      LogType
+  title     String
+  content   String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+  userId    String?
+
+  @@index([type, createdAt])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Signal {
-  id            String        @id @default(uuid())
+  id            String       @id
   source        String
   sourceId      String
   title         String
   description   String?
   url           String?
   imageUrl      String?
-  tags          String[]      @default([])
+  tags          String[]     @default([])
   author        String?
-  votesCount    Int           @default(0)
-  commentsCount Int           @default(0)
-  hotScore      Float         @default(0)
+  votesCount    Int          @default(0)
+  commentsCount Int          @default(0)
+  hotScore      Float        @default(0)
   noveltyScore  Float?
   businessScore Float?
   localScore    Float?
   finalScore    Float?
   scoreVersion  String?
-  status        SignalStatus  @default(PENDING)
+  status        SignalStatus @default(PENDING)
   rawData       Json?
-  fetchedAt     DateTime      @default(now())
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-
-  forgeProjects ForgeProject[]
-  canvasReports CanvasReport[]
-  logEntries    LogEntry[]
+  fetchedAt     DateTime     @default(now())
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime
+  metrics       Json         @default("{}")
+  trendData     Float[]      @default([])
 
   @@unique([source, sourceId])
-  @@index([status, finalScore])
   @@index([source, fetchedAt])
+  @@index([status, finalScore])
 }
 
-enum SignalStatus {
-  PENDING
-  SCREENED
-  SCORED
-  TOP10
-  ARCHIVED
-}
-
-model ForgeProject {
-  id              String           @id @default(uuid())
-  signalId        String
-  signal          Signal           @relation(fields: [signalId], references: [id])
-  status          ForgeStatus      @default(PENDING)
-  targetLanguage  String           @default("zh-CN")
-  customPrompt    String?
-  localScore      Float?
-  outputUrl       String?
-  outputRepoUrl   String?
-  outputPreviewUrl String?
-  outputSummary   String?
-  startedAt       DateTime?
-  completedAt     DateTime?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-
-  logEntries      LogEntry[]
-
-  @@index([status, createdAt])
-}
-
-enum ForgeStatus {
-  PENDING
-  RUNNING
-  COMPLETED
-  FAILED
-}
-
-model CanvasReport {
-  id         String     @id @default(uuid())
-  signalId   String
-  signal     Signal     @relation(fields: [signalId], references: [id])
-  positioning String?
-  userPersona String?
-  competitors Json?
-  monetization String?
-  actionPlan  Json?
-  fullReport  Json?
-  status     CanvasStatus @default(PENDING)
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-
-  @@index([status, createdAt])
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model UserSetting {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId            String    @unique @db.VarChar
+  sources           String[]  @default([])
+  categories        String[]  @default([])
+  minScore          Float?    @default(0)
+  notify            Boolean?  @default(true)
+  subscribedSignals String[]  @default([])
+  createdAt         DateTime? @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime? @default(now()) @db.Timestamp(6)
 }
 
 enum CanvasStatus {
@@ -102,19 +115,11 @@ enum CanvasStatus {
   FAILED
 }
 
-model LogEntry {
-  id        String        @id @default(uuid())
-  signalId  String?
-  signal    Signal?       @relation(fields: [signalId], references: [id])
-  forgeId   String?
-  forgeProject ForgeProject? @relation(fields: [forgeId], references: [id])
-  type      LogType
-  title     String
-  content   String?
-  metadata  Json?
-  createdAt DateTime      @default(now())
-
-  @@index([type, createdAt])
+enum ForgeStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
 }
 
 enum LogType {
@@ -128,24 +133,10 @@ enum LogType {
   SYSTEM
 }
 
-model UserSetting {
-  id       String   @id @default(uuid())
-  userId   String   @unique
-  sources  String[] @default([])
-  categories String[] @default([])
-  minScore Float    @default(0)
-  notify   Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Profile {
-  id        String   @id @db.Uuid
-  email     String   @unique
-  name      String?
-  avatarUrl String?  @map("avatar_url")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@map("profiles")
+enum SignalStatus {
+  PENDING
+  SCREENED
+  SCORED
+  TOP10
+  ARCHIVED
 }

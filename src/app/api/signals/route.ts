@@ -43,6 +43,22 @@ export async function GET(request: NextRequest) {
       response.warnings = [{ message: error }]
     }
 
+    // 如果数据库不可用且没有缓存数据，返回 503 而非 200
+    if (!dbAvailable && (!signals || signals.length === 0)) {
+      return NextResponse.json(
+        {
+          success: false,
+          data: [],
+          total: 0,
+          limit,
+          offset,
+          dbStatus: 'unavailable',
+          error: 'Database is unavailable and no cached data is available',
+        },
+        { status: 503 }
+      )
+    }
+
     return NextResponse.json(response)
 
   } catch (error) {

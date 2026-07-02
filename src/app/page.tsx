@@ -145,6 +145,10 @@ function SignalPreview() {
     async function fetchSignals() {
       try {
         const res = await fetch('/api/signals?limit=6')
+        if (!res.ok) {
+          console.error('Failed to fetch signals:', res.status)
+          return
+        }
         const data = await res.json()
         if (!cancelled && data.success && data.data) {
           setSignals(data.data.slice(0, 6))

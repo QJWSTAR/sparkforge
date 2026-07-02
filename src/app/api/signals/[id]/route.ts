@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSignalById } from '@/lib/signals'
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
@@ -12,11 +12,7 @@ export async function GET(
 
     if (!signal) {
       return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Signal not found',
-          dbStatus: dbAvailable ? 'available' : 'unavailable'
-        },
+        { success: false, error: '信号不存在', data: null },
         { status: 404 }
       )
     }
@@ -24,21 +20,15 @@ export async function GET(
     return NextResponse.json({
       success: true,
       data: signal,
-      dbStatus: dbAvailable ? 'available' : 'unavailable'
+      dbAvailable,
     })
-
   } catch (error) {
     console.error('[API] Unexpected error in signal detail endpoint:', error)
-    
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to fetch signal',
-        dbStatus: 'unavailable',
-        message: 'An unexpected error occurred, database connection may be unstable',
-        details: process.env.NODE_ENV === 'development' 
-          ? (error instanceof Error ? error.message : 'Unknown error') 
-          : undefined
+        error: 'Internal server error',
+        data: null,
       },
       { status: 500 }
     )

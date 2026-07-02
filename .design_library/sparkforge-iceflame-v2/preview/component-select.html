@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Select - SparkForge 冰焰版</title>
+  <link rel="stylesheet" href="../colors_and_type.css">
+  <style>
+    body {
+      margin: 0;
+      padding: var(--page-padding);
+      min-height: 100vh;
+      position: relative;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--atmosphere-glow);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px;
+    }
+    .section { margin-bottom: 48px; }
+    .section-title {
+      font-family: var(--font-body);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-on-surface-variant);
+      margin-bottom: 16px;
+    }
+    .state-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .state-label {
+      font-size: var(--font-size-xs);
+      color: var(--color-muted-foreground);
+      width: 60px;
+      flex-shrink: 0;
+      padding-top: 10px;
+    }
+
+    /* === Select Trigger Base === */
+    .select-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+    .select-trigger {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 320px;
+      height: var(--size-input-height);
+      padding: 0 12px;
+      font-family: var(--font-body);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-regular);
+      color: var(--color-foreground);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-button);
+      outline: none;
+      cursor: pointer;
+      box-sizing: border-box;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      user-select: none;
+    }
+    .select-trigger .placeholder {
+      color: var(--color-muted-foreground);
+    }
+    .select-trigger .chevron {
+      width: 16px;
+      height: 16px;
+      color: var(--color-muted-foreground);
+      flex-shrink: 0;
+      margin-left: 8px;
+      transition: transform 0.15s ease;
+    }
+
+    /* Focus state */
+    .select-trigger.focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(77, 168, 255, 0.15);
+    }
+
+    /* Open state */
+    .select-trigger.open {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(77, 168, 255, 0.15);
+    }
+    .select-trigger.open .chevron {
+      transform: rotate(180deg);
+    }
+
+    /* Disabled state */
+    .select-trigger.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* === Dropdown Panel === */
+    .select-panel {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      width: 100%;
+      min-width: 320px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-2);
+      padding: 4px 0;
+      z-index: 10;
+    }
+    .select-option {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      font-family: var(--font-body);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-regular);
+      color: var(--color-foreground);
+      cursor: pointer;
+      transition: background 0.1s ease;
+    }
+    .select-option:hover {
+      background: rgba(77, 168, 255, 0.08);
+    }
+    .select-option.active {
+      background: rgba(77, 168, 255, 0.08);
+      color: var(--color-primary);
+    }
+
+    /* === Dev Spec Table === */
+    .spec-section { margin-top: 48px; }
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      font-size: var(--font-size-sm);
+    }
+    .spec-table th {
+      text-align: left;
+      padding: 10px 16px;
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-on-surface-variant);
+      background: var(--color-surface-dim);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .spec-table td {
+      padding: 8px 16px;
+      color: var(--color-on-surface-variant);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .spec-table tr:last-child td { border-bottom: none; }
+    .color-swatch {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      vertical-align: middle;
+      margin-right: 6px;
+      border: 1px solid var(--color-border);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <h2 class="sf-h2" style="color: var(--color-foreground); margin-bottom: 8px;">Select 下拉选择框</h2>
+    <p class="sf-body" style="color: var(--color-muted-foreground); margin-bottom: 40px;">4 个状态: default, focus, open, disabled</p>
+
+    <div class="section">
+      <div class="state-row">
+        <span class="state-label">Default</span>
+        <div class="select-wrapper">
+          <div class="select-trigger">
+            <span class="placeholder">请选择...</span>
+            <svg class="chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 6l4 4 4-4"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="state-row">
+        <span class="state-label">Focus</span>
+        <div class="select-wrapper">
+          <div class="select-trigger focus">
+            <span>已选中项目</span>
+            <svg class="chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 6l4 4 4-4"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="state-row">
+        <span class="state-label">Open</span>
+        <div class="select-wrapper">
+          <div class="select-trigger open">
+            <span>已选中项目</span>
+            <svg class="chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 6l4 4 4-4"/>
+            </svg>
+          </div>
+          <div class="select-panel">
+            <div class="select-option active">已选中项目</div>
+            <div class="select-option">选项二</div>
+            <div class="select-option">选项三</div>
+            <div class="select-option">选项四</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="state-row">
+        <span class="state-label">Disabled</span>
+        <div class="select-wrapper">
+          <div class="select-trigger disabled">
+            <span class="placeholder">不可选择</span>
+            <svg class="chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 6l4 4 4-4"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Dev Spec Table ===== -->
+    <div class="spec-section">
+      <h3 class="sf-h3" style="color: var(--color-foreground); margin-bottom: 16px;">Dev Spec - Trigger</h3>
+      <table class="spec-table">
+        <thead>
+          <tr><th>属性</th><th>Default</th><th>Focus</th><th>Open</th><th>Disabled</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>背景色</td>
+            <td><span class="color-swatch" style="background:#1C2128;"></span>#1C2128</td>
+            <td><span class="color-swatch" style="background:#1C2128;"></span>#1C2128</td>
+            <td><span class="color-swatch" style="background:#1C2128;"></span>#1C2128</td>
+            <td><span class="color-swatch" style="background:#1C2128; opacity:0.4;"></span>#1C2128</td>
+          </tr>
+          <tr>
+            <td>文字色</td>
+            <td>#E8F4FF</td>
+            <td>#E8F4FF</td>
+            <td>#E8F4FF</td>
+            <td>#E8F4FF</td>
+          </tr>
+          <tr>
+            <td>边框</td>
+            <td>1px solid #30363D</td>
+            <td>1px solid #4DA8FF</td>
+            <td>1px solid #4DA8FF</td>
+            <td>1px solid #30363D</td>
+          </tr>
+          <tr>
+            <td>阴影</td>
+            <td>none</td>
+            <td>0 0 0 3px rgba(77,168,255,0.15)</td>
+            <td>0 0 0 3px rgba(77,168,255,0.15)</td>
+            <td>none</td>
+          </tr>
+          <tr>
+            <td>透明度</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0.4</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="spec-section">
+      <h3 class="sf-h3" style="color: var(--color-foreground); margin-bottom: 16px;">Dev Spec - 下拉面板</h3>
+      <table class="spec-table">
+        <thead>
+          <tr><th>属性</th><th>值</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>背景色</td>
+            <td><span class="color-swatch" style="background:#1C2128;"></span>#1C2128</td>
+          </tr>
+          <tr>
+            <td>边框</td>
+            <td>1px solid #30363D</td>
+          </tr>
+          <tr>
+            <td>圆角</td>
+            <td>8px (--radius-card)</td>
+          </tr>
+          <tr>
+            <td>阴影</td>
+            <td>0px 4px 16px rgba(77,168,255,0.08) (--shadow-2)</td>
+          </tr>
+          <tr>
+            <td>内边距</td>
+            <td>4px 0 (纵向)</td>
+          </tr>
+          <tr>
+            <td>选项文字色</td>
+            <td>#E8F4FF</td>
+          </tr>
+          <tr>
+            <td>选项悬停背景</td>
+            <td>rgba(77,168,255,0.08)</td>
+          </tr>
+          <tr>
+            <td>选中项文字色</td>
+            <td>#4DA8FF</td>
+          </tr>
+          <tr>
+            <td>Chevron 色值</td>
+            <td>#8B949E (--color-muted-foreground)</td>
+          </tr>
+          <tr>
+            <td>Chevron 展开旋转</td>
+            <td>rotate(180deg)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="spec-section">
+      <h3 class="sf-h3" style="color: var(--color-foreground); margin-bottom: 16px;">Dev Spec - Trigger 共享属性</h3>
+      <table class="spec-table">
+        <thead>
+          <tr><th>属性</th><th>值</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>高度</td><td>40px (--size-input-height)</td></tr>
+          <tr><td>内边距</td><td>0 12px</td></tr>
+          <tr><td>字号</td><td>14px (--font-size-base)</td></tr>
+          <tr><td>字重</td><td>400 (Regular)</td></tr>
+          <tr><td>字体</td><td>Inter</td></tr>
+          <tr><td>圆角</td><td>6px (--radius-button)</td></tr>
+          <tr><td>过渡</td><td>border-color 0.15s, box-shadow 0.15s</td></tr>
+          <tr><td>占位符色</td><td>#8B949E (--color-muted-foreground)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</body>
+</html>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth'
 
 interface SubscribeButtonProps {
@@ -9,29 +10,36 @@ interface SubscribeButtonProps {
 }
 
 export default function SubscribeButton({ signalId, initialSubscribed = false }: SubscribeButtonProps) {
-  const { user, isAuthenticated } = useAuth()
+  const router = useRouter()
+  const { user, isAuthenticated, getSessionToken } = useAuth()
   const [subscribed, setSubscribed] = useState(initialSubscribed)
   const [loading, setLoading] = useState(false)
 
   const handleClick = async () => {
     if (!isAuthenticated || !user) {
-      window.location.href = '/login'
+      router.push('/login')
       return
     }
 
     setLoading(true)
 
     try {
-      const url = `/api/subscribe${subscribed ? '' : ''}`
+      const token = await getSessionToken()
       const method = subscribed ? 'DELETE' : 'POST'
 
-      const res = await fetch(url, {
+      const res = await fetch('/api/subscribe', {
         method,
         headers: {
           'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({ userId: user.id, signalId }),
       })
+
+      if (!res.ok) {
+        console.error('Subscribe error:', res.status)
+        return
+      }
 
       const data = await res.json()
 

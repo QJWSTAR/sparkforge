@@ -1,0 +1,30 @@
+{
+  "slug": "modal",
+  "schemaVersion": 2,
+  "name": "模态框",
+  "category": "overlay",
+  "sourceKind": "from-scratch",
+  "confidence": "medium",
+  "variants": [
+    {
+      "name": "default",
+      "states": {
+        "closed": {
+          "opacity": "0"
+        },
+        "opening": {
+          "opacity": "0"
+        },
+        "open": {
+          "opacity": "1"
+        },
+        "closing": {
+          "opacity": "0"
+        }
+      }
+    }
+  ],
+  "anatomy": ["overlay", "modal-container", "title", "content", "close-button"],
+  "usageHints": { "priorityHint": "medium" },
+  "keyInsightSeed": "Overlay modal with semi-transparent backdrop, card-styled panel with rounded corners, and smooth fade transition between states."
+}

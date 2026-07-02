@@ -1,0 +1,22 @@
+# Verification Checklist
+
+- [x] 导航栏高度 56px，全宽，背景 #0A0E14，底部边框 1px #30363D，内边距 0 32px
+- [x] 侧边栏宽度 240px，背景 #0A0E14，右侧边框 1px #30363D，内边距 16px
+- [x] 主内容区 ml: 240px, mt: 56px, padding: 24px 32px
+- [x] 移动端 <768px 侧边栏默认隐藏，Menu 按钮可切换显示/隐藏
+- [x] 移动端 <768px 主内容区 ml: 0
+- [x] 统计卡片区 3 列网格（grid-cols-3），gap: 16px
+- [x] 移动端统计卡片单列布局（grid-cols-1）
+- [x] 统计卡片使用 DataCard 组件，展示标题、数值、趋势
+- [x] 信号列表垂直排列，间距 16px
+- [x] 每条信号使用 ContentCard 组件，hover 时边框变蓝
+- [x] 信号卡内包含标题、描述、Badge 分类标签、评分
+- [x] 每条信号右侧有 Primary 按钮"一键复刻"
+- [x] 每条信号右侧有 Ghost 按钮"收藏"（Heart 图标）和"分享"（Share2 图标）
+- [x] 全页仅保留一个 Primary 按钮变体，其余操作用 Ghost 变体
+- [x] 导航栏右侧有搜索框（Input 组件 + Search 图标）
+- [x] 导航栏右侧有用户头像（Avatar 组件，md, online）
+- [x] 所有颜色使用 CSS 变量或 Tailwind utility（bg-ui-*, text-ui-*, border-ui-*），无硬编码色值
+- [x] 所有间距为 4px 的倍数
+- [x] 所有图标使用 lucide-react
+- [x] `npm run build` 编译通过，无 TypeScript 错误

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avatar / 头像 - SparkForge 冰焰版</title>
+  <link rel="stylesheet" href="../colors_and_type.css">
+  <style>
+    body {
+      background-color: var(--color-background);
+      position: relative;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: var(--atmosphere-glow);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .page-wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px;
+    }
+    .section { margin-bottom: 48px; }
+    .state-label {
+      color: var(--color-on-surface-variant);
+      font-size: var(--font-size-xs);
+      margin-bottom: 12px;
+      font-weight: var(--font-weight-medium);
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    /* Avatar base */
+    .avatar {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 9999px;
+      border: 2px solid #30363D;
+      flex-shrink: 0;
+      transition: box-shadow 160ms ease;
+      position: relative;
+      overflow: visible;
+    }
+    .avatar:hover {
+      box-shadow: 0 0 0 2px #4DA8FF;
+    }
+
+    /* Sizes */
+    .avatar--sm { width: 32px; height: 32px; }
+    .avatar--md { width: 40px; height: 40px; }
+    .avatar--lg { width: 56px; height: 56px; }
+
+    /* Avatar gradients (simulating images) */
+    .avatar--grad-1 { background: linear-gradient(135deg, #4DA8FF 0%, #7B61FF 100%); }
+    .avatar--grad-2 { background: linear-gradient(135deg, #22C55E 0%, #4DA8FF 100%); }
+    .avatar--grad-3 { background: linear-gradient(135deg, #7B61FF 0%, #EAB308 100%); }
+    .avatar--grad-4 { background: linear-gradient(135deg, #EAB308 0%, #EF4444 100%); }
+    .avatar--grad-5 { background: linear-gradient(135deg, #EF4444 0%, #7B61FF 100%); }
+    .avatar--grad-6 { background: linear-gradient(135deg, #4DA8FF 0%, #22C55E 100%); }
+
+    /* Avatar initials */
+    .avatar span {
+      color: #fff;
+      font-weight: var(--font-weight-semibold);
+      line-height: 1;
+      user-select: none;
+    }
+    .avatar--sm span { font-size: 11px; }
+    .avatar--md span { font-size: 14px; }
+    .avatar--lg span { font-size: 20px; }
+
+    /* Online indicator */
+    .avatar__status {
+      position: absolute;
+      bottom: -1px;
+      right: -1px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #22C55E;
+      border: 2px solid var(--color-background);
+    }
+    .avatar--sm .avatar__status { width: 8px; height: 8px; }
+    .avatar--lg .avatar__status { width: 12px; height: 12px; }
+
+    /* Group overlap */
+    .avatar-group {
+      display: flex;
+      align-items: center;
+    }
+    .avatar-group .avatar {
+      margin-left: -8px;
+    }
+    .avatar-group .avatar:first-child {
+      margin-left: 0;
+    }
+
+    /* Size label below avatars */
+    .avatar-demo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .avatar-demo .size-label {
+      color: var(--color-muted-foreground);
+      font-size: 11px;
+      font-family: var(--font-mono);
+    }
+
+    /* Dev spec table */
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 24px;
+      font-size: var(--font-size-sm);
+    }
+    .spec-table th,
+    .spec-table td {
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .spec-table thead th {
+      background: var(--color-surface);
+      color: var(--color-foreground);
+      font-weight: var(--font-weight-semibold);
+    }
+    .spec-table tbody td {
+      color: var(--color-on-surface-variant);
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+    }
+    .spec-table tbody tr:hover td {
+      background: rgba(77, 168, 255, 0.04);
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+
+    <h2 class="sf-h2" style="margin-bottom: 4px;">Avatar / 头像</h2>
+    <p class="sf-body" style="color: var(--color-on-surface-variant); margin-bottom: 32px;">用于用户身份展示，支持 3 种尺寸、在线状态指示和群组重叠布局。</p>
+
+    <!-- Default: 3 sizes -->
+    <div class="section">
+      <p class="state-label">Default 状态 (三种尺寸)</p>
+      <div class="row">
+        <div class="avatar-demo">
+          <div class="avatar avatar--sm avatar--grad-1"><span>A</span></div>
+          <span class="size-label">sm / 32px</span>
+        </div>
+        <div class="avatar-demo">
+          <div class="avatar avatar--md avatar--grad-1"><span>A</span></div>
+          <span class="size-label">md / 40px</span>
+        </div>
+        <div class="avatar-demo">
+          <div class="avatar avatar--lg avatar--grad-1"><span>A</span></div>
+          <span class="size-label">lg / 56px</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hover -->
+    <div class="section">
+      <p class="state-label">Hover 状态 (ring: 0 0 0 2px #4DA8FF)</p>
+      <div class="row">
+        <div class="avatar-demo">
+          <div class="avatar avatar--sm avatar--grad-2" style="box-shadow: 0 0 0 2px #4DA8FF;"><span>B</span></div>
+          <span class="size-label">sm</span>
+        </div>
+        <div class="avatar-demo">
+          <div class="avatar avatar--md avatar--grad-2" style="box-shadow: 0 0 0 2px #4DA8FF;"><span>B</span></div>
+          <span class="size-label">md</span>
+        </div>
+        <div class="avatar-demo">
+          <div class="avatar avatar--lg avatar--grad-2" style="box-shadow: 0 0 0 2px #4DA8FF;"><span>B</span></div>
+          <span class="size-label">lg</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Online -->
+    <div class="section">
+      <p class="state-label">Online 在线状态 (绿色圆点)</p>
+      <div class="row">
+        <div class="avatar-demo">
+          <div class="avatar avatar--sm avatar--grad-3">
+            <span>C</span>
+            <span class="avatar__status"></span>
+          </div>
+          <span class="size-label">sm</span>
+        </div>
+        <div class="avatar-demo">
+          <div class="avatar avatar--md avatar--grad-3">
+            <span>C</span>
+            <span class="avatar__status"></span>
+          </div>
+          <span class="size-label">md</span>
+        </div>
+        <div class="avatar-demo">
+          <div class="avatar avatar--lg avatar--grad-3">
+            <span>C</span>
+            <span class="avatar__status"></span>
+          </div>
+          <span class="size-label">lg</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Group -->
+    <div class="section">
+      <p class="state-label">Group 群组状态 (重叠布局, margin-left: -8px)</p>
+      <div class="row" style="margin-bottom: 12px;">
+        <div class="avatar-group">
+          <div class="avatar avatar--md avatar--grad-4"><span>D</span></div>
+          <div class="avatar avatar--md avatar--grad-5"><span>E</span></div>
+          <div class="avatar avatar--md avatar--grad-6"><span>F</span></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="avatar-group">
+          <div class="avatar avatar--sm avatar--grad-4"><span>D</span></div>
+          <div class="avatar avatar--sm avatar--grad-5"><span>E</span></div>
+          <div class="avatar avatar--sm avatar--grad-6"><span>F</span></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="avatar-group">
+          <div class="avatar avatar--lg avatar--grad-4"><span>D</span></div>
+          <div class="avatar avatar--lg avatar--grad-5"><span>E</span></div>
+          <div class="avatar avatar--lg avatar--grad-6"><span>F</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dev Spec Table -->
+    <div class="section">
+      <h3 class="sf-h4" style="color: var(--color-foreground); margin-bottom: 12px;">开发规格</h3>
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>属性</th>
+            <th>sm (32px)</th>
+            <th>md (40px)</th>
+            <th>lg (56px)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>尺寸</td>
+            <td>32 &times; 32px</td>
+            <td>40 &times; 40px</td>
+            <td>56 &times; 56px</td>
+          </tr>
+          <tr>
+            <td>圆角</td>
+            <td colspan="3">9999px</td>
+          </tr>
+          <tr>
+            <td>边框</td>
+            <td colspan="3">2px solid #30363D</td>
+          </tr>
+          <tr>
+            <td>hover ring</td>
+            <td colspan="3">0 0 0 2px #4DA8FF</td>
+          </tr>
+          <tr>
+            <td>在线指示器尺寸</td>
+            <td>8px</td>
+            <td>10px</td>
+            <td>12px</td>
+          </tr>
+          <tr>
+            <td>在线指示器颜色</td>
+            <td colspan="3">#22C55E</td>
+          </tr>
+          <tr>
+            <td>在线指示器位置</td>
+            <td colspan="3">bottom: -1px, right: -1px</td>
+          </tr>
+          <tr>
+            <td>群组重叠</td>
+            <td colspan="3">margin-left: -8px</td>
+          </tr>
+          <tr>
+            <td>transition</td>
+            <td colspan="3">box-shadow 160ms ease</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</body>
+</html>

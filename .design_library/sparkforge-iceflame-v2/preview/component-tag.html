@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tag / 徽章 - SparkForge 冰焰版</title>
+  <link rel="stylesheet" href="../colors_and_type.css">
+  <style>
+    body {
+      background-color: var(--color-background);
+      position: relative;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: var(--atmosphere-glow);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .page-wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px;
+    }
+    .section { margin-bottom: 48px; }
+    .section-title {
+      color: var(--color-foreground);
+      margin-bottom: 8px;
+    }
+    .section-desc {
+      color: var(--color-on-surface-variant);
+      font-size: var(--font-size-sm);
+      margin-bottom: 20px;
+    }
+    .state-label {
+      color: var(--color-on-surface-variant);
+      font-size: var(--font-size-xs);
+      margin-bottom: 8px;
+      font-weight: var(--font-weight-medium);
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    /* Tag base */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      font-family: 'Inter', var(--font-body);
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1;
+      padding: 2px 8px;
+      height: 20px;
+      border-radius: 9999px;
+      white-space: nowrap;
+      transition: transform 120ms ease, opacity 120ms ease;
+      user-select: none;
+    }
+
+    /* Default variant */
+    .tag--default {
+      background: rgba(77, 168, 255, 0.12);
+      color: #4DA8FF;
+    }
+    .tag--default:hover {
+      color: #69B9FF;
+      background: rgba(77, 168, 255, 0.18);
+    }
+    .tag--default:active {
+      transform: scale(0.97);
+    }
+    .tag--default.is-disabled {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    /* Success variant */
+    .tag--success {
+      background: rgba(34, 197, 94, 0.12);
+      color: #22C55E;
+    }
+    .tag--success:hover {
+      color: #4ADE80;
+      background: rgba(34, 197, 94, 0.18);
+    }
+    .tag--success:active {
+      transform: scale(0.97);
+    }
+    .tag--success.is-disabled {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    /* Warning variant */
+    .tag--warning {
+      background: rgba(234, 179, 8, 0.12);
+      color: #EAB308;
+    }
+    .tag--warning:hover {
+      color: #FACC15;
+      background: rgba(234, 179, 8, 0.18);
+    }
+    .tag--warning:active {
+      transform: scale(0.97);
+    }
+    .tag--warning.is-disabled {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    /* Tag with close button */
+    .tag .tag-close {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 14px;
+      height: 14px;
+      margin-left: 4px;
+      border-radius: 50%;
+      cursor: pointer;
+      opacity: 0.6;
+      font-size: 10px;
+      line-height: 1;
+      transition: opacity 120ms ease;
+    }
+    .tag .tag-close:hover {
+      opacity: 1;
+    }
+
+    /* Dev spec table */
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 24px;
+      font-size: var(--font-size-sm);
+    }
+    .spec-table th,
+    .spec-table td {
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .spec-table thead th {
+      background: var(--color-surface);
+      color: var(--color-foreground);
+      font-weight: var(--font-weight-semibold);
+      position: sticky;
+      top: 0;
+    }
+    .spec-table tbody td {
+      color: var(--color-on-surface-variant);
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+    }
+    .spec-table tbody tr:hover td {
+      background: rgba(77, 168, 255, 0.04);
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+
+    <h2 class="sf-h2" style="margin-bottom: 4px;">Tag / 徽章</h2>
+    <p class="sf-body" style="color: var(--color-on-surface-variant); margin-bottom: 32px;">用于状态标记、分类筛选、属性标注等场景，支持 3 种变体和 4 种交互状态。</p>
+
+    <!-- Default state row -->
+    <div class="section">
+      <p class="state-label">Default 状态</p>
+      <div class="row">
+        <span class="tag tag--default">默认</span>
+        <span class="tag tag--success">成功</span>
+        <span class="tag tag--warning">警告</span>
+      </div>
+
+      <p class="state-label">Hover 状态</p>
+      <div class="row">
+        <span class="tag tag--default" style="color:#69B9FF; background:rgba(77,168,255,0.18);">默认</span>
+        <span class="tag tag--success" style="color:#4ADE80; background:rgba(34,197,94,0.18);">成功</span>
+        <span class="tag tag--warning" style="color:#FACC15; background:rgba(234,179,8,0.18);">警告</span>
+      </div>
+
+      <p class="state-label">Active 状态</p>
+      <div class="row">
+        <span class="tag tag--default" style="transform:scale(0.97);">默认</span>
+        <span class="tag tag--success" style="transform:scale(0.97);">成功</span>
+        <span class="tag tag--warning" style="transform:scale(0.97);">警告</span>
+      </div>
+
+      <p class="state-label">Disabled 状态</p>
+      <div class="row">
+        <span class="tag tag--default is-disabled">默认</span>
+        <span class="tag tag--success is-disabled">成功</span>
+        <span class="tag tag--warning is-disabled">警告</span>
+      </div>
+    </div>
+
+    <!-- Tag with close button -->
+    <div class="section">
+      <p class="state-label" style="margin-bottom: 8px;">带关闭按钮 (Closable)</p>
+      <div class="row">
+        <span class="tag tag--default">默认 <span class="tag-close">&times;</span></span>
+        <span class="tag tag--success">成功 <span class="tag-close">&times;</span></span>
+        <span class="tag tag--warning">警告 <span class="tag-close">&times;</span></span>
+      </div>
+    </div>
+
+    <!-- Dev Spec Table -->
+    <div class="section">
+      <h3 class="sf-h4" style="color: var(--color-foreground); margin-bottom: 12px;">开发规格</h3>
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>属性</th>
+            <th>default</th>
+            <th>hover</th>
+            <th>active</th>
+            <th>disabled</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>字号</td>
+            <td colspan="4">12px / 500 Inter</td>
+          </tr>
+          <tr>
+            <td>高度</td>
+            <td colspan="4">20px</td>
+          </tr>
+          <tr>
+            <td>内边距</td>
+            <td colspan="4">2px 8px</td>
+          </tr>
+          <tr>
+            <td>圆角</td>
+            <td colspan="4">9999px (full)</td>
+          </tr>
+          <tr>
+            <td>默认 - 背景</td>
+            <td>rgba(77,168,255,0.12)</td>
+            <td>rgba(77,168,255,0.18)</td>
+            <td>rgba(77,168,255,0.12)</td>
+            <td>rgba(77,168,255,0.12)</td>
+          </tr>
+          <tr>
+            <td>默认 - 文字</td>
+            <td>#4DA8FF</td>
+            <td>#69B9FF</td>
+            <td>#4DA8FF</td>
+            <td>#4DA8FF</td>
+          </tr>
+          <tr>
+            <td>成功 - 背景</td>
+            <td>rgba(34,197,94,0.12)</td>
+            <td>rgba(34,197,94,0.18)</td>
+            <td>rgba(34,197,94,0.12)</td>
+            <td>rgba(34,197,94,0.12)</td>
+          </tr>
+          <tr>
+            <td>成功 - 文字</td>
+            <td>#22C55E</td>
+            <td>#4ADE80</td>
+            <td>#22C55E</td>
+            <td>#22C55E</td>
+          </tr>
+          <tr>
+            <td>警告 - 背景</td>
+            <td>rgba(234,179,8,0.12)</td>
+            <td>rgba(234,179,8,0.18)</td>
+            <td>rgba(234,179,8,0.12)</td>
+            <td>rgba(234,179,8,0.12)</td>
+          </tr>
+          <tr>
+            <td>警告 - 文字</td>
+            <td>#EAB308</td>
+            <td>#FACC15</td>
+            <td>#EAB308</td>
+            <td>#EAB308</td>
+          </tr>
+          <tr>
+            <td>transform</td>
+            <td>none</td>
+            <td>none</td>
+            <td>scale(0.97)</td>
+            <td>none</td>
+          </tr>
+          <tr>
+            <td>opacity</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0.4</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SparkForge 冰焰版 — 数据指标卡片组件预览</title>
+  <link rel="stylesheet" href="../colors_and_type.css">
+  <style>
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: var(--atmosphere-glow);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body { position: relative; z-index: 1; }
+
+    .preview-container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: var(--page-padding);
+    }
+
+    .section-title {
+      margin-bottom: var(--space-4);
+    }
+    .section-desc {
+      color: var(--color-on-surface-variant);
+      margin-bottom: var(--space-6);
+    }
+
+    .states-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: var(--space-6);
+      margin-bottom: var(--space-10);
+    }
+
+    .state-item {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    .state-label {
+      font-family: var(--font-body);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-muted-foreground);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* Data Card Component */
+    .data-card {
+      background: #1C2128;
+      border-radius: var(--radius-card);
+      padding: var(--space-4);
+      border-left: 3px solid #4DA8FF;
+      transition: box-shadow 0.2s ease, transform 0.2s ease, outline 0.2s ease, opacity 0.2s ease;
+      outline: none;
+    }
+
+    .data-card .label {
+      font-family: var(--font-body);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-regular);
+      color: #8B949E;
+      margin-bottom: var(--space-1);
+    }
+
+    .data-card .value {
+      font-family: var(--font-mono);
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      color: #E8F4FF;
+      line-height: var(--line-height-tight);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .data-card .trend {
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: #22C55E;
+      margin-top: var(--space-1);
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+    .data-card .trend.down {
+      color: #EF4444;
+    }
+    .data-card .trend svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* Hover */
+    .data-card.state-hover {
+      box-shadow: 0px 4px 16px rgba(77, 168, 255, 0.08);
+      transform: translateY(-1px);
+    }
+
+    /* Selected */
+    .data-card.state-selected {
+      outline: 1px solid rgba(77, 168, 255, 0.3);
+      outline-offset: 0px;
+      box-shadow: 0 0 0 1px rgba(77, 168, 255, 0.3);
+    }
+
+    /* Disabled */
+    .data-card.state-disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    /* Dev Spec Table */
+    .spec-table-wrap {
+      margin-bottom: var(--space-10);
+      overflow-x: auto;
+    }
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-body);
+      font-size: var(--font-size-sm);
+    }
+    .spec-table th,
+    .spec-table td {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      padding: var(--space-2) var(--space-3);
+      text-align: left;
+      color: var(--color-on-surface-variant);
+    }
+    .spec-table th {
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-foreground);
+      background: var(--color-surface-dim);
+      white-space: nowrap;
+    }
+    .spec-table td code {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--color-primary);
+      background: var(--primary-muted);
+      padding: 1px 5px;
+      border-radius: var(--radius-sm);
+    }
+  </style>
+</head>
+<body>
+  <div class="preview-container">
+
+    <!-- Page Title -->
+    <h2 class="sf-h2 section-title">数据指标卡片 DataCard</h2>
+    <p class="section-desc">用于展示核心业务指标的紧凑型卡片，支持左侧强调色条、趋势指示与多状态交互。</p>
+
+    <!-- States Grid -->
+    <div class="states-grid">
+
+      <!-- Default -->
+      <div class="state-item">
+        <span class="state-label">Default</span>
+        <div class="data-card">
+          <div class="label">活跃用户数</div>
+          <div class="value">12,847</div>
+          <div class="trend">
+            <svg viewBox="0 0 14 14" fill="none"><path d="M7 10V4M7 4L3 8M7 4L11 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            +12.5%
+          </div>
+        </div>
+      </div>
+
+      <!-- Hover -->
+      <div class="state-item">
+        <span class="state-label">Hover</span>
+        <div class="data-card state-hover">
+          <div class="label">活跃用户数</div>
+          <div class="value">12,847</div>
+          <div class="trend">
+            <svg viewBox="0 0 14 14" fill="none"><path d="M7 10V4M7 4L3 8M7 4L11 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            +12.5%
+          </div>
+        </div>
+      </div>
+
+      <!-- Selected -->
+      <div class="state-item">
+        <span class="state-label">Selected</span>
+        <div class="data-card state-selected">
+          <div class="label">活跃用户数</div>
+          <div class="value">12,847</div>
+          <div class="trend">
+            <svg viewBox="0 0 14 14" fill="none"><path d="M7 10V4M7 4L3 8M7 4L11 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            +12.5%
+          </div>
+        </div>
+      </div>
+
+      <!-- Disabled -->
+      <div class="state-item">
+        <span class="state-label">Disabled</span>
+        <div class="data-card state-disabled">
+          <div class="label">活跃用户数</div>
+          <div class="value">12,847</div>
+          <div class="trend">
+            <svg viewBox="0 0 14 14" fill="none"><path d="M7 10V4M7 4L3 8M7 4L11 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            +12.5%
+          </div>
+        </div>
+      </div>
+
+      <!-- Down Trend variant -->
+      <div class="state-item">
+        <span class="state-label">Default (下降)</span>
+        <div class="data-card">
+          <div class="label">跳出率</div>
+          <div class="value">34.2%</div>
+          <div class="trend down">
+            <svg viewBox="0 0 14 14" fill="none"><path d="M7 4V10M7 10L3 6M7 10L11 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            -3.1%
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Dev Spec Table -->
+    <h3 class="sf-h3" style="margin-bottom: var(--space-3);">开发规格</h3>
+    <div class="spec-table-wrap">
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>属性</th>
+            <th>Default</th>
+            <th>Hover</th>
+            <th>Selected</th>
+            <th>Disabled</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>background</td>
+            <td><code>#1C2128</code></td>
+            <td><code>#1C2128</code></td>
+            <td><code>#1C2128</code></td>
+            <td><code>#1C2128</code></td>
+          </tr>
+          <tr>
+            <td>border-left</td>
+            <td><code>3px solid #4DA8FF</code></td>
+            <td><code>3px solid #4DA8FF</code></td>
+            <td><code>3px solid #4DA8FF</code></td>
+            <td><code>3px solid #4DA8FF</code></td>
+          </tr>
+          <tr>
+            <td>box-shadow</td>
+            <td>none</td>
+            <td><code>0 4px 16px rgba(77,168,255,0.08)</code></td>
+            <td><code>0 0 0 1px rgba(77,168,255,0.3)</code></td>
+            <td>none</td>
+          </tr>
+          <tr>
+            <td>transform</td>
+            <td>none</td>
+            <td><code>translateY(-1px)</code></td>
+            <td>none</td>
+            <td>none</td>
+          </tr>
+          <tr>
+            <td>opacity</td>
+            <td><code>1</code></td>
+            <td><code>1</code></td>
+            <td><code>1</code></td>
+            <td><code>0.5</code></td>
+          </tr>
+          <tr>
+            <td>border-radius</td>
+            <td colspan="4"><code>8px</code></td>
+          </tr>
+          <tr>
+            <td>padding</td>
+            <td colspan="4"><code>16px</code></td>
+          </tr>
+          <tr>
+            <td>label 字体</td>
+            <td colspan="4"><code>12px/400 Inter, #8B949E</code></td>
+          </tr>
+          <tr>
+            <td>数值字体</td>
+            <td colspan="4"><code>32px/700 JetBrains Mono, #E8F4FF</code></td>
+          </tr>
+          <tr>
+            <td>趋势色-上升</td>
+            <td colspan="4"><code>#22C55E</code></td>
+          </tr>
+          <tr>
+            <td>趋势色-下降</td>
+            <td colspan="4"><code>#EF4444</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</body>
+</html>

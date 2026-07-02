@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getSupabaseAdmin } from '@/lib/supabase'
 
 const DEEPSEEK_API = 'https://api.deepseek.com/v1/chat/completions'
 
 export async function POST(request: NextRequest) {
   const apiKey = process.env.DEEPSEEK_API_KEY
-  
+
   if (!apiKey) {
     return NextResponse.json(
       { success: false, error: 'DeepSeek API key not configured' },
@@ -12,7 +13,25 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const { signalTitle, signalDescription, language, transformPoints, customPrompt } = await request.json()
+  // Token 认证
+  const authHeader = request.headers.get('authorization')
+  const token = authHeader?.split(' ')[1]
+  if (!token) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const supabaseAdmin = await getSupabaseAdmin()
+  if (!supabaseAdmin) {
+    return NextResponse.json({ error: 'Database unavailable' }, { status: 500 })
+  }
+
+  const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token)
+  if (userError || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const userId = user.id
+
+  const { signalTitle, signalDescription, signalId, language, transformPoints, customPrompt } = await request.json()
 
   if (!signalTitle) {
     return NextResponse.json(
@@ -105,9 +124,38 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // 持久化到 ForgeProject 表
+    let project = null
+    if (supabaseAdmin) {
+      try {
+        const { data: inserted, error: insertError } = await supabaseAdmin
+          .from('ForgeProject')
+          .insert({
+            id: crypto.randomUUID(),
+            userId,
+            signalId: signalId || '',
+            status: 'COMPLETED',
+            outputSummary: result.summary || '',
+            result: result,
+            targetLanguage: language || 'zh',
+            updatedAt: new Date().toISOString(),
+          })
+          .select()
+          .single()
+        if (insertError) {
+          console.error('Failed to persist forge result (insertError):', insertError)
+        } else if (inserted) {
+          project = inserted
+        }
+      } catch (err) {
+        console.error('Failed to persist forge result (exception):', err)
+      }
+    }
+
     return NextResponse.json({
       success: true,
       data: result,
+      projectId: project?.id,
     })
   } catch (error) {
     console.error('Forge generation failed:', error)

@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SparkForge 冰焰版 Design System v2 - UIKit</title>
+  <link rel="stylesheet" href="../../colors_and_type.css" />
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background-color: var(--color-background);
+      color: var(--color-foreground);
+      font-family: var(--font-body);
+      font-size: var(--font-size-base);
+      line-height: var(--line-height-normal);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--atmosphere-glow);
+      pointer-events: none;
+      z-index: 0;
+    }
+    #root { position: relative; z-index: 1; }
+    .uikit-shell { overflow: hidden; }
+    .uikit-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .uikit-nowrap { white-space: nowrap; }
+    .uikit-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .uikit-responsive-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(0, 1fr)); gap: var(--space-4); }
+    .uikit-main { min-width: 0; }
+    .uikit-toolbar { min-width: 0; }
+    .uikit-action-cell { max-width: 120px; }
+    .uikit-action { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    @media (max-width: 900px) { .uikit-responsive-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 640px) { .uikit-responsive-grid { grid-template-columns: 1fr; padding: var(--space-4); } }
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: var(--page-padding);
+    }
+    /* Brand Hero */
+    .hero {
+      text-align: center;
+      padding: var(--space-12) 0 var(--space-8);
+    }
+    .hero-title {
+      font-family: var(--font-body);
+      font-size: 3rem;
+      font-weight: var(--font-weight-bold);
+      color: var(--spark-blue-400);
+      letter-spacing: -0.03em;
+      margin-bottom: var(--space-2);
+    }
+    .hero-sub {
+      font-size: var(--font-size-md);
+      color: var(--deep-space-50);
+      margin-bottom: var(--space-6);
+    }
+    .hero-dots {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-3);
+    }
+    .hero-dot {
+      width: 28px; height: 28px;
+      border-radius: var(--radius-full);
+      border: 2px solid rgba(255,255,255,0.1);
+      transition: transform 0.2s;
+    }
+    .hero-dot:hover { transform: scale(1.2); }
+    /* Section */
+    .section {
+      margin-bottom: var(--space-10);
+    }
+    .section-title {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-foreground);
+      margin-bottom: var(--space-4);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .section-title::before {
+      content: '';
+      width: 4px; height: 20px;
+      background: var(--spark-blue-400);
+      border-radius: var(--radius-sm);
+    }
+    /* Collapsible */
+    .collapse-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      margin-bottom: var(--space-2);
+      transition: background 0.15s;
+      user-select: none;
+    }
+    .collapse-header:hover { background: var(--bg-hover); }
+    .collapse-header span { font-weight: var(--font-weight-medium); font-size: var(--font-size-sm); }
+    .collapse-arrow {
+      display: inline-block;
+      transition: transform 0.2s;
+      color: var(--fg-muted);
+      font-size: 12px;
+    }
+    .collapse-arrow.open { transform: rotate(90deg); }
+    .collapse-body {
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .collapse-body-inner {
+      padding: var(--space-4);
+      background: var(--color-surface-dim);
+      border: 1px solid var(--color-border);
+      border-top: none;
+      border-radius: 0 0 var(--radius-card) var(--radius-card);
+    }
+    /* Color Swatch */
+    .swatch-row {
+      display: flex;
+      gap: var(--space-1);
+      margin-bottom: var(--space-4);
+    }
+    .swatch {
+      flex: 1;
+      min-height: 56px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding-bottom: var(--space-1);
+      font-size: 10px;
+      font-family: var(--font-mono);
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+      transition: transform 0.15s;
+      cursor: default;
+    }
+    .swatch:hover { transform: translateY(-2px); }
+    .swatch-label {
+      font-size: 9px;
+      opacity: 0.8;
+      margin-bottom: 2px;
+    }
+    /* Typography preview */
+    .type-row {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-4);
+      padding: var(--space-2) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .type-row:last-child { border-bottom: none; }
+    .type-token {
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+      color: var(--spark-blue-400);
+      min-width: 140px;
+      flex-shrink: 0;
+    }
+    .type-sample { color: var(--color-foreground); }
+    /* Spacing grid */
+    .space-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-2);
+    }
+    .space-block {
+      background: var(--spark-blue-400);
+      opacity: 0.7;
+      border-radius: 2px;
+      height: 16px;
+      transition: opacity 0.15s;
+    }
+    .space-block:hover { opacity: 1; }
+    .space-label {
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+      color: var(--fg-muted);
+      min-width: 100px;
+    }
+    /* Tab bar */
+    .tabs {
+      display: flex;
+      gap: 2px;
+      background: var(--color-surface-dim);
+      padding: 3px;
+      border-radius: var(--radius-card);
+      margin-bottom: var(--space-6);
+      overflow-x: auto;
+    }
+    .tab {
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--fg-muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+      border: none;
+      background: transparent;
+      font-family: var(--font-body);
+    }
+    .tab:hover { color: var(--color-foreground); background: var(--bg-hover); }
+    .tab.active {
+      background: var(--bg-elevated);
+      color: var(--spark-blue-400);
+      box-shadow: var(--shadow-1);
+    }
+    /* Playground */
+    .playground {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: var(--space-6);
+    }
+    .playground-controls {
+      display: flex;
+      gap: var(--space-3);
+      margin-bottom: var(--space-5);
+      flex-wrap: wrap;
+    }
+    .control-group {
+      display: flex;
+      gap: 2px;
+      background: var(--color-surface-dim);
+      padding: 2px;
+      border-radius: var(--radius-sm);
+    }
+    .control-btn {
+      padding: var(--space-1) var(--space-3);
+      border: none;
+      border-radius: 3px;
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+      color: var(--fg-muted);
+      background: transparent;
+      cursor: pointer;
+      font-family: var(--font-body);
+      transition: all 0.15s;
+    }
+    .control-btn:hover { color: var(--color-foreground); }
+    .control-btn.active {
+      background: var(--spark-blue-400);
+      color: #0A0E14;
+    }
+    .playground-preview {
+      display: flex;
+      gap: var(--space-4);
+      align-items: center;
+      flex-wrap: wrap;
+      min-height: 80px;
+    }
+    /* SF Buttons */
+    .sf-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      font-family: var(--font-body);
+      font-weight: var(--font-weight-medium);
+      border: none;
+      border-radius: var(--radius-button);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+      font-size: var(--font-size-sm);
+    }
+    .sf-btn-md { height: var(--size-button-md); padding: 0 var(--space-4); }
+    .sf-btn-lg { height: var(--size-button-lg); padding: 0 var(--space-6); font-size: var(--font-size-base); }
+    .sf-btn-primary {
+      background: var(--spark-blue-400);
+      color: #0A0E14;
+    }
+    .sf-btn-primary:hover { background: var(--primary-hover); box-shadow: 0 0 16px rgba(77,168,255,0.3); }
+    .sf-btn-secondary {
+      background: var(--color-surface);
+      color: var(--color-foreground);
+      border: 1px solid var(--color-border);
+    }
+    .sf-btn-secondary:hover { background: var(--bg-hover); border-color: var(--spark-blue-400); }
+    .sf-btn-ghost {
+      background: transparent;
+      color: var(--spark-blue-400);
+    }
+    .sf-btn-ghost:hover { background: var(--primary-muted); }
+    .sf-btn:disabled, .sf-btn.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    /* SF Input */
+    .sf-input-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+    .sf-input {
+      height: var(--size-input-height);
+      padding: 0 var(--space-3);
+      background: var(--color-surface-dim);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-button);
+      color: var(--color-foreground);
+      font-family: var(--font-body);
+      font-size: var(--font-size-sm);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      width: 280px;
+    }
+    .sf-input::placeholder { color: var(--fg-muted); }
+    .sf-input:focus {
+      border-color: var(--spark-blue-400);
+      box-shadow: 0 0 0 3px var(--primary-muted);
+    }
+    .sf-input.error {
+      border-color: var(--error-500);
+      box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+    }
+    .sf-input-label {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+      color: var(--fg-secondary);
+    }
+    .sf-input-hint {
+      font-size: var(--font-size-xs);
+      color: var(--fg-muted);
+    }
+    .sf-input-hint.error { color: var(--error-400); }
+    /* SF Select */
+    .sf-select {
+      height: var(--size-input-height);
+      padding: 0 var(--space-3);
+      background: var(--color-surface-dim);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-button);
+      color: var(--color-foreground);
+      font-family: var(--font-body);
+      font-size: var(--font-size-sm);
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238B949E' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+      width: 280px;
+      transition: border-color 0.15s;
+    }
+    .sf-select:focus { border-color: var(--spark-blue-400); box-shadow: 0 0 0 3px var(--primary-muted); }
+    /* Data Card */
+    .sf-data-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: var(--space-5);
+      min-width: 200px;
+    }
+    .sf-data-card-label {
+      font-size: var(--font-size-xs);
+      color: var(--fg-muted);
+      margin-bottom: var(--space-1);
+    }
+    .sf-data-card-value {
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-foreground);
+      font-variant-numeric: tabular-nums;
+      margin-bottom: var(--space-1);
+    }
+    .sf-data-card-trend {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+    }
+    .sf-data-card-trend.up { color: var(--success-400); }
+    .sf-data-card-trend.down { color: var(--error-400); }
+    /* Content Card */
+    .sf-content-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      width: 320px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .sf-content-card:hover {
+      border-color: var(--spark-blue-400);
+      box-shadow: 0 4px 24px rgba(77,168,255,0.1);
+    }
+    .sf-content-card-img {
+      width: 100%;
+      height: 160px;
+      background: linear-gradient(135deg, var(--deep-space-600), var(--deep-space-400));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-size-xs);
+      color: var(--fg-muted);
+    }
+    .sf-content-card-body {
+      padding: var(--space-4);
+    }
+    .sf-content-card-title {
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-base);
+      margin-bottom: var(--space-1);
+    }
+    .sf-content-card-desc {
+      font-size: var(--font-size-sm);
+      color: var(--fg-muted);
+      line-height: var(--line-height-relaxed);
+    }
+    /* Modal */
+    .sf-modal-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    .sf-modal {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-modal);
+      width: 420px;
+      max-width: 90vw;
+      overflow: hidden;
+    }
+    .sf-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-4) var(--space-5);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .sf-modal-header h3 {
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-base);
+    }
+    .sf-modal-close {
+      background: transparent;
+      border: none;
+      color: var(--fg-muted);
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px;
+      line-height: 1;
+      transition: color 0.15s;
+    }
+    .sf-modal-close:hover { color: var(--color-foreground); }
+    .sf-modal-body {
+      padding: var(--space-5);
+      font-size: var(--font-size-sm);
+      color: var(--fg-secondary);
+      line-height: var(--line-height-relaxed);
+    }
+    .sf-modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-5);
+      border-top: 1px solid var(--color-border);
+    }
+    /* Tag */
+    .sf-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: 2px var(--space-2);
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+    }
+    .sf-tag-blue { background: var(--primary-muted); color: var(--spark-blue-400); }
+    .sf-tag-purple { background: var(--accent-muted); color: var(--nebula-purple-400); }
+    .sf-tag-green { background: rgba(34,197,94,0.12); color: var(--success-400); }
+    .sf-tag-red { background: rgba(239,68,68,0.12); color: var(--error-400); }
+    .sf-tag-yellow { background: rgba(234,179,8,0.12); color: var(--warning-400); }
+    .sf-tag-neutral { background: var(--bg-hover); color: var(--fg-secondary); }
+    /* Avatar */
+    .sf-avatar {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-full);
+      font-weight: var(--font-weight-semibold);
+      color: #0A0E14;
+      flex-shrink: 0;
+    }
+    .sf-avatar-sm { width: var(--size-avatar-sm); height: var(--size-avatar-sm); font-size: var(--font-size-xs); }
+    .sf-avatar-md { width: var(--size-avatar-md); height: var(--size-avatar-md); font-size: var(--font-size-sm); }
+    .sf-avatar-lg { width: var(--size-avatar-lg); height: var(--size-avatar-lg); font-size: var(--font-size-lg); }
+    .sf-avatar-group { display: flex; }
+    .sf-avatar-group .sf-avatar { margin-left: -8px; border: 2px solid var(--color-background); }
+    .sf-avatar-group .sf-avatar:first-child { margin-left: 0; }
+    /* Toggle */
+    .sf-toggle-wrap {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      cursor: pointer;
+    }
+    .sf-toggle {
+      width: 40px; height: 22px;
+      border-radius: var(--radius-full);
+      background: var(--deep-space-300);
+      position: relative;
+      transition: background 0.2s;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      flex-shrink: 0;
+    }
+    .sf-toggle.on { background: var(--spark-blue-400); }
+    .sf-toggle-knob {
+      width: 16px; height: 16px;
+      border-radius: var(--radius-full);
+      background: #fff;
+      position: absolute;
+      top: 3px; left: 3px;
+      transition: transform 0.2s;
+    }
+    .sf-toggle.on .sf-toggle-knob { transform: translateX(18px); }
+    .sf-toggle-label {
+      font-size: var(--font-size-sm);
+      color: var(--fg-secondary);
+    }
+    /* Dev Spec Table */
+    .devspec-toggle {
+      margin-top: var(--space-5);
+      border-top: 1px solid var(--color-border);
+      padding-top: var(--space-3);
+    }
+    .devspec-toggle-btn {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      background: transparent;
+      border: none;
+      color: var(--fg-muted);
+      cursor: pointer;
+      font-size: var(--font-size-xs);
+      font-family: var(--font-mono);
+      padding: var(--space-1) 0;
+      transition: color 0.15s;
+    }
+    .devspec-toggle-btn:hover { color: var(--spark-blue-400); }
+    .devspec-table {
+      margin-top: var(--space-3);
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--font-size-xs);
+    }
+    .devspec-table th {
+      text-align: left;
+      padding: var(--space-2) var(--space-3);
+      background: var(--color-surface-dim);
+      color: var(--fg-muted);
+      font-weight: var(--font-weight-medium);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .devspec-table td {
+      padding: var(--space-2) var(--space-3);
+      border-bottom: 1px solid var(--color-border);
+      color: var(--fg-secondary);
+      font-family: var(--font-mono);
+    }
+    .devspec-table tr:last-child td { border-bottom: none; }
+  </style>
+</head>
+<body>
+  <div id="root" data-layout-guard="uikit-v1"></div>
+  <script type="text/babel">
+    const { useState } = React;
+
+    /* ── Helpers ── */
+    const BLUE_STEPS = Array.from({length:10}, (_,i) => {
+      const n = (i+1)*100;
+      return { name: `--spark-blue-${n}`, value: getComputedStyle(document.documentElement).getPropertyValue(`--spark-blue-${n}`).trim() };
+    });
+
+    const TYPO_STEPS = [
+      {token:'--font-size-xs', css:'12px', label:'xs'},
+      {token:'--font-size-sm', css:'13px', label:'sm'},
+      {token:'--font-size-base', css:'14px', label:'base'},
+      {token:'--font-size-md', css:'16px', label:'md'},
+      {token:'--font-size-lg', css:'20px', label:'lg'},
+      {token:'--font-size-xl', css:'24px', label:'xl'},
+      {token:'--font-size-2xl', css:'32px', label:'2xl'},
+    ];
+
+    const WEIGHT_STEPS = [
+      {token:'--font-weight-regular', css:'400', label:'Regular'},
+      {token:'--font-weight-medium', css:'500', label:'Medium'},
+      {token:'--font-weight-semibold', css:'600', label:'Semibold'},
+      {token:'--font-weight-bold', css:'700', label:'Bold'},
+    ];
+
+    const SPACE_STEPS = [
+      {token:'--space-1', value:'4px', px:4},
+      {token:'--space-2', value:'8px', px:8},
+      {token:'--space-3', value:'12px', px:12},
+      {token:'--space-4', value:'16px', px:16},
+      {token:'--space-5', value:'20px', px:20},
+      {token:'--space-6', value:'24px', px:24},
+      {token:'--space-8', value:'32px', px:32},
+      {token:'--space-10', value:'40px', px:40},
+      {token:'--space-12', value:'48px', px:48},
+    ];
+
+    const COMPONENTS = [
+      'Button', 'Input', 'Select', 'Data Card', 'Content Card', 'Modal', 'Tag', 'Avatar', 'Toggle'
+    ];
+
+    /* ── Collapsible ── */
+    function Collapsible({ title, children, defaultOpen = false }) {
+      const [open, setOpen] = useState(defaultOpen);
+      return (
+        <div>
+          <div className="collapse-header" onClick={() => setOpen(!open)}>
+            <span>{title}</span>
+            <span className={"collapse-arrow" + (open ? " open" : "")}>&#9654;</span>
+          </div>
+          {open && <div className="collapse-body"><div className="collapse-body-inner">{children}</div></div>}
+        </div>
+      );
+    }
+
+    /* ── Token Panel ── */
+    function TokenPanel() {
+      return (
+        <div className="section">
+          <h2 className="section-title">Design Tokens</h2>
+
+          <Collapsible title="Spark Blue 色阶 (10 steps)" defaultOpen={true}>
+            <div className="swatch-row">
+              {BLUE_STEPS.map(s => (
+                <div className="swatch" key={s.name} style={{ backgroundColor: s.value }}>
+                  <span className="swatch-label">{s.name.replace('--spark-blue-','')}</span>
+                  <span>{s.value}</span>
+                </div>
+              ))}
+            </div>
+          </Collapsible>
+
+          <Collapsible title="字阶预览 (Typography Scale)">
+            {TYPO_STEPS.map(t => (
+              <div className="type-row" key={t.token}>
+                <span className="type-token">{t.token} ({t.css})</span>
+                <span className="type-sample" style={{ fontSize: t.css }}>SparkForge 冰焰版 {t.label}</span>
+              </div>
+            ))}
+          </Collapsible>
+
+          <Collapsible title="字重预览 (Font Weights)">
+            {WEIGHT_STEPS.map(w => (
+              <div className="type-row" key={w.token}>
+                <span className="type-token">{w.token} ({w.css})</span>
+                <span className="type-sample" style={{ fontWeight: w.css }}>SparkForge 字重 {w.label}</span>
+              </div>
+            ))}
+          </Collapsible>
+
+          <Collapsible title="间距栅格 (4px Base Grid)">
+            {SPACE_STEPS.map(s => (
+              <div className="space-row" key={s.token}>
+                <span className="space-label">{s.token} = {s.value}</span>
+                <div className="space-block" style={{ width: s.px }}></div>
+              </div>
+            ))}
+          </Collapsible>
+        </div>
+      );
+    }
+
+    /* ── Dev Spec ── */
+    function DevSpec({ rows, open, onToggle }) {
+      return (
+        <div className="devspec-toggle">
+          <button className="devspec-toggle-btn" onClick={onToggle}>
+            <span>{open ? '&#9660;' : '&#9654;'}</span> Dev Spec
+          </button>
+          {open && (
+            <div className="uikit-table-wrap"><table className="devspec-table">
+              <thead><tr><th>属性</th><th>值</th><th>Token</th></tr></thead>
+              <tbody>
+                {rows.map((r,i) => <tr key={i}><td>{r[0]}</td><td>{r[1]}</td><td style={{color:'var(--spark-blue-400)'}}>{r[2]}</td></tr>)}
+              </tbody>
+            </table></div>
+          )}
+        </div>
+      );
+    }
+
+    /* ── Component Playgrounds ── */
+
+    function ButtonPlayground() {
+      const [variant, setVariant] = useState('primary');
+      const [size, setSize] = useState('md');
+      const [specOpen, setSpecOpen] = useState(false);
+      const specs = [
+        ['height (md)', '40px', '--size-button-md'],
+        ['height (lg)', '48px', '--size-button-lg'],
+        ['radius', '6px', '--radius-button'],
+        ['font-weight', '500', '--font-weight-medium'],
+        ['primary bg', '#4DA8FF', '--spark-blue-400'],
+        ['secondary bg', '#1C2128', '--bg-elevated'],
+        ['disabled opacity', '0.4', 'inline'],
+      ];
+      return (
+        <div className="playground">
+          <div className="playground-controls">
+            <span style={{fontSize:'var(--font-size-xs)',color:'var(--fg-muted)',lineHeight:'28px'}}>Variant:</span>
+            <div className="control-group">
+              {['primary','secondary','ghost'].map(v => (
+                <button key={v} className={"control-btn"+(variant===v?" active":"")} onClick={()=>setVariant(v)}>{v}</button>
+              ))}
+            </div>
+            <span style={{fontSize:'var(--font-size-xs)',color:'var(--fg-muted)',lineHeight:'28px'}}>Size:</span>
+            <div className="control-group">
+              {['md','lg'].map(s => (
+                <button key={s} className={"control-btn"+(size===s?" active":"")} onClick={()=>setSize(s)}>{s}</button>
+              ))}
+            </div>
+          </div>
+          <div className="playground-preview">
+            <button className={"sf-btn sf-btn-"+size+" sf-btn-"+variant}>默认按钮</button>
+            <button className={"sf-btn sf-btn-"+size+" sf-btn-"+variant} style={{opacity:0.6}}>Hover</button>
+            <button className={"sf-btn sf-btn-"+size+" sf-btn-"+variant} disabled>Disabled</button>
+            {variant==='primary' && <button className={"sf-btn sf-btn-"+size+" sf-btn-"+variant} style={{boxShadow:'0 0 24px rgba(77,168,255,0.4)'}}>Glow</button>}
+          </div>
+          <DevSpec rows={specs} open={specOpen} onToggle={()=>setSpecOpen(!specOpen)} />
+        </div>
+      );
+    }
+
+    function InputPlayground() {
+      const [focused, setFocused] = useState(false);
+      const [error, setError] = useState(false);
+      const [specOpen, setSpecOpen] = useState(false);
+      const specs = [
+        ['height', '40px', '--size-input-height'],
+        ['radius', '6px', '--radius-button'],
+        ['font-size', '13px', '--font-size-sm'],
+        ['bg', '#161B22', '--color-surface-dim'],
+        ['border', '#30363D', '--color-border'],
+        ['focus ring', '3px rgba(77,168,255,0.12)', '--primary-muted'],
+      ];
+      return (
+        <div className="playground">
+          <div className="playground-controls">
+            <span style={{fontSize:'var(--font-size-xs)',color:'var(--fg-muted)',lineHeight:'28px'}}>状态:</span>
+            <div className="control-group">
+              <button className={"control-btn"+(!focused&&!error?" active":"")} onClick={()=>{setFocused(false);setError(false)}}>默认</button>
+              <button className={"control-btn"+(focused?" active":"")} onClick={()=>{setFocused(true);setError(false)}}>Focus</button>
+              <button className={"control-btn"+(error?" active":"")} onClick={()=>{setError(true);setFocused(false)}}>Error</button>
+            </div>
+          </div>
+          <div className="playground-preview">
+            <div className="sf-input-wrap">
+              <span className="sf-input-label">标签文本</span>
+              <input
+                className={"sf-input"+(focused?" focused":"")+(error?" error":"")}
+                placeholder="请输入内容..."
+                readOnly
+              />
+              {focused && <span className="sf-input-hint">辅助提示文本</span>}
+              {error && <span className="sf-input-hint error">错误：请检查输入</span>}
+            </div>
+          </div>
+          <DevSpec rows={specs} open={specOpen} onToggle={()=>setSpecOpen(!specOpen)} />
+        </div>
+      );
+    }
+
+    function SelectPlayground() {
+      const [specOpen, setSpecOpen] = useState(false);
+      const specs = [
+        ['height', '40px', '--size-input-height'],
+        ['radius', '6px', '--radius-button'],
+        ['bg', '#161B22', '--color-surface-dim'],
+        ['border', '#30363D', '--color-border'],
+        ['arrow', 'SVG chevron', 'inline'],
+      ];
+      return (
+        <div className="playground">
+          <div className="playground-controls">
+            <span style={{fontSize:'var(--font-size-xs)',color:'var(--fg-muted)',lineHeight:'28px'}}>选择器组件</span>
+          </div>
+          <div className="playground-preview">
+            <div className="sf-input-wrap">
+              <span className="sf-input-label">选择项目</span>
+              <select className="sf-select">
+                <option>选项一 - 默认</option>
+                <option>选项二</option>
+                <option>选项三</option>
+              </select>
+            </div>
+            <div className="sf-input-wrap">
+              <span className="sf-input-label">禁用状态</span>
+              <select className="sf-select" disabled style={{opacity:0.4}}>
+                <option>不可选择</option>
+              </select>
+            </div>
+          </div>
+          <DevSpec rows={specs} open={specOpen} onToggle={()=>setSpecOpen(!specOpen)} />
+        </div>
+      );
+    }
+
+    function DataCardPlayground() {
+      const [specOpen, setSpecOpen] = useState(false);
+      const specs = [
+        ['bg', '#1C2128', '--color-card'],
+        ['radius', '8px', '--radius-card'],
+        ['border', '#30363D', '--color-border'],
+        ['value font', 'JetBrains Mono', '--font-mono'],
+        ['value size', '24px', '--font-size-xl'],
+      ];
+      return (
+        <div className="playground">
+          <div className="playground-controls">
+            <span style={{fontSize:'var(--font-size-xs)',color:'var(--fg-muted)',lineHeight:'28px'}}>数据卡片组件</span>
+          </div>
+          <div className="playground-preview">
+            <div className="sf-data-card">
+              <div className="sf-data-card-label">月活用户</div>
+              <div className="sf-data-card-value">128,459</div>
+              <div className="sf-data-card-trend up">+12.5% &#9650;</div>
+            </div>
+            <div className="sf-data-card">
+              <div className="sf-data-card-label">日收入</div>
+              <div className="sf-data-card-value">&yen;32,180</div>
+              <div className="sf-data-card-trend up">+8.3% &#9650;</div>
+            </div>
+            <div className="sf-data-card">
+              <div className="sf-data-card-label">错误率</div>
+              <div className="sf-data-card-value">0.42%</div>
+              <div className="sf-data-card-trend down">+0.05% &#9650;</div>
+            </div>
+          </div>
+          <DevSpec rows={specs} open={specOpen} onToggle={()=>setSpecOpen(!specOpen)} />
+        </div>
+      );
+    }
+
+    function ContentCardPlayground() {
+      const [specOpen, setSpecOpen] = useState(false);
+      const specs = [
+        ['bg', '#1C2128', '--color-card'],
+        ['radius', '8px', '--radius-card'],
+        ['border', '#30363D', '--color-border'],
+        ['hover border', '#4DA8FF', '--spark-blue-400'],
+        ['hover shadow', '0 4px 24px rgba(77,168,255,0.1)', '--shadow-2'],
+      ];
+      return (
+        <div className="playground">
+          <div className="playground-controls">
+            <span style={{fontSize:'var(--font-size-xs)',color:'var(--fg-muted)',lineHeight:'28px'}}>内容卡片组件 (hover 查看)</span>
+          </div>
+          <div className="playground-preview">
+            <div className="sf-content-card">
+              <div className="sf-content-card-img">320 x 160 图像区域</div>
+              <div className="sf-content-card-body">
+                <div className="sf-content-card-title">项目概览卡片</div>
+                <div className="sf-content-card-desc">这是一个内容卡片的描述文本，展示卡片在冰焰主题下的样式表现。</div>
+              </div>
+            </div>
+          </div>
+          <DevSpec rows={specs} open={specOpen} onToggle={()=>setSpecOpen(!specOpen)} />
+        </div>
+      );
+    }
+
+    function ModalPlayground() {
+      const [open, setOpen] = useState(false);
+      const [specOpen, setSpecOpen] = useState(false);
+      const specs = [
+        ['radius', '12px', '--radius-modal'],
+        ['bg', '#1C2128', '--color-surface'],
+        ['overlay', 'rgba(0,0,0,0.6)', 'inline'],
+        ['blur', '4px', 'backdrop-filter'],
+        ['width', '420px', 'inline'],
+      ];
+      return (
+        <div className="playground">
+          <div className="playground-controls">
+            <button className="sf-btn sf-btn-md sf-btn-primary" onClick={()=>setOpen(true)}>打开弹窗</button>
+          </div>
+          <div className="playground-preview">
+            <span style={{fontSize:'var(--font-size-sm)',color:'var(--fg-muted)'}}>点击按钮查看弹窗效果</span>
+          </div>
+          {open && (
+            <div className="sf-modal-overlay" onClick={()=>setOpen(false)}>
+              <div className="sf-modal" onClick={e=>e.stopPropagation()}>
+                <div className="sf-modal-header">
+                  <h3>确认操作</h3>
+                  <button className="sf-modal-close" onClick={()=>setOpen(false)}>&times;</button>
+                </div>
+                <div className="sf-modal-body">确定要执行此操作吗？此操作无法撤销，请仔细确认后再继续。</div>
+                <div className="sf-modal-footer">
+                  <button className="sf-btn sf-btn-md sf-btn-secondary" onClick={()=>setOpen(false)}>取消</button>
+                  <button className="sf-btn sf-btn-md sf-btn-primary" onClick={()=>setOpen(false)}>确认</button>
+                </div>
+              </div>
+            </div>
+          )}
+          <DevSpec rows={specs} open={specOpen} onToggle={()=>setSpecOpen(!specOpen)} />
+        </div>
+      );
+    }
+
+    function TagPlayground() {
+      const [specOpen, setSpecOpen] = useState(false);
+      const specs = [
+        ['radius', '9999px', '--radius-full'],
+        ['font-size', '12px', '--font-size-xs'],
+        ['font-weight', '500', '--font-weight-medium'],
+        ['padding', '2px 8px', '--space-1, --space-2'],
+      ];
+      const tags = [
+        {label:'默认', cls:'sf-tag-blue'},
+        {label:'紫色', cls:'sf-tag-purple'},
+        {label:'成功', cls:'sf-tag-green'},
+        {label:'警告', cls:'sf-tag-yellow'},
+        {label:'错误', cls:'sf-tag-red'},
+        {label:'中性', cls:'sf-tag-neutral'},
+      ];
+      return (
+        <div className="playground">
+          <div className="playground-controls">
+            <span style={{fontSize:'var(--font-size-xs)',color:'var(--fg-muted)',lineHeight:'28px'}}>标签变体</span>
+          </div>
+          <div className="playground-preview">
+            {tags.map(t => (
+              <span key={t.label} className={"sf-tag "+t.cls}>{t.label}</span>
+            ))}
+          </div>
+          <DevSpec rows={specs} open={specOpen} onToggle={()=>setSpecOpen(!specOpen)} />
+        </div>
+      );
+    }
+
+    function AvatarPlayground() {
+      const [specOpen, setSpecOpen] = useState(false);
+      const specs = [
+        ['sm', '32px', '--size-avatar-sm'],
+        ['md', '40px', '--size-avatar-md'],
+        ['lg', '56px', '--size-avatar-lg'],
+        ['radius', '9999px', '--radius-full'],
+        ['font', 'Inter Semibold', '--font-weight-semibold'],
+      ];
+      const colors = ['var(--spark-blue-400)','var(--nebula-purple-400)','var(--success-400)','var(--warning-400)','var(--error-400)'];
+      return (
+        <div className="playground">
+          <div className="playground-controls">
+            <span style={{fontSize:'var(--font-size-xs)',color:'var(--fg-muted)',lineHeight:'28px'}}>尺寸变体</span>
+          </div>
+          <div className="playground-preview" style={{flexDirection:'column', alignItems:'flex-start'}}>
+            <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
+              <span style={{fontSize:'var(--font-size-xs)',color:'var(--fg-muted)',minWidth:'60px'}}>SM</span>
+              {['Z','K','M','Q','L'].map((c,i)=>(
+                <div key={i} className={"sf-avatar sf-avatar-sm"} style={{background:colors[i%colors.length]}}>{c}</div>
+              ))}
+            </div>
+            <div style={{display:'flex',alignItems:'center',gap:'12px',marginTop:'12px'}}>
+              <span style={{fontSize:'var(--font-size-xs)',color:'var(--fg-muted)',minWidth:'60px'}}>MD</span>
+              {['Z','K','M','Q','L'].map((c,i)=>(
+                <div key={i} className={"sf-avatar sf-avatar-md"} style={{background:colors[i%colors.length]}}>{c}</div>
+              ))}
+            </div>
+            <div style={{display:'flex',alignItems:'center',gap:'12px',marginTop:'12px'}}>
+              <span style={{fontSize:'var(--font-size-xs)',color:'var(--fg-muted)',minWidth:'60px'}}>LG</span>
+              {['Z','K','M'].map((c,i)=>(
+                <div key={i} className={"sf-avatar sf-avatar-lg"} style={{background:colors[i%colors.length]}}>{c}</div>
+              ))}
+            </div>
+            <div style={{marginTop:'16px'}}>
+              <span style={{fontSize:'var(--font-size-xs)',color:'var(--fg-muted)',marginRight:'12px'}}>Avatar Group:</span>
+              <div className="sf-avatar-group">
+                {['Z','K','M','Q'].map((c,i)=>(
+                  <div key={i} className={"sf-avatar sf-avatar-sm"} style={{background:colors[i%colors.length]}}>{c}</div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <DevSpec rows={specs} open={specOpen} onToggle={()=>setSpecOpen(!specOpen)} />
+        </div>
+      );
+    }
+
+    function TogglePlayground() {
+      const [on1, setOn1] = useState(true);
+      const [on2, setOn2] = useState(false);
+      const [on3, setOn3] = useState(false);
+      const [specOpen, setSpecOpen] = useState(false);
+      const specs = [
+        ['width', '40px', 'inline'],
+        ['height', '22px', 'inline'],
+        ['radius', '9999px', '--radius-full'],
+        ['knob', '16px', 'inline'],
+        ['on bg', '#4DA8FF', '--spark-blue-400'],
+        ['off bg', '#30363D', '--deep-space-300'],
+      ];
+      return (
+        <div className="playground">
+          <div className="playground-controls">
+            <span style={{fontSize:'var(--font-size-xs)',color:'var(--fg-muted)',lineHeight:'28px'}}>交互切换</span>
+          </div>
+          <div className="playground-preview" style={{flexDirection:'column', alignItems:'flex-start'}}>
+            <div className="sf-toggle-wrap" onClick={()=>setOn1(!on1)}>
+              <button className={"sf-toggle"+(on1?" on":"")}>
+                <div className="sf-toggle-knob"></div>
+              </button>
+              <span className="sf-toggle-label">开启 - {on1?'已启用':'已关闭'}</span>
+            </div>
+            <div className="sf-toggle-wrap" onClick={()=>setOn2(!on2)} style={{marginTop:'12px'}}>
+              <button className={"sf-toggle"+(on2?" on":"")}>
+                <div className="sf-toggle-knob"></div>
+              </button>
+              <span className="sf-toggle-label">暗色模式 - {on2?'已启用':'已关闭'}</span>
+            </div>
+            <div className="sf-toggle-wrap" onClick={()=>setOn3(!on3)} style={{marginTop:'12px'}}>
+              <button className={"sf-toggle"+(on3?" on":"")} disabled style={{opacity: on3?1:0.4}}>
+                <div className="sf-toggle-knob"></div>
+              </button>
+              <span className="sf-toggle-label">禁用 - {on3?'已启用':'已关闭'}</span>
+            </div>
+          </div>
+          <DevSpec rows={specs} open={specOpen} onToggle={()=>setSpecOpen(!specOpen)} />
+        </div>
+      );
+    }
+
+    const PLAYGROUNDS = {
+      'Button': ButtonPlayground,
+      'Input': InputPlayground,
+      'Select': SelectPlayground,
+      'Data Card': DataCardPlayground,
+      'Content Card': ContentCardPlayground,
+      'Modal': ModalPlayground,
+      'Tag': TagPlayground,
+      'Avatar': AvatarPlayground,
+      'Toggle': TogglePlayground,
+    };
+
+    /* ── Main App ── */
+    function App() {
+      const [activeTab, setActiveTab] = useState('Button');
+
+      return (
+        <div className="uikit-shell">
+        <div className="container uikit-main">
+          {/* Brand Hero */}
+          <div className="hero">
+            <div className="hero-title">SparkForge</div>
+            <div className="hero-sub">冰焰版 Design System v2</div>
+            <div className="hero-dots">
+              <div className="hero-dot" style={{background:'#4DA8FF'}} title="spark-blue"></div>
+              <div className="hero-dot" style={{background:'#7B61FF'}} title="nebula-purple"></div>
+              <div className="hero-dot" style={{background:'#22C55E'}} title="success"></div>
+              <div className="hero-dot" style={{background:'#EAB308'}} title="warning"></div>
+              <div className="hero-dot" style={{background:'#EF4444'}} title="error"></div>
+            </div>
+          </div>
+
+          {/* Token Panel */}
+          <TokenPanel />
+
+          {/* Component Playground */}
+          <div className="section">
+            <h2 className="section-title">组件 Playground</h2>
+            <div className="tabs">
+              {COMPONENTS.map(name => (
+                <button
+                  key={name}
+                  className={"tab" + (activeTab === name ? " active" : "")}
+                  onClick={() => setActiveTab(name)}
+                >
+                  {name}
+                </button>
+              ))}
+            </div>
+            {React.createElement(PLAYGROUNDS[activeTab])}
+          </div>
+
+          <div style={{height:'var(--space-12)'}}></div>
+        </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+  "slug": "data-card",
+  "schemaVersion": 2,
+  "name": "数据卡片",
+  "category": "data-display",
+  "sourceKind": "from-scratch",
+  "confidence": "medium",
+  "variants": [
+    {
+      "name": "default",
+      "states": {
+        "default": {
+          "backgroundColor": "#1C2128",
+          "borderRadius": "8px",
+          "padding": "16px"
+        },
+        "hover": {
+          "boxShadow": "0px 4px 16px rgba(77,168,255,0.08)",
+          "transform": "translateY(-1px)"
+        },
+        "selected": {
+          "boxShadow": "0 0 0 1px rgba(77,168,255,0.3)"
+        },
+        "disabled": {
+          "opacity": "0.4"
+        }
+      }
+    }
+  ],
+  "anatomy": ["left-accent-border", "label", "value"],
+  "usageHints": { "priorityHint": "high" },
+  "keyInsightSeed": "Compact data display card with left accent border in primary blue, large mono value for readability, and lift-on-hover interaction."
+}

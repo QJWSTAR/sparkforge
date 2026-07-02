@@ -1,0 +1,29 @@
+{
+  "slug": "avatar",
+  "schemaVersion": 2,
+  "name": "头像",
+  "category": "data-display",
+  "sourceKind": "from-scratch",
+  "confidence": "medium",
+  "variants": [
+    {
+      "name": "default",
+      "states": {
+        "default": {
+          "borderRadius": "9999px",
+          "border": "2px solid #30363D",
+          "width": "40px",
+          "height": "40px"
+        },
+        "hover": {
+          "boxShadow": "0 0 0 2px #4DA8FF"
+        },
+        "online": {},
+        "group": {}
+      }
+    }
+  ],
+  "anatomy": ["avatar-image", "online-indicator"],
+  "usageHints": { "priorityHint": "medium" },
+  "keyInsightSeed": "Circular avatar with optional online status indicator dot, border ring on hover, and multiple sizes for context-aware display."
+}

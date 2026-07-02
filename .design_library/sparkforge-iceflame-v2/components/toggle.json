@@ -1,0 +1,44 @@
+{
+  "slug": "toggle",
+  "schemaVersion": 2,
+  "name": "开关",
+  "category": "forms",
+  "sourceKind": "from-scratch",
+  "confidence": "medium",
+  "variants": [
+    {
+      "name": "default",
+      "states": {
+        "off": {
+          "backgroundColor": "#30363D",
+          "borderRadius": "10px",
+          "width": "40px",
+          "height": "20px"
+        },
+        "on": {
+          "backgroundColor": "#4DA8FF",
+          "borderRadius": "10px",
+          "width": "40px",
+          "height": "20px"
+        },
+        "disabled-off": {
+          "backgroundColor": "#30363D",
+          "borderRadius": "10px",
+          "width": "40px",
+          "height": "20px",
+          "opacity": "0.5"
+        },
+        "disabled-on": {
+          "backgroundColor": "#4DA8FF",
+          "borderRadius": "10px",
+          "width": "40px",
+          "height": "20px",
+          "opacity": "0.5"
+        }
+      }
+    }
+  ],
+  "anatomy": ["track", "thumb"],
+  "usageHints": { "priorityHint": "medium" },
+  "keyInsightSeed": "Compact toggle switch with neutral off-state and primary-colored on-state, smooth thumb transition, and reduced opacity for disabled states."
+}

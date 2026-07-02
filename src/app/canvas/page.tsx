@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { mockSignals } from '@/data/mockSignals'
 import { SkeletonCanvas } from '@/components/Skeleton'
 import type { Signal } from '@/types/signal'
+import { useAuth } from '@/lib/auth'
 
 interface CanvasData {
   valueProposition: string
@@ -33,6 +34,7 @@ interface CanvasData {
 }
 
 export default function CanvasPage() {
+  const { getSessionToken } = useAuth()
   const [signals, setSignals] = useState<Signal[]>([])
   const [selectedSignal, setSelectedSignal] = useState<Signal>(mockSignals[0])
   const [isGenerating, setIsGenerating] = useState(false)
@@ -42,6 +44,10 @@ export default function CanvasPage() {
     const fetchSignals = async () => {
       try {
         const res = await fetch('/api/signals?limit=20&sortBy=score')
+        if (!res.ok) {
+          console.error('Failed to fetch signals:', res.status)
+          return
+        }
         const data = await res.json()
 
         if (data.success && data.data?.length > 0) {
@@ -60,16 +66,44 @@ export default function CanvasPage() {
     setIsGenerating(true)
 
     try {
+      const token = await getSessionToken()
       const response = await fetch('/api/generate/canvas', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
+          signalId: selectedSignal.id,
           signalTitle: selectedSignal.title,
           signalDescription: selectedSignal.description,
         }),
       })
+
+      if (!response.ok) {
+        console.error('Canvas generation failed:', response.status)
+        setCanvasData({
+          valueProposition: selectedSignal.title,
+          customerSegments: ['目标用户群体'],
+          revenueStreams: ['订阅收入'],
+          keyPartners: [],
+          keyActivities: ['产品开发', '市场营销'],
+          keyResources: ['技术团队', '资金'],
+          channels: ['社交媒体', '内容营销'],
+          customerRelationships: ['社区运营'],
+          costStructure: ['人力成本', '服务器成本'],
+          competitiveAnalysis: [],
+          swot: {
+            strengths: ['创新的产品理念'],
+            weaknesses: ['品牌认知度低'],
+            opportunities: ['市场增长潜力大'],
+            threats: ['竞争激烈'],
+          },
+          actionPlan: ['Day 1-7: MVP开发', 'Day 8-14: 用户获取'],
+          summary: 'AI 服务暂时不可用，使用默认模板',
+        })
+        return
+      }
 
       const result = await response.json()
       if (result.success && result.data) {

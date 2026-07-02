@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SparkForge 冰焰版 — 内容卡片组件预览</title>
+  <link rel="stylesheet" href="../colors_and_type.css">
+  <style>
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: var(--atmosphere-glow);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body { position: relative; z-index: 1; }
+
+    .preview-container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: var(--page-padding);
+    }
+
+    .section-title {
+      margin-bottom: var(--space-4);
+    }
+    .section-desc {
+      color: var(--color-on-surface-variant);
+      margin-bottom: var(--space-6);
+    }
+
+    .states-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: var(--space-6);
+      margin-bottom: var(--space-10);
+    }
+
+    .state-item {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    .state-label {
+      font-family: var(--font-body);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-muted-foreground);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* Content Card Component */
+    .content-card {
+      background: #1C2128;
+      border-radius: var(--radius-card);
+      padding: var(--space-4);
+      border: 1px solid #30363D;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, outline 0.2s ease, opacity 0.2s ease;
+      outline: none;
+    }
+
+    .content-card .title {
+      font-family: var(--font-body);
+      font-size: 16px;
+      font-weight: var(--font-weight-semibold);
+      color: #E8F4FF;
+      margin-bottom: var(--space-2);
+    }
+
+    .content-card .body {
+      font-family: var(--font-body);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-regular);
+      color: #8B949E;
+      line-height: var(--line-height-normal);
+    }
+
+    /* Hover */
+    .content-card.state-hover {
+      border-color: #4DA8FF;
+    }
+
+    /* Selected */
+    .content-card.state-selected {
+      border-color: #4DA8FF;
+      box-shadow: 0 0 0 1px rgba(77, 168, 255, 0.3);
+      outline: 1px solid rgba(77, 168, 255, 0.3);
+      outline-offset: 0px;
+    }
+
+    /* Disabled */
+    .content-card.state-disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    /* Dev Spec Table */
+    .spec-table-wrap {
+      margin-bottom: var(--space-10);
+      overflow-x: auto;
+    }
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-body);
+      font-size: var(--font-size-sm);
+    }
+    .spec-table th,
+    .spec-table td {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      padding: var(--space-2) var(--space-3);
+      text-align: left;
+      color: var(--color-on-surface-variant);
+    }
+    .spec-table th {
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-foreground);
+      background: var(--color-surface-dim);
+      white-space: nowrap;
+    }
+    .spec-table td code {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--color-primary);
+      background: var(--primary-muted);
+      padding: 1px 5px;
+      border-radius: var(--radius-sm);
+    }
+  </style>
+</head>
+<body>
+  <div class="preview-container">
+
+    <!-- Page Title -->
+    <h2 class="sf-h2 section-title">内容卡片 ContentCard</h2>
+    <p class="section-desc">通用的内容承载容器，适用于信息展示、列表项、设置面板等场景，支持边框交互与选中态。</p>
+
+    <!-- States Grid -->
+    <div class="states-grid">
+
+      <!-- Default -->
+      <div class="state-item">
+        <span class="state-label">Default</span>
+        <div class="content-card">
+          <div class="title">系统更新日志</div>
+          <div class="body">已完成 v2.4.1 版本的安全补丁部署，包含 3 项关键修复。</div>
+        </div>
+      </div>
+
+      <!-- Hover -->
+      <div class="state-item">
+        <span class="state-label">Hover</span>
+        <div class="content-card state-hover">
+          <div class="title">系统更新日志</div>
+          <div class="body">已完成 v2.4.1 版本的安全补丁部署，包含 3 项关键修复。</div>
+        </div>
+      </div>
+
+      <!-- Selected -->
+      <div class="state-item">
+        <span class="state-label">Selected</span>
+        <div class="content-card state-selected">
+          <div class="title">系统更新日志</div>
+          <div class="body">已完成 v2.4.1 版本的安全补丁部署，包含 3 项关键修复。</div>
+        </div>
+      </div>
+
+      <!-- Disabled -->
+      <div class="state-item">
+        <span class="state-label">Disabled</span>
+        <div class="content-card state-disabled">
+          <div class="title">系统更新日志</div>
+          <div class="body">已完成 v2.4.1 版本的安全补丁部署，包含 3 项关键修复。</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Dev Spec Table -->
+    <h3 class="sf-h3" style="margin-bottom: var(--space-3);">开发规格</h3>
+    <div class="spec-table-wrap">
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>属性</th>
+            <th>Default</th>
+            <th>Hover</th>
+            <th>Selected</th>
+            <th>Disabled</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>background</td>
+            <td><code>#1C2128</code></td>
+            <td><code>#1C2128</code></td>
+            <td><code>#1C2128</code></td>
+            <td><code>#1C2128</code></td>
+          </tr>
+          <tr>
+            <td>border</td>
+            <td><code>1px solid #30363D</code></td>
+            <td><code>1px solid #4DA8FF</code></td>
+            <td><code>1px solid #4DA8FF</code></td>
+            <td><code>1px solid #30363D</code></td>
+          </tr>
+          <tr>
+            <td>box-shadow</td>
+            <td>none</td>
+            <td>none</td>
+            <td><code>0 0 0 1px rgba(77,168,255,0.3)</code></td>
+            <td>none</td>
+          </tr>
+          <tr>
+            <td>opacity</td>
+            <td><code>1</code></td>
+            <td><code>1</code></td>
+            <td><code>1</code></td>
+            <td><code>0.5</code></td>
+          </tr>
+          <tr>
+            <td>border-radius</td>
+            <td colspan="4"><code>8px</code></td>
+          </tr>
+          <tr>
+            <td>padding</td>
+            <td colspan="4"><code>16px</code></td>
+          </tr>
+          <tr>
+            <td>title 字体</td>
+            <td colspan="4"><code>16px/600 Inter, #E8F4FF</code></td>
+          </tr>
+          <tr>
+            <td>body 字体</td>
+            <td colspan="4"><code>14px/400 Inter, #8B949E</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</body>
+</html>
