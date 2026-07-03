@@ -1,11 +1,11 @@
 {
   "crons": [
     {
-      "path": "/api/crawl",
+      "path": "/api/crawl?key=${CRON_API_KEY}",
       "schedule": "0 0 * * *"
     },
     {
-      "path": "/api/score/batch",
+      "path": "/api/score/batch?key=${CRON_API_KEY}",
       "schedule": "0 1 * * *"
     }
   ]

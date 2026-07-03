@@ -14,9 +14,15 @@ build
 # Production
 dist/
 
-# Misc
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
 .DS_Store
-*.pem
+Thumbs.db
 
 # Debug
 npm-debug.log*

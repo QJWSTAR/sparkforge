@@ -10,31 +10,13 @@ AI 驱动的创意信号雷达 + TRAE 自动化落地工坊，帮助独立开发
 
 ## 技术栈
 
-- **框架**: Next.js 15 (App Router)
+- **框架**: Next.js 16 (App Router)
 - **UI**: React 19, Tailwind CSS v4
 - **语言**: TypeScript
 - **数据库**: Supabase (PostgreSQL)
-- **ORM**: Prisma
-- **动画**: Framer Motion
 - **图标**: Lucide React
 - **AI**: DeepSeek API
-
-## 本地运行
-
-```bash
-# 安装依赖
-npm install
-
-# 配置环境变量
-cp .env.example .env.local
-# 编辑 .env.local，填入 Supabase 密钥和 DeepSeek API Key
-
-# 启动开发服务器
-npm run dev
-
-# 构建生产版本
-npm run build
-```
+- **部署**: Vercel
 
 ## 环境变量
 
@@ -44,15 +26,32 @@ npm run build
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase 匿名密钥 |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase 服务角色密钥 |
 | `DEEPSEEK_API_KEY` | DeepSeek API 密钥 |
+| `ALGOLIA_API_KEY` | Algolia 搜索密钥 |
+| `PRODUCTHUNT_ACCESS_TOKEN` | Product Hunt API 令牌 |
 | `CRON_API_KEY` | Cron Job 鉴权密钥 |
 
 ## 部署
+
+### Vercel 一键部署
 
 部署于 Vercel：https://sparkforge-blush.vercel.app
 
 ```bash
 # 推送代码自动触发 Vercel 部署
 git push origin main
+```
+
+### Cron Job 配置
+
+Vercel Cron Job 每天执行一次信号抓取和评分：
+
+```json
+{
+  "crons": [
+    { "path": "/api/crawl?key=${CRON_API_KEY}", "schedule": "0 0 * * *" },
+    { "path": "/api/score/batch?key=${CRON_API_KEY}", "schedule": "0 1 * * *" }
+  ]
+}
 ```
 
 ## 目录结构
@@ -62,22 +61,28 @@ sparkforge/
 ├── src/
 │   ├── app/               # App Router 页面
 │   │   ├── page.tsx       # 首页
-│   │   ├── radar/         # 创意雷达
-│   │   ├── forge/         # 复刻工坊
-│   │   ├── canvas/        # 商业画布
-│   │   ├── stream/        # 公开日志
+│   │   ├── radar/         # 创意雷达（发现创意）
+│   │   ├── forge/         # 一键复刻（生成方案）
+│   │   ├── canvas/        # 商业画布（分析画布）
+│   │   ├── stream/        # 公开动态
+│   │   ├── projects/      # 我的项目
 │   │   ├── login/         # 登录
 │   │   ├── register/      # 注册
 │   │   ├── profile/       # 用户中心
+│   │   ├── privacy/       # 隐私政策
+│   │   ├── terms/         # 服务条款
+│   │   ├── about/         # 关于我们
 │   │   └── api/           # API 路由
 │   ├── components/
-│   │   ├── ui/            # UI 组件库
+│   │   ├── ui/            # UI 组件库（Button, Input, Modal, Badge, etc.）
 │   │   ├── Navbar.tsx     # 导航栏
+│   │   ├── AuthCard.tsx   # 登录/注册表单
 │   │   ├── SignalCard.tsx # 信号卡片
 │   │   └── ...
-│   ├── lib/               # 工具函数
+│   ├── lib/               # 工具函数（AI, 认证, 数据库, API）
 │   ├── types/             # TypeScript 类型
 │   └── data/              # Mock 数据
-├── prisma/                # 数据库 Schema
-└── .trae/                 # 规格文档
+├── public/                # 静态资源
+├── supabase-setup.sql     # 数据库建表脚本
+└── vercel.json            # Vercel 部署配置
 ```
