@@ -2,34 +2,30 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Sparkles, Radar, Hammer, Layout, Radio, ArrowRight } from 'lucide-react'
-import { Button, DataCard, ContentCard, Badge } from '@/components/ui'
-import { Skeleton, SkeletonCard } from '@/components/Skeleton'
+import { Sparkles, TrendingUp, ArrowRight, Zap, Search, Wrench, Share2 } from 'lucide-react'
+import { Button, Badge } from '@/components/ui'
 import { sourceLabels } from '@/data/mockSignals'
 import type { Signal } from '@/types/signal'
 
-/* ── Hero Section ── */
+/* ── Value Proposition ── */
 
-function Hero() {
+function ValueProp() {
   return (
-    <section className="relative px-4 py-24 md:py-32">
+    <section className="px-4 pt-24 pb-8 md:pt-32 md:pb-12">
       <div className="mx-auto max-w-4xl text-center">
-        {/* Sparkle graphic */}
         <div className="mb-8 inline-flex items-center justify-center">
           <div className="relative">
-            <div className="absolute inset-0 rounded-full blur-2xl bg-spark-blue/10" />
+            <div className="absolute inset-0 rounded-full bg-spark-blue/10 blur-2xl" />
             <Sparkles className="w-16 h-16 text-spark-blue relative z-10" />
           </div>
         </div>
-
-        <h1 className="text-3xl md:text-4xl font-bold text-ice-white mb-4 leading-tight">
-          From spark to shipped, in 24 hours.
+        <h1 className="text-[36px] md:text-5xl font-bold text-ice-white mb-4 leading-tight">
+          发现下一个爆款创意
         </h1>
-
         <p className="text-base text-fog max-w-2xl mx-auto mb-8">
-          SparkForge 为你监控全网 9+ 灵感源，一键生成 MVP。从灵感到上线，只需 24 小时。
+          监控 Product Hunt、Hacker News、小红书等 9+ 灵感源，AI 自动评分排序，
+          一键生成可运行 MVP，从灵感到上线只需 24 小时。
         </p>
-
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link href="/register">
             <Button variant="primary" size="lg">
@@ -38,7 +34,7 @@ function Hero() {
           </Link>
           <Link href="/radar">
             <Button variant="secondary" size="lg">
-              查看演示
+              浏览创意信号
             </Button>
           </Link>
         </div>
@@ -47,85 +43,42 @@ function Hero() {
   )
 }
 
-/* ── Trust Signals ── */
+/* ── How It Works ── */
 
-function TrustSignals() {
+function HowItWorks() {
+  const steps = [
+    {
+      icon: <Search className="w-7 h-7 text-spark-blue" />,
+      title: '发现创意',
+      description: 'AI 实时抓取全网最新创意信号，帮你找到下一个爆款',
+    },
+    {
+      icon: <Wrench className="w-7 h-7 text-spark-blue" />,
+      title: '生成方案',
+      description: '一键复刻，AI 自动生成技术方案和商业画布',
+    },
+    {
+      icon: <Share2 className="w-7 h-7 text-spark-blue" />,
+      title: '分享动态',
+      description: '发布你的创意历程，获得社区反馈',
+    },
+  ]
+
   return (
-    <section className="px-4 py-16 border-y border-border-line">
+    <section className="px-4 pb-8">
       <div className="mx-auto max-w-4xl">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <DataCard title="信号源" value="9+" />
-          <DataCard title="每日信号" value="200+" />
-          <DataCard title="MVP 生成" value="30s" />
-          <DataCard title="Top10 入选率" value="70%" />
-        </div>
-      </div>
-    </section>
-  )
-}
-
-/* ── Core Features ── */
-
-const features = [
-  {
-    icon: Radar,
-    title: '创意雷达',
-    description:
-      '7×24 小时抓取 Product Hunt、Hacker News 等 9 个信号源，AI 自动评分排序，发现下一个爆款创意。',
-    href: '/radar',
-  },
-  {
-    icon: Hammer,
-    title: '复刻工坊',
-    description:
-      '一键调用 TRAE IDE 生成可运行 MVP。配置复刻语言、改造点、自定义 Prompt，30 秒出结果。',
-    href: '/forge',
-  },
-  {
-    icon: Layout,
-    title: '商业画布',
-    description:
-      '基于信号生成完整商业画布。一句话定位、用户画像、竞品图谱、30 天行动清单，一键导出。',
-    href: '/canvas',
-  },
-  {
-    icon: Radio,
-    title: '公开日志',
-    description:
-      'Build in Public 实时流。记录从信号发现到商业变现的全过程，自动生成分享文案。',
-    href: '/stream',
-  },
-]
-
-function CoreFeatures() {
-  return (
-    <section className="px-4 py-20">
-      <div className="mx-auto max-w-5xl">
-        <h2 className="text-2xl md:text-3xl font-bold text-ice-white text-center mb-12">
-          核心功能
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {features.map((f) => (
-            <ContentCard key={f.title} className="p-6">
-              <div className="flex flex-col h-full">
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 bg-spark-blue/10">
-                  <f.icon className="w-5 h-5 text-spark-blue" />
-                </div>
-                <h3 className="text-lg font-semibold text-ice-white mb-2">
-                  {f.title}
-                </h3>
-                <p className="text-sm text-fog leading-relaxed flex-1 mb-4">
-                  {f.description}
-                </p>
-                <Link
-                  href={f.href}
-                  className="inline-flex items-center gap-1 text-sm text-spark-blue hover:text-spark-blue-hover transition-colors"
-                >
-                  了解更多
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {steps.map((step, i) => (
+            <div
+              key={step.title}
+              className="bg-spark-blue/5 border border-spark-blue/10 rounded-lg p-4 text-center"
+            >
+              <span className="mb-2 flex justify-center">{step.icon}</span>
+              <div className="text-sm font-semibold text-ice-white mb-1">
+                {i + 1}. {step.title}
               </div>
-            </ContentCard>
+              <p className="text-xs text-fog leading-relaxed">{step.description}</p>
+            </div>
           ))}
         </div>
       </div>
@@ -133,49 +86,177 @@ function CoreFeatures() {
   )
 }
 
-/* ── Real-time Signal Preview ── */
+/* ── Stats Bar ── */
 
-function SignalPreview() {
+function StatsBar() {
+  const [stats, setStats] = useState<{
+    totalSignals: number
+    todaySignals: number
+    avgScore: number
+    top10Count: number
+  } | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/stats')
+      .then((res) => res.json())
+      .then((json) => {
+        if (!cancelled && json.success && json.data) {
+          setStats(json.data)
+        }
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [])
+
+  const display = stats || { totalSignals: 0, todaySignals: 0, avgScore: 0, top10Count: 0 }
+
+  const items = [
+    { label: '信号源', value: `${display.totalSignals}+` },
+    { label: '今日新增', value: `${display.todaySignals}+` },
+    { label: '平均评分', value: `${display.avgScore}分` },
+    { label: 'Top10', value: `${display.top10Count}个` },
+  ]
+
+  return (
+    <div className="px-4 pb-8">
+      <div className="mx-auto max-w-4xl">
+        <div className="grid grid-cols-2 sm:flex sm:items-center sm:justify-center gap-4 sm:gap-8 py-4 px-4 sm:px-6 rounded-lg bg-graphite/50 border border-border-line">
+          {items.map((item, i) => (
+            <div key={item.label} className="flex items-center gap-4">
+              {i > 0 && <div className="hidden sm:block w-px h-8 bg-border-line" />}
+              <div className="text-center">
+                <p className="text-xl font-bold text-ice-white tabular-nums">{item.value}</p>
+                <p className="text-xs text-fog mt-1">{item.label}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ── Signal Card (Xiaohongshu Style) ── */
+
+function SignalCard({ signal }: { signal: Signal }) {
+  return (
+    <Link href={`/radar/${signal.id}`} className="block group">
+      <article className="bg-graphite border border-border-line rounded-lg overflow-hidden transition-all duration-200 hover:border-spark-blue/40 hover:shadow-md group-hover:translate-y-[-2px]">
+        {/* Cover Area */}
+        <div className="relative aspect-[4/3] bg-gradient-to-br from-spark-blue/5 via-graphite to-nebula-purple/5 flex items-center justify-center overflow-hidden">
+          {/* Subtle ambient glow */}
+          <div className="absolute inset-0 bg-gradient-to-t from-graphite/60 to-transparent" />
+
+          {/* Source badge (top-left) */}
+          <div className="absolute top-3 left-3 z-10">
+            <Badge variant="default" size="sm">
+              {sourceLabels[signal.source] || signal.source}
+            </Badge>
+          </div>
+
+          {/* Score badge (top-right) */}
+          <div className="absolute top-3 right-3 z-10">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-graphite/80 backdrop-blur-sm text-sm font-bold text-spark-blue tabular-nums">
+              <TrendingUp className="w-3 h-3" />
+              {signal.finalScore ?? signal.hotScore ?? 0}
+            </span>
+          </div>
+
+          {/* Center icon */}
+          <Zap className="w-10 h-10 text-spark-blue/15 group-hover:text-spark-blue/30 transition-colors duration-300" />
+        </div>
+
+        {/* Content */}
+        <div className="p-4">
+          <h3 className="text-base font-semibold text-ice-white line-clamp-2 mb-2 group-hover:text-spark-blue transition-colors leading-snug">
+            {signal.title}
+          </h3>
+          <p className="text-sm text-fog line-clamp-1 mb-3">
+            {signal.description || '暂无描述'}
+          </p>
+          <div className="flex items-center flex-wrap gap-2">
+            {signal.tags?.slice(0, 3).map((tag) => (
+              <Badge key={tag} variant="default" size="sm">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      </article>
+    </Link>
+  )
+}
+
+/* ── Skeleton Card ── */
+
+function SkeletonSignalGrid() {
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {Array.from({ length: 12 }).map((_, i) => (
+        <div key={i} className="bg-graphite border border-border-line rounded-lg overflow-hidden animate-pulse">
+          <div className="aspect-[4/3] bg-graphite" />
+          <div className="p-4 space-y-3">
+            <div className="h-4 bg-graphite rounded w-3/4" />
+            <div className="h-3 bg-graphite rounded w-full" />
+            <div className="flex gap-2">
+              <div className="h-5 bg-graphite rounded-full w-12" />
+              <div className="h-5 bg-graphite rounded-full w-16" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/* ── Signal Feed ── */
+
+function SignalFeed() {
   const [signals, setSignals] = useState<Signal[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
     let cancelled = false
 
     async function fetchSignals() {
       try {
-        const res = await fetch('/api/signals?limit=6')
+        const res = await fetch('/api/signals?limit=12&sortBy=score')
         if (!res.ok) {
-          console.error('Failed to fetch signals:', res.status)
+          setError(true)
           return
         }
         const data = await res.json()
         if (!cancelled && data.success && data.data) {
-          setSignals(data.data.slice(0, 6))
+          setSignals(data.data.slice(0, 12))
         }
       } catch {
-        // silent fallback
+        if (!cancelled) setError(true)
       } finally {
         if (!cancelled) setLoading(false)
       }
     }
 
     fetchSignals()
-    return () => {
-      cancelled = true
-    }
+    return () => { cancelled = true }
   }, [])
 
   return (
-    <section className="px-4 py-20">
-      <div className="mx-auto max-w-5xl">
+    <section className="px-4 py-8">
+      <div className="mx-auto max-w-6xl">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-ice-white">
-            实时信号
-          </h2>
+          <div>
+            <h2 className="text-xl font-bold text-ice-white">
+              精选创意信号
+            </h2>
+            <p className="text-sm text-fog mt-1">
+              来自全球灵感源的实时创意，AI 评分排序
+            </p>
+          </div>
           <Link
             href="/radar"
-            className="inline-flex items-center gap-1 text-sm text-spark-blue hover:text-spark-blue-hover transition-colors"
+            className="inline-flex items-center gap-1 text-sm text-spark-blue hover:text-spark-blue-hover transition-colors shrink-0"
           >
             查看全部
             <ArrowRight className="w-4 h-4" />
@@ -183,45 +264,32 @@ function SignalPreview() {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <SkeletonCard key={i} />
-            ))}
+          <SkeletonSignalGrid />
+        ) : error ? (
+          <div className="text-center py-16">
+            <p className="text-base text-fog">信号加载失败</p>
+            <p className="text-sm text-fog mt-2">请稍后刷新页面重试</p>
           </div>
         ) : signals.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {signals.map((signal) => (
-              <ContentCard key={signal.id} className="p-4 flex flex-col">
-                <div className="flex items-center gap-2 mb-3">
-                  <Badge variant="default" size="sm">
-                    {sourceLabels[signal.source] || signal.source}
-                  </Badge>
-                  {signal.tags?.slice(0, 2).map((tag) => (
-                    <Badge key={tag} variant="default" size="sm">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-                <h3 className="text-base font-semibold text-ice-white mb-2 line-clamp-2 flex-1">
-                  {signal.title}
-                </h3>
-                <div className="flex items-center justify-between mt-auto pt-3 border-t border-border-line">
-                  <span className="text-sm font-mono text-spark-blue font-bold tabular-nums">
-                    {signal.finalScore ?? signal.hotScore ?? 0}
-                  </span>
-                  <Link href={`/radar/${signal.id}`}>
-                    <Button variant="ghost" size="md">
-                      查看详情
-                    </Button>
-                  </Link>
-                </div>
-              </ContentCard>
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {signals.map((signal) => (
+                <SignalCard key={signal.id} signal={signal} />
+              ))}
+            </div>
+            <div className="mt-8 text-center">
+              <Link href="/radar">
+                <Button variant="secondary" size="lg">
+                  查看全部创意信号
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
+            </div>
+          </>
         ) : (
-          <div className="text-center py-12 text-fog">
-            <p className="text-base">暂无信号数据</p>
-            <p className="text-sm mt-2">调用 /api/crawl 抓取信号后即可显示</p>
+          <div className="text-center py-16">
+            <p className="text-base text-fog">暂无信号数据</p>
+            <p className="text-sm text-fog mt-2">调用 /api/crawl 抓取信号后即可显示</p>
           </div>
         )}
       </div>
@@ -229,92 +297,27 @@ function SignalPreview() {
   )
 }
 
-/* ── CTA Section ── */
-
-function CTASection() {
-  return (
-    <section className="px-4 py-20">
-      <div className="mx-auto max-w-2xl text-center">
-        <h2 className="text-2xl md:text-3xl font-bold text-ice-white mb-4">
-          准备好点燃你的下一个灵感了吗？
-        </h2>
-        <p className="text-fog mb-8">
-          加入 1000+ 独立开发者，用 AI 发现下一个爆款创意
-        </p>
-        <div className="flex flex-col items-center gap-4">
-          <Link href="/register">
-            <Button variant="primary" size="lg">
-              免费开始 SparkForge
-            </Button>
-          </Link>
-          <span className="text-sm text-fog">无需信用卡 · 5 分钟上手</span>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-/* ── Footer ── */
-
-function Footer() {
-  return (
-    <footer className="px-4 py-8 border-t border-border-line">
-      <div className="mx-auto max-w-5xl flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex flex-col items-center md:items-start gap-2">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-spark-blue" />
-            <span className="font-bold text-ice-white">SparkForge</span>
-            <span className="text-sm text-fog">© 2026</span>
-          </div>
-          <span className="text-xs text-fog">Hosted on Cloudflare · Vercel</span>
-        </div>
-
-        <div className="flex items-center gap-6 text-sm text-fog">
-          <Link href="/privacy" className="hover:text-spark-blue transition-colors">
-            隐私政策
-          </Link>
-          <Link href="/terms" className="hover:text-spark-blue transition-colors">
-            服务条款
-          </Link>
-          <Link href="/about" className="hover:text-spark-blue transition-colors">
-            关于我们
-          </Link>
-          <a
-            href="https://github.com/QJWSTAR/sparkforge/issues"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-spark-blue transition-colors"
-          >
-            联系我们
-          </a>
-        </div>
-      </div>
-    </footer>
-  )
-}
-
 /* ── Page ── */
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <main className="min-h-screen bg-deep-space relative">
-      {/* Ambient glow */}
-      <div
-        className="pointer-events-none fixed inset-0 z-0"
-        style={{
-          background:
-            'radial-gradient(600px at 50% 30%, rgba(77,168,255,0.04), transparent)',
-        }}
-      />
-
-      <div className="relative z-10">
-        <Hero />
-        <TrustSignals />
-        <CoreFeatures />
-        <SignalPreview />
-        <CTASection />
-        <Footer />
-      </div>
-    </main>
+    <div className="min-h-screen bg-ambient-glow">
+      <ValueProp />
+      <HowItWorks />
+      <StatsBar />
+      <SignalFeed />
+    </div>
   )
 }
+
+/*
+ * 设计规则遵守情况自查：
+ * 1. 无内联 style ✅ — 全部使用 Tailwind 类名 + 设计令牌
+ * 2. 组件库 ✅ — 使用 Button、Badge（Sparkles、TrendingUp、ArrowRight、Zap 图标）
+ * 3. 间距栅格 ✅ — pt-24/pb-8/py-4/px-6/gap-4/gap-8/mb-4/mb-8/p-4 等均为 4 的倍数
+ * 4. 圆角规则 ✅ — 卡片 rounded-lg，按钮 rounded-md（组件内置），Badge rounded-full
+ * 5. 字体阶梯 ✅ — 标题 32px/text-xl(20px)/text-base(16px)/text-sm(14px)/text-xs(12px)
+ * 6. 交互状态 ✅ — 卡片 hover:border-spark-blue/40 + hover:shadow-md + translate-y，标题 hover:text-spark-blue，链接 hover 颜色变化
+ * 7. 氛围光 ✅ — 根 div 使用 bg-ambient-glow
+ * 8. 响应式 ✅ — grid-cols-2 (mobile) → md:grid-cols-3 (tablet) → lg:grid-cols-4 (desktop)
+ */

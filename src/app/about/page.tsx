@@ -1,570 +1,324 @@
 import Link from 'next/link'
+import { Button, ContentCard, Badge } from '@/components/ui'
+import { ArrowRight, ExternalLink, Mail, Radio, Flame, ClipboardList, Tv, Zap, Globe, Database, Cloud, Rocket } from 'lucide-react'
 
 const techStack = [
   {
     name: 'Next.js',
-    icon: '⚛️',
-    color: 'rgba(0, 0, 0, 0.8)',
-    bgColor: 'rgba(0, 0, 0, 0.12)',
-    description: 'Full-stack React framework with App Router, Server Components, and Edge Runtime for optimal performance.',
-    features: ['App Router', 'Server Components', 'Edge Functions', 'Static Generation'],
+    icon: <Globe className="w-6 h-6 text-ice-white" />,
+    description: '基于 App Router 和 Server Components 的全栈 React 框架，支持边缘运行时',
+    features: ['App Router', 'Server Components', 'Edge Functions', 'SSG/ISR'],
   },
   {
     name: 'Supabase',
-    icon: '🛢️',
-    color: '#3ECF8E',
-    bgColor: 'rgba(62, 207, 142, 0.12)',
-    description: 'Open-source Firebase alternative providing PostgreSQL database, authentication, and real-time subscriptions.',
+    icon: <Database className="w-6 h-6 text-ice-white" />,
+    description: '开源 Firebase 替代方案，提供 PostgreSQL 数据库、认证和实时订阅',
     features: ['PostgreSQL', 'Auth', 'Real-time', 'Storage'],
   },
   {
     name: 'Cloudflare',
-    icon: '☁️',
-    color: '#F38020',
-    bgColor: 'rgba(243, 128, 32, 0.12)',
-    description: 'Global edge network for CDN, caching, and serverless functions with 300+ data centers worldwide.',
+    icon: <Cloud className="w-6 h-6 text-ice-white" />,
+    description: '全球边缘网络，300+ 数据中心提供 CDN、缓存和无服务器函数',
     features: ['CDN', 'Workers', 'KV Store', 'Zero Trust'],
   },
   {
     name: 'Vercel',
-    icon: '▲',
-    color: '#000000',
-    bgColor: 'rgba(0, 0, 0, 0.12)',
-    description: 'Frontend cloud platform with automatic deployments, preview environments, and Edge Network.',
-    features: ['Git Integration', 'Preview Deployments', 'Edge Network', 'Analytics'],
+    icon: <Rocket className="w-6 h-6 text-ice-white" />,
+    description: '前端云平台，支持自动部署、预览环境和边缘网络',
+    features: ['Git 集成', '预览部署', 'Edge Network', 'Analytics'],
   },
 ]
 
 const features = [
   {
-    icon: '📡',
-    title: 'Creative Radar',
-    description: '7×24 real-time monitoring of 9+ signal sources including Product Hunt, Hacker News, and more.',
+    icon: <Radio className="w-6 h-6 text-spark-blue" />,
+    title: '发现创意',
+    description: '7×24 小时实时监控 9+ 灵感源，覆盖 Product Hunt、Hacker News、即刻等平台',
   },
   {
-    icon: '🔥',
-    title: 'Forge Workshop',
-    description: 'One-click MVP generation using TRAE IDE. Configure tech stack, custom prompts, and get results in 30 seconds.',
+    icon: <Flame className="w-6 h-6 text-spark-blue" />,
+    title: '生成方案',
+    description: '一键调用 TRAE IDE 生成 MVP，配置技术栈、自定义提示词，30 秒出结果',
   },
   {
-    icon: '📋',
-    title: 'Business Canvas',
-    description: 'Generate complete business models from signals. One-sentence positioning, user personas, competitor analysis.',
+    icon: <ClipboardList className="w-6 h-6 text-spark-blue" />,
+    title: '分析画布',
+    description: '基于信号生成完整商业模型，含 SWOT 分析、竞品分析和 30 天行动清单',
   },
   {
-    icon: '📺',
-    title: 'Public Streams',
-    description: 'Build in Public real-time logging. Track your journey from signal discovery to commercialization.',
+    icon: <Tv className="w-6 h-6 text-spark-blue" />,
+    title: '动态广场',
+    description: '公开记录你的创意开发历程，从信号发现到商业化的完整旅程',
   },
 ]
 
 const howItWorks = [
   {
     step: '01',
-    title: 'Discover Signals',
-    description: 'Our radar continuously scans the web for emerging creative ideas and trending products.',
+    title: '发现信号',
+    description: '创意雷达持续扫描全网，捕捉新兴创意和热门产品',
   },
   {
     step: '02',
-    title: 'AI Evaluation',
-    description: 'Signals are automatically scored across multiple dimensions: hotness, novelty, business potential, and localization.',
+    title: 'AI 评分',
+    description: '多维度自动评分：热度、新颖度、商业潜力、本地化潜力',
   },
   {
     step: '03',
-    title: 'Generate MVP',
-    description: 'Select a signal and use TRAE IDE to generate a fully functional prototype in your preferred tech stack.',
+    title: '生成 MVP',
+    description: '选择信号，使用 TRAE IDE 一键生成可运行的原型',
   },
   {
     step: '04',
-    title: 'Launch & Iterate',
-    description: 'Deploy to production and start iterating based on real user feedback.',
+    title: '上线迭代',
+    description: '部署到生产环境，基于真实用户反馈持续迭代',
   },
 ]
 
 const projectHistory = [
-  {
-    date: 'Q1 2026',
-    event: 'Project inception and initial research on creative signal detection',
-  },
-  {
-    date: 'Q2 2026',
-    event: 'MVP development with Next.js and Supabase integration',
-  },
-  {
-    date: 'Q3 2026',
-    event: 'TRAE IDE integration and automated MVP generation',
-  },
-  {
-    date: 'Q4 2026',
-    event: 'Public launch and community building',
-  },
+  { date: '2026 Q1', event: '项目启动，创意信号检测技术调研' },
+  { date: '2026 Q2', event: 'MVP 开发，Next.js + Supabase 技术栈集成' },
+  { date: '2026 Q3', event: 'TRAE IDE 集成，实现自动化 MVP 生成' },
+  { date: '2026 Q4', event: '正式发布，社区建设与用户增长' },
 ]
 
 const roadmap = [
   {
-    phase: 'Phase 1',
-    title: 'Signal Expansion',
-    items: ['Add 5+ new signal sources', 'Advanced filtering and search', 'Custom alert rules'],
-    status: 'in-progress',
+    phase: '第一阶段',
+    title: '信号源扩展',
+    items: ['新增 5+ 灵感源', '高级筛选与搜索', '自定义告警规则'],
+    inProgress: true,
   },
   {
-    phase: 'Phase 2',
-    title: 'AI Enhancement',
-    items: ['Predictive trend analysis', 'Automated competitor research', 'Market size estimation'],
-    status: 'upcoming',
+    phase: '第二阶段',
+    title: 'AI 能力增强',
+    items: ['趋势预测分析', '自动化竞品研究', '市场规模估算'],
+    inProgress: false,
   },
   {
-    phase: 'Phase 3',
-    title: 'Community Features',
-    items: ['Signal sharing and discussion', 'Collaborative forging', 'Leaderboard and rankings'],
-    status: 'upcoming',
-  },
-]
-
-const team = [
-  {
-    name: 'Quan Jiawei',
-    role: 'Founder & Lead Developer',
-    bio: 'Full-stack developer passionate about AI-powered tools for independent creators.',
+    phase: '第三阶段',
+    title: '社区功能',
+    items: ['信号分享与讨论', '协作生成', '排行榜'],
+    inProgress: false,
   },
 ]
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen">
-      <section className="py-20 px-4">
-        <div className="container-app text-center">
-          <div
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6"
-            style={{
-              backgroundColor: 'var(--color-primary-muted)',
-              color: 'var(--color-primary)',
-            }}
-          >
-            <span
-              className="w-2 h-2 rounded-full animate-pulse"
-              style={{ backgroundColor: 'var(--color-primary)' }}
-            ></span>
-            About SparkForge
+    <div className="min-h-screen bg-ambient-glow">
+      {/* Hero */}
+      <section className="py-16 md:py-24 px-4">
+        <div className="mx-auto max-w-3xl text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-spark-blue/10 border border-spark-blue/20 text-sm font-medium text-spark-blue mb-8">
+            <span className="w-2 h-2 rounded-full bg-spark-blue animate-pulse" />
+            关于 SparkForge
           </div>
-          <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
-            <span
-              className="bg-gradient-to-r from-[var(--color-primary)] via-[var(--state-warning)] to-[var(--color-primary)] bg-clip-text text-transparent"
-            >
-              Building the Future
-            </span>
+          <h1 className="text-[32px] md:text-5xl font-bold text-ice-white mb-8 leading-tight">
+            构建创意发现的
             <br />
-            <span style={{ color: 'var(--color-text)' }}>of Creative Discovery</span>
+            <span className="bg-gradient-to-r from-spark-blue via-state-warning to-spark-blue bg-clip-text text-transparent">
+              下一代平台
+            </span>
           </h1>
-          <p
-            className="text-xl max-w-3xl mx-auto mb-10"
-            style={{ color: 'var(--color-text-secondary)' }}
-          >
-            SparkForge is a comprehensive platform that bridges the gap between creative discovery and MVP deployment. 
-            Our mission is to empower independent developers to turn ideas into reality faster than ever.
+          <p className="text-base text-fog max-w-2xl mx-auto mb-8">
+            SparkForge 是一个连接创意发现与 MVP 落地的综合平台。
+            我们的使命是帮助独立开发者以前所未有的速度将创意变为现实。
           </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="/register">
+              <Button variant="primary" size="lg">
+                免费开始
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
+            <Link href="/radar">
+              <Button variant="secondary" size="lg">
+                浏览创意信号
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 
-      <section
-        className="py-20 px-4"
-        style={{ backgroundColor: 'var(--color-bg-muted)' }}
-      >
-        <div className="container-app">
-          <h2
-            className="text-3xl md:text-4xl font-bold text-center mb-16"
-            style={{ color: 'var(--color-text)' }}
-          >
-            Technology Stack
+      {/* Tech Stack */}
+      <section className="py-16 px-4 bg-graphite/30 border-y border-border-line">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="text-2xl md:text-3xl font-bold text-ice-white text-center mb-12">
+            技术栈
           </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {techStack.map((tech) => (
-              <div
-                key={tech.name}
-                className="rounded-2xl p-6 card-hover"
-                style={{
-                  backgroundColor: 'var(--color-bg-surface)',
-                  boxShadow: 'var(--shadow-md)',
-                  border: '1px solid var(--color-border)',
-                }}
-              >
-                <div
-                  className="w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-3xl"
-                  style={{ backgroundColor: tech.bgColor }}
-                >
+              <ContentCard key={tech.name} className="p-6">
+                <div className="w-12 h-12 rounded-xl bg-spark-blue/10 flex items-center justify-center mb-4 text-2xl">
                   {tech.icon}
                 </div>
-                <h3 className="text-xl font-bold mb-3" style={{ color: tech.color }}>
-                  {tech.name}
-                </h3>
-                <p className="text-sm mb-4" style={{ color: 'var(--color-text-secondary)' }}>
-                  {tech.description}
-                </p>
+                <h3 className="text-lg font-bold text-ice-white mb-2">{tech.name}</h3>
+                <p className="text-sm text-fog mb-4">{tech.description}</p>
                 <div className="flex flex-wrap gap-2">
-                  {tech.features.map((feature) => (
-                    <span
-                      key={feature}
-                      className="text-xs px-3 py-1 rounded-full"
-                      style={{
-                        backgroundColor: tech.bgColor,
-                        color: tech.color,
-                      }}
-                    >
-                      {feature}
-                    </span>
+                  {tech.features.map((f) => (
+                    <Badge key={f} variant="default" size="sm">{f}</Badge>
                   ))}
                 </div>
-              </div>
+              </ContentCard>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-20 px-4">
-        <div className="container-app">
-          <h2
-            className="text-3xl md:text-4xl font-bold text-center mb-16"
-            style={{ color: 'var(--color-text)' }}
-          >
-            Features Overview
+      {/* Features */}
+      <section className="py-16 px-4">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="text-2xl md:text-3xl font-bold text-ice-white text-center mb-12">
+            功能概览
           </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((feature) => (
-              <div
-                key={feature.title}
-                className="rounded-2xl p-6 card-hover"
-                style={{
-                  backgroundColor: 'var(--color-bg-surface)',
-                  boxShadow: 'var(--shadow-md)',
-                  border: '1px solid var(--color-border)',
-                }}
-              >
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-                  style={{ backgroundColor: 'var(--color-primary-muted)' }}
-                >
-                  <span className="text-2xl">{feature.icon}</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {features.map((f) => (
+              <ContentCard key={f.title} className="p-6">
+                <div className="w-12 h-12 rounded-xl bg-spark-blue/10 flex items-center justify-center mb-4">
+                  <span className="text-2xl">{f.icon}</span>
                 </div>
-                <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
-                  {feature.title}
-                </h3>
-                <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                  {feature.description}
-                </p>
-              </div>
+                <h3 className="text-lg font-bold text-ice-white mb-2">{f.title}</h3>
+                <p className="text-sm text-fog">{f.description}</p>
+              </ContentCard>
             ))}
           </div>
         </div>
       </section>
 
-      <section
-        className="py-20 px-4"
-        style={{ backgroundColor: 'var(--color-bg-muted)' }}
-      >
-        <div className="container-app">
-          <h2
-            className="text-3xl md:text-4xl font-bold text-center mb-16"
-            style={{ color: 'var(--color-text)' }}
-          >
-            How It Works
+      {/* How It Works */}
+      <section className="py-16 px-4 bg-graphite/30 border-y border-border-line">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="text-2xl md:text-3xl font-bold text-ice-white text-center mb-12">
+            使用流程
           </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {howItWorks.map((item) => (
-              <div key={item.step} className="relative">
-                <div
-                  className="rounded-2xl p-6 h-full card-hover"
-                  style={{
-                    backgroundColor: 'var(--color-bg-surface)',
-                    boxShadow: 'var(--shadow-md)',
-                    border: '1px solid var(--color-border)',
-                  }}
-                >
-                  <div
-                    className="text-5xl font-bold mb-4"
-                    style={{ color: 'var(--color-primary-muted)' }}
-                  >
-                    {item.step}
-                  </div>
-                  <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
-                    {item.title}
-                  </h3>
-                  <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                    {item.description}
-                  </p>
+              <ContentCard key={item.step} className="p-6 relative">
+                <div className="text-4xl font-bold text-spark-blue/20 mb-4 font-mono">
+                  {item.step}
                 </div>
-                {howItWorks.indexOf(item) < howItWorks.length - 1 && (
-                  <div
-                    className="hidden lg:block absolute top-1/2 -right-3 transform -translate-y-1/2 z-10"
-                    style={{ color: 'var(--color-text-muted)' }}
-                  >
-                    <span className="text-2xl">→</span>
-                  </div>
-                )}
+                <h3 className="text-lg font-bold text-ice-white mb-2">{item.title}</h3>
+                <p className="text-sm text-fog">{item.description}</p>
+              </ContentCard>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Project History */}
+      <section className="py-16 px-4">
+        <div className="mx-auto max-w-3xl">
+          <h2 className="text-2xl md:text-3xl font-bold text-ice-white text-center mb-12">
+            项目历程
+          </h2>
+          <div className="space-y-4">
+            {projectHistory.map((item, i) => (
+              <div key={item.date} className="flex items-start gap-4">
+                <div className="shrink-0 w-8 h-8 rounded-full bg-spark-blue flex items-center justify-center text-xs font-bold text-white">
+                  {i + 1}
+                </div>
+                <ContentCard className="flex-1 p-4">
+                  <h3 className="text-sm font-bold text-spark-blue mb-1">{item.date}</h3>
+                  <p className="text-sm text-fog">{item.event}</p>
+                </ContentCard>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-20 px-4">
-        <div className="container-app max-w-3xl">
-          <h2
-            className="text-3xl md:text-4xl font-bold text-center mb-16"
-            style={{ color: 'var(--color-text)' }}
-          >
-            Project History
+      {/* Roadmap */}
+      <section className="py-16 px-4 bg-graphite/30 border-y border-border-line">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="text-2xl md:text-3xl font-bold text-ice-white text-center mb-12">
+            路线图
           </h2>
-          <div className="relative">
-            <div
-              className="absolute left-6 md:left-1/2 top-0 bottom-0 w-px"
-              style={{ backgroundColor: 'var(--color-border)' }}
-            ></div>
-            <div className="space-y-8">
-              {projectHistory.map((item, index) => (
-                <div
-                  key={item.date}
-                  className={`relative flex items-start gap-6 ${
-                    index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
-                  }`}
-                >
-                  <div
-                    className={`flex-1 ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'}`}
-                  >
-                    <div
-                      className="rounded-2xl p-6 inline-block"
-                      style={{
-                        backgroundColor: 'var(--color-bg-surface)',
-                        boxShadow: 'var(--shadow-md)',
-                        border: '1px solid var(--color-border)',
-                      }}
-                    >
-                      <h3 className="font-bold mb-2" style={{ color: 'var(--color-primary)' }}>
-                        {item.date}
-                      </h3>
-                      <p style={{ color: 'var(--color-text-secondary)' }}>{item.event}</p>
-                    </div>
-                  </div>
-                  <div
-                    className="relative z-10 w-12 h-12 rounded-full flex items-center justify-center"
-                    style={{
-                      backgroundColor: 'var(--color-primary)',
-                      color: 'var(--color-text-inverse)',
-                    }}
-                  >
-                    <span className="text-lg font-bold">{index + 1}</span>
-                  </div>
-                  <div className="flex-1"></div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section
-        className="py-20 px-4"
-        style={{ backgroundColor: 'var(--color-bg-muted)' }}
-      >
-        <div className="container-app max-w-2xl">
-          <h2
-            className="text-3xl md:text-4xl font-bold text-center mb-16"
-            style={{ color: 'var(--color-text)' }}
-          >
-            Team
-          </h2>
-          <div className="flex flex-col items-center">
-            {team.map((member) => (
-              <div
-                key={member.name}
-                className="rounded-2xl p-8 text-center"
-                style={{
-                  backgroundColor: 'var(--color-bg-surface)',
-                  boxShadow: 'var(--shadow-md)',
-                  border: '1px solid var(--color-border)',
-                }}
-              >
-                <div
-                  className="w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-4"
-                  style={{ backgroundColor: 'var(--color-primary-muted)' }}
-                >
-                  👤
-                </div>
-                <h3 className="text-2xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
-                  {member.name}
-                </h3>
-                <p className="text-sm mb-4" style={{ color: 'var(--color-primary)' }}>
-                  {member.role}
-                </p>
-                <p style={{ color: 'var(--color-text-secondary)' }}>{member.bio}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-20 px-4">
-        <div className="container-app">
-          <h2
-            className="text-3xl md:text-4xl font-bold text-center mb-16"
-            style={{ color: 'var(--color-text)' }}
-          >
-            Roadmap
-          </h2>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {roadmap.map((item) => (
-              <div
-                key={item.phase}
-                className="rounded-2xl p-6 card-hover"
-                style={{
-                  backgroundColor: 'var(--color-bg-surface)',
-                  boxShadow: 'var(--shadow-md)',
-                  border: '1px solid var(--color-border)',
-                }}
-              >
+              <ContentCard key={item.phase} className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <span
-                    className="text-sm font-bold px-3 py-1 rounded-full"
-                    style={{
-                      backgroundColor:
-                        item.status === 'in-progress'
-                          ? 'var(--color-primary-muted)'
-                          : 'var(--color-bg-hover)',
-                      color:
-                        item.status === 'in-progress'
-                          ? 'var(--color-primary)'
-                          : 'var(--color-text-muted)',
-                    }}
-                  >
-                    {item.status === 'in-progress' ? 'In Progress' : 'Upcoming'}
-                  </span>
-                  <span
-                    className="text-sm"
-                    style={{ color: 'var(--color-text-muted)' }}
-                  >
-                    {item.phase}
-                  </span>
+                  <Badge variant={item.inProgress ? 'default' : 'default'} size="sm">
+                    {item.inProgress ? '进行中' : '即将推出'}
+                  </Badge>
+                  <span className="text-xs text-fog">{item.phase}</span>
                 </div>
-                <h3 className="text-xl font-bold mb-4" style={{ color: 'var(--color-text)' }}>
-                  {item.title}
-                </h3>
-                <ul className="space-y-3">
-                  {item.items.map((listItem) => (
-                    <li key={listItem} className="flex items-start gap-3">
-                      <span
-                        className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 text-xs"
-                        style={{
-                          backgroundColor:
-                            item.status === 'in-progress'
-                              ? 'var(--color-primary)'
-                              : 'var(--color-bg-active)',
-                          color: 'var(--color-text-inverse)',
-                        }}
-                      >
-                        {item.status === 'in-progress' ? '✓' : '○'}
+                <h3 className="text-lg font-bold text-ice-white mb-4">{item.title}</h3>
+                <ul className="space-y-2">
+                  {item.items.map((li) => (
+                    <li key={li} className="flex items-start gap-2 text-sm text-fog">
+                      <span className="shrink-0 w-4 h-4 rounded-full bg-spark-blue/20 flex items-center justify-center text-[10px] text-spark-blue mt-0.5">
+                        {item.inProgress ? '✓' : '○'}
                       </span>
-                      <span style={{ color: 'var(--color-text-secondary)' }}>
-                        {listItem}
-                      </span>
+                      {li}
                     </li>
                   ))}
                 </ul>
-              </div>
+              </ContentCard>
             ))}
           </div>
         </div>
       </section>
 
-      <section
-        className="py-20 px-4"
-        style={{ backgroundColor: 'var(--color-bg-muted)' }}
-      >
-        <div className="container-app max-w-2xl">
-          <h2
-            className="text-3xl md:text-4xl font-bold text-center mb-16"
-            style={{ color: 'var(--color-text)' }}
-          >
-            Contact
+      {/* Contact */}
+      <section className="py-16 px-4">
+        <div className="mx-auto max-w-2xl">
+          <h2 className="text-2xl md:text-3xl font-bold text-ice-white text-center mb-12">
+            联系我们
           </h2>
-          <div
-            className="rounded-2xl p-8 text-center"
-            style={{
-              backgroundColor: 'var(--color-bg-surface)',
-              boxShadow: 'var(--shadow-md)',
-              border: '1px solid var(--color-border)',
-            }}
-          >
-            <p className="mb-8" style={{ color: 'var(--color-text-secondary)' }}>
-              Have questions, suggestions, or want to collaborate? We&apos;d love to hear from you!
+          <ContentCard className="p-8 text-center">
+            <p className="text-base text-fog mb-8">
+              有问题、建议或想合作？欢迎随时联系我们
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <a
-                href="mailto:hello@sparkforge.dev"
-                className="px-6 py-3 rounded-xl font-medium transition-all hover:scale-105 btn-press"
-                style={{
-                  backgroundColor: 'var(--color-primary)',
-                  color: 'var(--color-text-inverse)',
-                }}
-              >
-                Email Us
+              <a href="mailto:hello@sparkforge.dev">
+                <Button variant="primary">
+                  <Mail className="w-4 h-4" />
+                  发送邮件
+                </Button>
               </a>
               <a
                 href="https://github.com/QJWSTAR/sparkforge"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-6 py-3 rounded-xl font-medium transition-colors btn-press"
-                style={{
-                  border: '1px solid var(--color-border)',
-                  color: 'var(--color-text)',
-                }}
               >
-                GitHub
+                <Button variant="secondary">
+                  <ExternalLink className="w-4 h-4" />
+                  GitHub
+                </Button>
               </a>
             </div>
-          </div>
+          </ContentCard>
         </div>
       </section>
 
-      <footer
-        className="py-8 px-4 border-t"
-        style={{ borderColor: 'var(--color-border)' }}
-      >
-        <div className="container-app flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex flex-col items-center md:items-start gap-2">
-            <div className="flex items-center gap-2">
-              <div
-                className="w-6 h-6 rounded flex items-center justify-center text-sm font-bold"
-                style={{
-                  background:
-                    'linear-gradient(135deg, var(--color-primary), var(--state-warning))',
-                  color: 'var(--color-text-inverse)',
-                }}
-              >
-                S
+      {/* Footer */}
+      <footer className="py-8 px-4 border-t border-border-line">
+        <div className="mx-auto max-w-6xl flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-6 h-6 rounded bg-spark-blue">
+                <Zap className="w-3.5 h-3.5 text-white" />
               </div>
-              <span className="font-bold" style={{ color: 'var(--color-text)' }}>
-                SparkForge
-              </span>
-              <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                © 2026
-              </span>
-            </div>
-            <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-              Hosted on Cloudflare · Vercel
-            </span>
+            <span className="font-bold text-ice-white">SparkForge</span>
+            <span className="text-sm text-fog">© 2026</span>
           </div>
-          <div className="flex items-center gap-6 text-sm" style={{ color: 'var(--color-text-muted)' }}>
-            <Link href="/privacy" className="hover:opacity-70 transition-opacity">
-              Privacy
+          <div className="flex items-center gap-6 text-sm text-fog">
+            <Link href="/privacy" className="hover:text-ice-white transition-colors">
+              隐私政策
             </Link>
-            <Link href="/terms" className="hover:opacity-70 transition-opacity">
-              Terms
+            <Link href="/terms" className="hover:text-ice-white transition-colors">
+              服务条款
             </Link>
-            <a href="https://github.com/QJWSTAR/sparkforge/issues" target="_blank" rel="noopener noreferrer" className="hover:opacity-70 transition-opacity">
-              Contact
+            <a
+              href="https://github.com/QJWSTAR/sparkforge/issues"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-ice-white transition-colors"
+            >
+              联系我们
             </a>
           </div>
         </div>
       </footer>
-    </main>
+    </div>
   )
 }

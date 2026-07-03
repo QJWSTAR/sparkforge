@@ -12,6 +12,10 @@
   --color-fog: #8B949E;
   --color-border-line: #30363D;
 
+  /* Standard colors needed by components */
+  --color-white: #FFFFFF;
+  --color-black: #000000;
+
   /* Legacy ui-* aliases — keep for backward compat */
   --color-ui-primary: #4DA8FF;
   --color-ui-primary-hover: #69B9FF;
@@ -275,6 +279,8 @@ select:focus {
 }
 
 /* ── Ambient Glow ── */
-.bg-ambient-glow {
-  background: radial-gradient(600px at 50% 30%, rgba(77, 168, 255, 0.04), transparent);
+@layer utilities {
+  .bg-ambient-glow {
+    background: radial-gradient(600px at 50% 30%, rgba(77, 168, 255, 0.04), transparent);
+  }
 }
