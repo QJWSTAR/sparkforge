@@ -1,47 +1,34 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getSupabase, getSupabaseAdmin } from '@/lib/supabase'
+import { NextRequest } from 'next/server';
+import { getSupabaseAdmin } from '@/lib/supabase';
+import { verifyAuth } from '@/lib/auth/verify';
+import { apiSuccess, apiError, apiUnauthorized } from '@/lib/api/response';
+import { checkRateLimit, getClientId } from '@/lib/api/rate-limit';
 
 export async function POST(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  if (!authHeader?.startsWith('Bearer ')) {
-    return NextResponse.json(
-      { success: false, error: 'Unauthorized' },
-      { status: 401 }
-    )
+  // Rate limiting
+  const clientId = getClientId(request);
+  const rateCheck = checkRateLimit(clientId, 'api');
+  if (!rateCheck.allowed) {
+    return apiError(`请求过于频繁，请 ${rateCheck.retryAfter} 秒后重试`, 429);
   }
 
-  const token = authHeader.split(' ')[1]
-  const supabase = getSupabase()
-  if (!supabase) {
-    return NextResponse.json(
-      { success: false, error: 'Supabase not configured' },
-      { status: 500 }
-    )
+  const auth = await verifyAuth(request);
+  if (!auth.success) {
+    return apiUnauthorized(auth.error);
   }
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser(token)
-  if (authError || !user) {
-    return NextResponse.json(
-      { success: false, error: 'Unauthorized' },
-      { status: 401 }
-    )
+  const userId = auth.user.id;
+
+  const body = await request.json();
+  const { signalId, subscribed } = body;
+
+  if (!signalId) {
+    return apiError('缺少信号 ID');
   }
 
-  const { userId, signalId } = await request.json()
-
-  if (!userId || !signalId) {
-    return NextResponse.json(
-      { success: false, error: 'Missing userId or signalId' },
-      { status: 400 }
-    )
-  }
-
-  const supabaseAdmin = await getSupabaseAdmin()
+  const supabaseAdmin = await getSupabaseAdmin();
   if (!supabaseAdmin) {
-    return NextResponse.json(
-      { success: false, error: 'Supabase not configured' },
-      { status: 500 }
-    )
+    return apiError('数据库连接失败，请稍后重试', 500);
   }
 
   try {
@@ -49,78 +36,58 @@ export async function POST(request: NextRequest) {
       .from('UserSetting')
       .select('subscribedSignals')
       .eq('userId', userId)
-      .single()
+      .single();
 
-    const currentSubscriptions = existing?.subscribedSignals || []
-    if (!currentSubscriptions.includes(signalId)) {
-      currentSubscriptions.push(signalId)
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      return apiError('获取订阅数据失败', 500);
     }
 
-    const { error } = await supabaseAdmin
+    const currentSignals: string[] = existing?.subscribedSignals ?? [];
+
+    const updatedSignals = subscribed
+      ? [...new Set([...currentSignals, signalId])]
+      : currentSignals.filter((id) => id !== signalId);
+
+    const { error: upsertError } = await supabaseAdmin
       .from('UserSetting')
-      .upsert({
-        userId,
-        subscribedSignals: currentSubscriptions,
-      })
+      .upsert({ userId, subscribedSignals: updatedSignals, updatedAt: new Date().toISOString() }, { onConflict: 'userId' });
 
-    if (error) {
-      throw error
+    if (upsertError) {
+      return apiError('更新订阅失败', 500);
     }
 
-    return NextResponse.json({ 
-      success: true,
-      data: { subscribedSignals: currentSubscriptions }
-    })
+    return apiSuccess({ signalId, subscribed, total: updatedSignals.length });
   } catch (error) {
-    console.error('Failed to subscribe:', error)
-    return NextResponse.json(
-      { success: false, error: 'Failed to subscribe' },
-      { status: 500 }
-    )
+    console.error('Subscribe API error:', error);
+    return apiError('服务器内部错误，请稍后重试', 500);
   }
 }
 
 export async function DELETE(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  if (!authHeader?.startsWith('Bearer ')) {
-    return NextResponse.json(
-      { success: false, error: 'Unauthorized' },
-      { status: 401 }
-    )
+  // Rate limiting
+  const clientId = getClientId(request);
+  const rateCheck = checkRateLimit(clientId, 'api');
+  if (!rateCheck.allowed) {
+    return apiError(`请求过于频繁，请 ${rateCheck.retryAfter} 秒后重试`, 429);
   }
 
-  const token = authHeader.split(' ')[1]
-  const supabase = getSupabase()
-  if (!supabase) {
-    return NextResponse.json(
-      { success: false, error: 'Supabase not configured' },
-      { status: 500 }
-    )
+  const auth = await verifyAuth(request);
+  if (!auth.success) {
+    return apiUnauthorized(auth.error);
   }
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser(token)
-  if (authError || !user) {
-    return NextResponse.json(
-      { success: false, error: 'Unauthorized' },
-      { status: 401 }
-    )
+  const userId = auth.user.id;
+
+  const body = await request.json();
+  const { signalId } = body;
+
+  if (!signalId) {
+    return apiError('缺少信号 ID');
   }
 
-  const { userId, signalId } = await request.json()
-
-  if (!userId || !signalId) {
-    return NextResponse.json(
-      { success: false, error: 'Missing userId or signalId' },
-      { status: 400 }
-    )
-  }
-
-  const supabaseAdmin = await getSupabaseAdmin()
+  const supabaseAdmin = await getSupabaseAdmin();
   if (!supabaseAdmin) {
-    return NextResponse.json(
-      { success: false, error: 'Supabase not configured' },
-      { status: 500 }
-    )
+    return apiError('数据库连接失败，请稍后重试', 500);
   }
 
   try {
@@ -128,101 +95,26 @@ export async function DELETE(request: NextRequest) {
       .from('UserSetting')
       .select('subscribedSignals')
       .eq('userId', userId)
-      .single()
+      .single();
 
-    const currentSubscriptions = (existing?.subscribedSignals || []) as string[]
-    const updatedSubscriptions = currentSubscriptions.filter((id: string) => id !== signalId)
-
-    const { error } = await supabaseAdmin
-      .from('UserSetting')
-      .upsert({
-        userId,
-        subscribedSignals: updatedSubscriptions,
-      })
-
-    if (error) {
-      throw error
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      return apiError('获取订阅数据失败', 500);
     }
 
-    return NextResponse.json({ 
-      success: true,
-      data: { subscribedSignals: updatedSubscriptions }
-    })
-  } catch (error) {
-    console.error('Failed to unsubscribe:', error)
-    return NextResponse.json(
-      { success: false, error: 'Failed to unsubscribe' },
-      { status: 500 }
-    )
-  }
-}
+    const currentSignals: string[] = existing?.subscribedSignals ?? [];
+    const updatedSignals = currentSignals.filter((id) => id !== signalId);
 
-export async function GET(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  if (!authHeader?.startsWith('Bearer ')) {
-    return NextResponse.json(
-      { success: false, error: 'Unauthorized' },
-      { status: 401 }
-    )
-  }
-
-  const token = authHeader.split(' ')[1]
-  const supabase = getSupabase()
-  if (!supabase) {
-    return NextResponse.json(
-      { success: false, error: 'Supabase not configured' },
-      { status: 500 }
-    )
-  }
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser(token)
-  if (authError || !user) {
-    return NextResponse.json(
-      { success: false, error: 'Unauthorized' },
-      { status: 401 }
-    )
-  }
-
-  const { searchParams } = new URL(request.url)
-  const userId = searchParams.get('userId')
-
-  if (!userId) {
-    return NextResponse.json(
-      { success: false, error: 'Missing userId' },
-      { status: 400 }
-    )
-  }
-
-  const supabaseAdmin = await getSupabaseAdmin()
-  if (!supabaseAdmin) {
-    return NextResponse.json(
-      { success: false, error: 'Database unavailable' },
-      { status: 500 }
-    )
-  }
-
-  try {
-    const { data, error } = await supabaseAdmin
+    const { error: upsertError } = await supabaseAdmin
       .from('UserSetting')
-      .select('subscribedSignals')
-      .eq('userId', userId)
-      .single()
+      .upsert({ userId, subscribedSignals: updatedSignals, updatedAt: new Date().toISOString() }, { onConflict: 'userId' });
 
-    if (error) {
-      throw error
+    if (upsertError) {
+      return apiError('取消订阅失败', 500);
     }
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        subscribedSignals: data?.subscribedSignals || [],
-      },
-    })
+    return apiSuccess({ signalId, subscribed: false, total: updatedSignals.length });
   } catch (error) {
-    console.error('Failed to get subscriptions:', error)
-    return NextResponse.json(
-      { success: false, error: 'Failed to get subscriptions' },
-      { status: 500 }
-    )
+    console.error('Subscribe DELETE error:', error);
+    return apiError('服务器内部错误，请稍后重试', 500);
   }
 }

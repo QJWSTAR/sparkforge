@@ -1,45 +1,43 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { scoreSignal } from '@/lib/scoring'
-import { getSupabaseAdmin } from '@/lib/supabase'
+import { NextRequest } from 'next/server';
+import { scoreSignal } from '@/lib/scoring';
+import { getSupabaseAdmin } from '@/lib/supabase';
+import { apiSuccess, apiError } from '@/lib/api/response';
+import { checkRateLimit, getClientId } from '@/lib/api/rate-limit';
 
 export async function POST(request: NextRequest) {
-  const apiKey = request.headers.get('x-api-key')
+  // Accept API key from header or query param (Vercel cron jobs can't set headers)
+  const apiKey = request.headers.get('x-api-key') || request.nextUrl.searchParams.get('key');
   if (apiKey !== process.env.CRON_API_KEY && process.env.NODE_ENV === 'production') {
-    return NextResponse.json(
-      { success: false, error: 'Unauthorized' },
-      { status: 401 }
-    )
+    return apiError('无权执行此操作', 401);
   }
 
-  const supabaseAdmin = await getSupabaseAdmin()
+  // Rate limiting
+  const clientId = getClientId(request);
+  const rateCheck = checkRateLimit(clientId, 'ai-score');
+  if (!rateCheck.allowed) {
+    return apiError(`请求过于频繁，请 ${rateCheck.retryAfter} 秒后重试`, 429);
+  }
+
+  const supabaseAdmin = await getSupabaseAdmin();
   if (!supabaseAdmin) {
-    return NextResponse.json(
-      { success: false, error: 'Supabase not configured' },
-      { status: 500 }
-    )
+    return apiError('服务配置异常，请联系管理员', 500);
   }
 
   try {
-    const { signalId } = await request.json()
+    const { signalId } = await request.json();
 
     if (!signalId) {
-      return NextResponse.json(
-        { success: false, error: 'signalId is required' },
-        { status: 400 }
-      )
+      return apiError('缺少信号ID');
     }
 
     const { data: signal, error: fetchError } = await supabaseAdmin
       .from('Signal')
       .select('*')
       .eq('id', signalId)
-      .single()
+      .single();
 
     if (fetchError || !signal) {
-      return NextResponse.json(
-        { success: false, error: 'Signal not found' },
-        { status: 404 }
-      )
+      return apiError('信号不存在', 404);
     }
 
     const scoreResult = await scoreSignal({
@@ -49,7 +47,7 @@ export async function POST(request: NextRequest) {
       tags: signal.tags,
       source: signal.source,
       hotScore: signal.hotScore,
-    })
+    });
 
     const { error: updateError } = await supabaseAdmin
       .from('Signal')
@@ -62,21 +60,15 @@ export async function POST(request: NextRequest) {
         status: 'SCORED',
         updatedAt: new Date().toISOString(),
       })
-      .eq('id', signalId)
+      .eq('id', signalId);
 
     if (updateError) {
-      console.error('Failed to update signal score:', updateError)
+      console.error('Failed to update signal score:', updateError);
     }
 
-    return NextResponse.json({
-      success: true,
-      data: scoreResult,
-    })
+    return apiSuccess(scoreResult);
   } catch (error) {
-    console.error('Scoring API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Failed to score signal' },
-      { status: 500 }
-    )
+    console.error('Scoring API error:', error);
+    return apiError('评分失败，请稍后重试', 500);
   }
 }

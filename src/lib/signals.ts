@@ -2,9 +2,56 @@ import { getSupabaseAdmin, isDbAvailable, invalidateDbConnection } from './supab
 import { fetchHackerNewsTop, saveHNSignals } from './hackernews'
 import { fetchProductHuntToday, savePHSignals } from './producthunt'
 import { fetchV2EXHot, saveV2EXSignals } from './v2ex'
-import { fetchJikeHot } from './jike'
+import { fetchJikeHot, type RawJikePost } from './jike'
 import { batchScoreUnscoredSignals } from './scoring'
 import { mockSignals } from '@/data/mockSignals'
+
+export async function saveJikeSignals(posts: RawJikePost[]): Promise<number> {
+  const supabaseAdmin = await getSupabaseAdmin()
+
+  if (!supabaseAdmin) {
+    console.warn('[Jike] Database unavailable, skipping save')
+    return 0
+  }
+
+  let savedCount = 0
+
+  for (const post of posts) {
+    try {
+      const hotScore = Math.round((post.votesCount / 300) * 100)
+
+      const { error } = await supabaseAdmin
+        .from('Signal')
+        .upsert(
+          {
+            source: 'jike',
+            sourceId: post.id,
+            title: post.title,
+            description: post.description || '',
+            url: post.url,
+            imageUrl: null,
+            tags: post.tags || [],
+            author: post.author || null,
+            votesCount: post.votesCount || 0,
+            commentsCount: post.commentsCount || 0,
+            hotScore: hotScore,
+            status: 'PENDING',
+          },
+          { onConflict: 'source,sourceId' }
+        )
+
+      if (!error) {
+        savedCount++
+      } else {
+        console.error('[Jike] Insert failed:', error)
+      }
+    } catch (err) {
+      console.error('[Jike] Unexpected error:', err)
+    }
+  }
+
+  return savedCount
+}
 
 export interface SignalQuery {
   source?: string
@@ -217,7 +264,7 @@ export async function crawlAllSources(): Promise<{ hn: number; ph: number; v2ex:
       saveHNSignals(hnItems),
       savePHSignals(phPosts),
       saveV2EXSignals(v2exTopics),
-      Promise.resolve(0),
+      saveJikeSignals(jikePosts),
     ])
 
     const total = hnSaved + phSaved + v2exSaved + jikeSaved

@@ -1,33 +1,34 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase'
+import { NextRequest } from 'next/server';
+import { getSupabaseAdmin } from '@/lib/supabase';
+import { verifyAuth } from '@/lib/auth/verify';
+import { apiSuccess, apiError, apiUnauthorized } from '@/lib/api/response';
 
 export async function POST(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  const token = authHeader?.split(' ')[1]
-  if (!token) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const auth = await verifyAuth(request);
+  if (!auth.success) {
+    return apiUnauthorized(auth.error);
   }
 
-  const supabaseAdmin = await getSupabaseAdmin()
+  const supabaseAdmin = await getSupabaseAdmin();
   if (!supabaseAdmin) {
-    return NextResponse.json({ error: 'Database unavailable' }, { status: 503 })
+    return apiError('数据库暂时不可用，请稍后重试', 503);
   }
 
-  const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token)
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const { name } = await request.json();
+
+  try {
+    const { error: insertError } = await supabaseAdmin
+      .from('profiles')
+      .upsert({ id: auth.user.id, email: auth.user.email, name: name || null }, { onConflict: 'id' });
+
+    if (insertError) {
+      console.error('[API] Failed to upsert profile:', insertError);
+      return apiError('创建用户资料失败，请稍后重试', 500);
+    }
+
+    return apiSuccess({ success: true });
+  } catch (error) {
+    console.error('[API] Profile upsert error:', error);
+    return apiError('创建用户资料失败，请稍后重试', 500);
   }
-
-  const { name } = await request.json()
-
-  const { error: insertError } = await supabaseAdmin
-    .from('profiles')
-    .upsert({ id: user.id, email: user.email, name: name || null }, { onConflict: 'id' })
-
-  if (insertError) {
-    console.error('[API] Failed to upsert profile:', insertError)
-    return NextResponse.json({ error: 'Failed to create profile' }, { status: 500 })
-  }
-
-  return NextResponse.json({ success: true })
 }

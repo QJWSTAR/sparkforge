@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
 
     if (!dbAvailable) {
       response.dbStatus = 'unavailable'
-      response.message = 'Database is currently unavailable, showing cached data'
+      response.message = '数据库暂时不可用，正在显示缓存数据'
       response.fromCache = fromCache
     } else {
       response.dbStatus = 'available'
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
           limit,
           offset,
           dbStatus: 'unavailable',
-          error: 'Database is unavailable and no cached data is available',
+          error: '数据库不可用且无缓存数据可用',
         },
         { status: 503 }
       )
@@ -72,10 +72,10 @@ export async function GET(request: NextRequest) {
         limit,
         offset,
         dbStatus: 'unavailable',
-        message: 'An unexpected error occurred, database connection may be unstable',
+        message: '发生未知错误，数据库连接可能不稳定',
         error: process.env.NODE_ENV === 'development' 
-          ? (error instanceof Error ? error.message : 'Unknown error') 
-          : 'Internal server error'
+          ? (error instanceof Error ? error.message : '未知错误') 
+          : '服务器暂时开小差，请稍后重试'
       },
       { status: 500 }
     )

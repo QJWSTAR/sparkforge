@@ -1,216 +1,123 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase'
+import { NextRequest } from 'next/server';
+import { getSupabaseAdmin } from '@/lib/supabase';
+import { verifyAuth } from '@/lib/auth/verify';
+import { apiSuccess, apiError, apiInternalError } from '@/lib/api/response';
+import { callDeepSeek, safeParseJson } from '@/lib/ai/deepseek';
+import { CANVAS_SYSTEM_PROMPT, buildCanvasPrompt } from '@/lib/ai/prompts';
+import { checkRateLimit, getClientId } from '@/lib/api/rate-limit';
 
-const DEEPSEEK_API = 'https://api.deepseek.com/v1/chat/completions'
-
-export async function POST(request: NextRequest) {
-  const apiKey = process.env.DEEPSEEK_API_KEY
-
-  if (!apiKey) {
-    return NextResponse.json(
-      { success: false, error: 'DeepSeek API key not configured' },
-      { status: 500 }
-    )
-  }
-
-  // Token 认证
-  const authHeader = request.headers.get('authorization')
-  const token = authHeader?.split(' ')[1]
-  if (!token) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  const supabaseAdmin = await getSupabaseAdmin()
-  if (!supabaseAdmin) {
-    return NextResponse.json({ error: 'Database unavailable' }, { status: 500 })
-  }
-
-  const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token)
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-  const userId = user.id
-
-  const { signalTitle, signalDescription, signalId } = await request.json()
-
-  if (!signalTitle) {
-    return NextResponse.json(
-      { success: false, error: 'signalTitle is required' },
-      { status: 400 }
-    )
-  }
-
-  const prompt = `你是一个资深的商业分析师和连续创业者，擅长为初创项目生成完整的商业模型画布。
-
-请为以下创意信号生成完整的商业分析：
-
-=== 创意信息 ===
-标题：${signalTitle}
-描述：${signalDescription || '无'}
-
-=== 输出内容 ===
-
-请输出严格的 JSON 格式，包含以下字段：
-{
-  "valueProposition": "一句话定位（产品提供什么独特价值）",
-  "customerSegments": [
-    "目标用户群体1",
-    "目标用户群体2"
-  ],
-  "revenueStreams": [
-    "收入来源1",
-    "收入来源2"
-  ],
-  "keyPartners": [
-    "合作伙伴1",
-    "合作伙伴2"
-  ],
-  "keyActivities": [
-    "关键活动1",
-    "关键活动2"
-  ],
-  "keyResources": [
-    "关键资源1",
-    "关键资源2"
-  ],
-  "channels": [
-    "渠道1",
-    "渠道2"
-  ],
-  "customerRelationships": [
-    "客户关系策略1",
-    "客户关系策略2"
-  ],
-  "costStructure": [
-    "成本项1",
-    "成本项2"
-  ],
-  "competitiveAnalysis": [
-    {
-      "competitor": "竞争对手名称",
-      "strengths": "竞争对手优势",
-      "weaknesses": "竞争对手劣势",
-      "opportunity": "竞争机会"
-    }
-  ],
-  "swot": {
-    "strengths": ["优势1", "优势2"],
-    "weaknesses": ["劣势1", "劣势2"],
-    "opportunities": ["机会1", "机会2"],
-    "threats": ["威胁1", "威胁2"]
+const CANVAS_FALLBACK = {
+  valueProposition: '',
+  customerSegments: ['目标用户群体'],
+  revenueStreams: ['订阅收入'],
+  keyPartners: [],
+  keyActivities: ['产品开发', '市场营销'],
+  keyResources: ['技术团队', '资金'],
+  channels: ['社交媒体', '内容营销'],
+  customerRelationships: ['社区运营'],
+  costStructure: ['人力成本', '服务器成本'],
+  competitiveAnalysis: [],
+  swot: {
+    strengths: ['创新的产品理念'],
+    weaknesses: ['品牌认知度低'],
+    opportunities: ['市场增长潜力大'],
+    threats: ['竞争激烈'],
   },
-  "actionPlan": [
-    "Day 1-7: 第一阶段行动",
-    "Day 8-14: 第二阶段行动"
-  ],
-  "summary": "商业分析总结"
+  actionPlan: ['Day 1-7: MVP开发', 'Day 8-14: 用户获取'],
+  summary: 'AI 服务暂时不可用，使用默认模板',
+};
+
+function validateCanvasOutput(data: Record<string, unknown>): Record<string, unknown> {
+  return {
+    valueProposition: typeof data.valueProposition === 'string' ? data.valueProposition : CANVAS_FALLBACK.valueProposition,
+    customerSegments: Array.isArray(data.customerSegments) ? data.customerSegments : CANVAS_FALLBACK.customerSegments,
+    revenueStreams: Array.isArray(data.revenueStreams) ? data.revenueStreams : CANVAS_FALLBACK.revenueStreams,
+    keyPartners: Array.isArray(data.keyPartners) ? data.keyPartners : CANVAS_FALLBACK.keyPartners,
+    keyActivities: Array.isArray(data.keyActivities) ? data.keyActivities : CANVAS_FALLBACK.keyActivities,
+    keyResources: Array.isArray(data.keyResources) ? data.keyResources : CANVAS_FALLBACK.keyResources,
+    channels: Array.isArray(data.channels) ? data.channels : CANVAS_FALLBACK.channels,
+    customerRelationships: Array.isArray(data.customerRelationships) ? data.customerRelationships : CANVAS_FALLBACK.customerRelationships,
+    costStructure: Array.isArray(data.costStructure) ? data.costStructure : CANVAS_FALLBACK.costStructure,
+    competitiveAnalysis: Array.isArray(data.competitiveAnalysis) ? data.competitiveAnalysis : CANVAS_FALLBACK.competitiveAnalysis,
+    swot: data.swot && typeof data.swot === 'object' ? data.swot : CANVAS_FALLBACK.swot,
+    actionPlan: Array.isArray(data.actionPlan) ? data.actionPlan : CANVAS_FALLBACK.actionPlan,
+    summary: typeof data.summary === 'string' ? data.summary : CANVAS_FALLBACK.summary,
+  };
 }
 
-只输出 JSON，不要任何其他文字或解释。`
+export async function POST(request: NextRequest) {
+  // Rate limiting
+  const clientId = getClientId(request);
+  const rateCheck = checkRateLimit(clientId, 'ai-generate');
+  if (!rateCheck.allowed) {
+    return apiError(`请求过于频繁，请 ${rateCheck.retryAfter} 秒后重试`, 429);
+  }
 
-  try {
-    const response = await fetch(DEEPSEEK_API, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: 'deepseek-chat',
-        messages: [
-          { role: 'system', content: '你是一个专业的商业分析师，擅长为初创项目生成完整的商业模型画布。' },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0.6,
-        max_tokens: 2500,
-        response_format: { type: 'json_object' },
-      }),
-    })
+  const auth = await verifyAuth(request);
+  const userId = auth.success ? auth.user.id : null;
 
-    if (!response.ok) {
-      throw new Error(`DeepSeek API error: ${response.status}`)
-    }
+  // Input size limit
+  const contentLength = parseInt(request.headers.get('content-length') || '0', 10);
+  if (contentLength > 100 * 1024) {
+    return apiError('请求体过大', 413);
+  }
 
-    const data = await response.json()
-    const content = data.choices?.[0]?.message?.content || '{}'
+  const body = await request.json();
+  const { signalTitle, signalDescription, signalId } = body;
 
-    let result
-    try {
-      result = JSON.parse(content)
-    } catch {
-      result = {
-        valueProposition: signalTitle,
-        customerSegments: ['目标用户群体'],
-        revenueStreams: ['订阅收入'],
-        keyPartners: [],
-        keyActivities: ['产品开发', '市场营销'],
-        keyResources: ['技术团队', '资金'],
-        channels: ['社交媒体', '内容营销'],
-        customerRelationships: ['社区运营'],
-        costStructure: ['人力成本', '服务器成本'],
-        competitiveAnalysis: [],
-        swot: {
-          strengths: ['创新的产品理念'],
-          weaknesses: ['品牌认知度低'],
-          opportunities: ['市场增长潜力大'],
-          threats: ['竞争激烈'],
-        },
-        actionPlan: ['Day 1-7: MVP开发', 'Day 8-14: 用户获取'],
-        summary: 'AI 解析失败，使用默认模板',
-      }
-    }
+  if (!signalTitle) {
+    return apiError('缺少信号标题');
+  }
 
-    // 持久化到 CanvasReport 表
+  const result = await callDeepSeek({
+    systemPrompt: CANVAS_SYSTEM_PROMPT,
+    userPrompt: buildCanvasPrompt({ signalTitle, signalDescription }),
+    temperature: 0.6,
+    maxTokens: 2500,
+  });
+
+  if (!result.success) {
+    console.error('[Canvas] Generation failed:', result.error, { retried: result.retried });
+    return apiInternalError('生成画布失败，请稍后重试');
+  }
+
+  const { data: rawParsed, wasRepaired } = safeParseJson<Record<string, unknown>>(result.content, {
+    ...CANVAS_FALLBACK,
+    valueProposition: signalTitle,
+    summary: 'AI 解析失败，使用默认模板',
+  });
+
+  if (wasRepaired) {
+    console.warn('[Canvas] JSON was repaired');
+  }
+
+  if (result.usage.totalTokens > 0) {
+    console.log(`[Canvas] Token usage: ${result.usage.totalTokens} (prompt: ${result.usage.promptTokens}, completion: ${result.usage.completionTokens})`);
+  }
+
+  const parsed = validateCanvasOutput(rawParsed);
+
+  // 持久化到 CanvasReport 表（仅登录用户）
+  if (userId) {
+    const supabaseAdmin = await getSupabaseAdmin();
     if (supabaseAdmin) {
       try {
         const { error: insertError } = await supabaseAdmin.from('CanvasReport').insert({
           id: crypto.randomUUID(),
           userId,
           signalId: signalId || '',
-          result: result,
+          result: parsed,
           status: 'COMPLETED',
           updatedAt: new Date().toISOString(),
-        })
+        });
         if (insertError) {
-          console.error('Failed to persist canvas result (insertError):', insertError)
+          console.error('[Canvas] Failed to persist result:', insertError);
         }
       } catch (err) {
-        console.error('Failed to persist canvas result (exception):', err)
+        console.error('[Canvas] Failed to persist result:', err);
       }
     }
-
-    return NextResponse.json({
-      success: true,
-      data: result,
-    })
-  } catch (error) {
-    console.error('Canvas generation failed:', error)
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'Failed to generate business canvas',
-        data: {
-          valueProposition: signalTitle,
-          customerSegments: ['目标用户群体'],
-          revenueStreams: ['订阅收入'],
-          keyPartners: [],
-          keyActivities: ['产品开发', '市场营销'],
-          keyResources: ['技术团队', '资金'],
-          channels: ['社交媒体', '内容营销'],
-          customerRelationships: ['社区运营'],
-          costStructure: ['人力成本', '服务器成本'],
-          competitiveAnalysis: [],
-          swot: {
-            strengths: ['创新的产品理念'],
-            weaknesses: ['品牌认知度低'],
-            opportunities: ['市场增长潜力大'],
-            threats: ['竞争激烈'],
-          },
-          actionPlan: ['Day 1-7: MVP开发', 'Day 8-14: 用户获取'],
-          summary: 'AI 服务暂时不可用，使用默认模板',
-        },
-      },
-      { status: 500 }
-    )
   }
+
+  return apiSuccess(parsed);
 }

@@ -1,42 +1,35 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase'
+import { NextRequest } from 'next/server';
+import { getSupabaseAdmin } from '@/lib/supabase';
+import { verifyAuth } from '@/lib/auth/verify';
+import { apiSuccess, apiError, apiUnauthorized } from '@/lib/api/response';
 
 export async function GET(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  const token = authHeader?.split(' ')[1]
-  if (!token) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const auth = await verifyAuth(request);
+  if (!auth.success) {
+    return apiUnauthorized(auth.error);
   }
 
-  const supabaseAdmin = await getSupabaseAdmin()
+  const userId = auth.user.id;
+  const supabaseAdmin = await getSupabaseAdmin();
+
   if (!supabaseAdmin) {
-    return NextResponse.json({ error: 'Database unavailable' }, { status: 500 })
+    return apiError('数据库暂时不可用，请稍后重试', 500);
   }
-
-  const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token)
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-  const userId = user.id
 
   try {
     const { data, error } = await supabaseAdmin
       .from('CanvasReport')
       .select('*')
       .eq('userId', userId)
-      .order('createdAt', { ascending: false })
+      .order('createdAt', { ascending: false });
 
-    if (error) throw error
+    if (error) {
+      throw error;
+    }
 
-    return NextResponse.json({
-      success: true,
-      data: data || [],
-    })
+    return apiSuccess(data || []);
   } catch (error) {
-    console.error('Failed to fetch canvas history:', error)
-    return NextResponse.json(
-      { success: false, error: 'Failed to fetch canvas history' },
-      { status: 500 }
-    )
+    console.error('Failed to fetch canvas history:', error);
+    return apiError('获取历史记录失败，请稍后重试', 500);
   }
 }

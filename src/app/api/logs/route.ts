@@ -1,80 +1,85 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getLogs } from '@/lib/signals'
-import { getSupabaseAdmin } from '@/lib/supabase'
+import { NextRequest } from 'next/server';
+import { getSupabaseAdmin } from '@/lib/supabase';
+import { verifyAuth } from '@/lib/auth/verify';
+import { apiSuccess, apiError, apiUnauthorized } from '@/lib/api/response';
+import { checkRateLimit, getClientId } from '@/lib/api/rate-limit';
 
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url)
-  
-  const limit = Math.min(Number(searchParams.get('limit')) || 20, 100)
-  const type = searchParams.get('type') || undefined
+export async function GET() {
+  const supabaseAdmin = await getSupabaseAdmin();
+
+  if (!supabaseAdmin) {
+    return apiError('数据库连接失败，请稍后重试', 500);
+  }
 
   try {
-    const logs = await getLogs(limit, type)
+    const { data: logs, error } = await supabaseAdmin
+      .from('LogEntry')
+      .select('*')
+      .order('createdAt', { ascending: false })
+      .limit(50);
 
-    return NextResponse.json({
-      success: true,
-      data: logs,
-    })
+    if (error) {
+      return apiError('获取日志失败', 500);
+    }
+
+    return apiSuccess(logs ?? []);
   } catch (error) {
-    console.error('API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Failed to fetch logs' },
-      { status: 500 }
-    )
+    console.error('Logs GET error:', error);
+    return apiError('服务器内部错误，请稍后重试', 500);
   }
 }
 
 export async function POST(request: NextRequest) {
-  // Token 认证
-  const authHeader = request.headers.get('authorization')
-  const token = authHeader?.split(' ')[1]
-  if (!token) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  // Rate limiting
+  const clientId = getClientId(request);
+  const rateCheck = checkRateLimit(clientId, 'api');
+  if (!rateCheck.allowed) {
+    return apiError(`请求过于频繁，请 ${rateCheck.retryAfter} 秒后重试`, 429);
   }
 
-  const supabaseAdmin = await getSupabaseAdmin()
+  // Auth
+  const auth = await verifyAuth(request);
+  if (!auth.success) {
+    return apiUnauthorized(auth.error);
+  }
+
+  const supabaseAdmin = await getSupabaseAdmin();
+
   if (!supabaseAdmin) {
-    return NextResponse.json({ error: 'Database unavailable' }, { status: 500 })
+    return apiError('数据库连接失败，请稍后重试', 500);
   }
 
-  const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token)
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-  const userId = user.id
+  const body = await request.json();
+  const { content, type, metadata } = body;
 
-  const { title, content } = await request.json()
-
-  if (!title) {
-    return NextResponse.json({ error: 'title is required' }, { status: 400 })
+  if (!content) {
+    return apiError('日志内容不能为空');
   }
+
+  // Sanitize content length
+  const safeContent = String(content).slice(0, 5000);
 
   try {
     const { data: log, error: insertError } = await supabaseAdmin
       .from('LogEntry')
       .insert({
         id: crypto.randomUUID(),
-        userId,
-        type: 'SYSTEM',
-        title,
-        content: content || null,
+        userId: auth.user.id,
+        type: type || 'SYSTEM',
+        content: safeContent,
+        metadata: metadata || {},
+        updatedAt: new Date().toISOString(),
       })
       .select()
-      .single()
+      .single();
 
     if (insertError) {
-      throw insertError
+      return apiError('创建日志失败', 500);
     }
 
-    return NextResponse.json({
-      success: true,
-      data: log,
-    })
+    return apiSuccess(log);
   } catch (error) {
-    console.error('Failed to create log:', error)
-    return NextResponse.json(
-      { success: false, error: 'Failed to create log' },
-      { status: 500 }
-    )
+    console.error('Logs POST error:', error);
+    return apiError('服务器内部错误，请稍后重试', 500);
   }
 }

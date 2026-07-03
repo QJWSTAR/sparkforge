@@ -1,36 +1,23 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getSignalById } from '@/lib/signals'
+import { NextRequest } from 'next/server';
+import { getSignalById } from '@/lib/signals';
+import { apiSuccess, apiError } from '@/lib/api/response';
 
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params
+  const { id } = await params;
 
   try {
-    const { signal, dbAvailable } = await getSignalById(id)
+    const { signal, dbAvailable } = await getSignalById(id);
 
     if (!signal) {
-      return NextResponse.json(
-        { success: false, error: '信号不存在', data: null },
-        { status: 404 }
-      )
+      return apiError('信号不存在', 404);
     }
 
-    return NextResponse.json({
-      success: true,
-      data: signal,
-      dbAvailable,
-    })
+    return apiSuccess({ signal, dbAvailable });
   } catch (error) {
-    console.error('[API] Unexpected error in signal detail endpoint:', error)
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'Internal server error',
-        data: null,
-      },
-      { status: 500 }
-    )
+    console.error('[API] Error in signal detail endpoint:', error);
+    return apiError('服务器暂时开小差，请稍后重试', 500);
   }
 }

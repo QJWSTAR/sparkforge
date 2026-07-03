@@ -1,50 +1,49 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { scoreSignal } from '@/lib/scoring'
-import { getSupabaseAdmin } from '@/lib/supabase'
-import { addLogEntry } from '@/lib/signals'
+import { NextRequest } from 'next/server';
+import { scoreSignal } from '@/lib/scoring';
+import { getSupabaseAdmin } from '@/lib/supabase';
+import { addLogEntry } from '@/lib/signals';
+import { apiSuccess, apiError } from '@/lib/api/response';
+import { checkRateLimit, getClientId } from '@/lib/api/rate-limit';
 
 export async function POST(request: NextRequest) {
-  const apiKey = request.headers.get('x-api-key')
-  
+  // Accept API key from header or query param (Vercel cron jobs can't set headers)
+  const apiKey = request.headers.get('x-api-key') || request.nextUrl.searchParams.get('key');
   if (apiKey !== process.env.CRON_API_KEY && process.env.NODE_ENV === 'production') {
-    return NextResponse.json(
-      { success: false, error: 'Unauthorized' },
-      { status: 401 }
-    )
+    return apiError('无权执行此操作', 401);
   }
 
-  const supabaseAdmin = await getSupabaseAdmin()
+  // Rate limiting
+  const clientId = getClientId(request);
+  const rateCheck = checkRateLimit(clientId, 'ai-score');
+  if (!rateCheck.allowed) {
+    return apiError(`请求过于频繁，请 ${rateCheck.retryAfter} 秒后重试`, 429);
+  }
+
+  const supabaseAdmin = await getSupabaseAdmin();
   if (!supabaseAdmin) {
-    return NextResponse.json(
-      { success: false, error: 'Supabase not configured' },
-      { status: 500 }
-    )
+    return apiError('服务配置异常，请联系管理员', 500);
   }
 
   try {
-    const { limit = 10 } = await request.json()
+    const { limit = 10 } = await request.json();
 
     const { data: signals, error } = await supabaseAdmin
       .from('Signal')
       .select('*')
       .eq('status', 'PENDING')
       .order('hotScore', { ascending: false })
-      .limit(limit)
+      .limit(limit);
 
     if (error) {
-      throw error
+      throw error;
     }
 
     if (!signals || signals.length === 0) {
-      return NextResponse.json({
-        success: true,
-        data: { scored: 0, total: 0 },
-        message: 'No pending signals to score',
-      })
+      return apiSuccess({ scored: 0, total: 0, message: 'No pending signals to score' });
     }
 
-    let scoredCount = 0
-    const results: Array<{ id: string; score: number }> = []
+    let scoredCount = 0;
+    const results: Array<{ id: string; score: number }> = [];
 
     for (const signal of signals) {
       try {
@@ -55,7 +54,7 @@ export async function POST(request: NextRequest) {
           tags: signal.tags,
           source: signal.source,
           hotScore: signal.hotScore,
-        })
+        });
 
         await supabaseAdmin
           .from('Signal')
@@ -68,12 +67,12 @@ export async function POST(request: NextRequest) {
             status: 'SCORED',
             updatedAt: new Date().toISOString(),
           })
-          .eq('id', signal.id)
+          .eq('id', signal.id);
 
-        results.push({ id: signal.id, score: scoreResult.finalScore })
-        scoredCount++
+        results.push({ id: signal.id, score: scoreResult.finalScore });
+        scoredCount++;
       } catch (err) {
-        console.error(`Failed to score signal ${signal.id}:`, err)
+        console.error(`Failed to score signal ${signal.id}:`, err);
       }
     }
 
@@ -82,22 +81,16 @@ export async function POST(request: NextRequest) {
       title: `AI 批量评分完成`,
       content: `已完成 ${scoredCount}/${signals.length} 条信号的 AI 评分`,
       metadata: { results },
-    })
+    });
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        scored: scoredCount,
-        total: signals.length,
-        results,
-      },
+    return apiSuccess({
+      scored: scoredCount,
+      total: signals.length,
+      results,
       message: `已完成 ${scoredCount} 条信号的 AI 评分`,
-    })
+    });
   } catch (error) {
-    console.error('Batch scoring error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Failed to batch score signals' },
-      { status: 500 }
-    )
+    console.error('Batch scoring error:', error);
+    return apiError('批量评分失败，请稍后重试', 500);
   }
 }
