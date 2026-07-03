@@ -4,16 +4,16 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth'
-import { AnimatePresence, motion } from 'framer-motion'
 import { Search, Sun, Moon, Menu, X, Zap } from 'lucide-react'
 import { Button, Input, Avatar } from '@/components/ui'
 
 const navLinks = [
   { href: '/', label: '首页' },
-  { href: '/radar', label: '创意雷达' },
-  { href: '/forge', label: '复刻工坊' },
-  { href: '/canvas', label: '商业画布' },
-  { href: '/stream', label: '公开日志' },
+  { href: '/radar', label: '发现创意' },
+  { href: '/forge', label: '生成方案' },
+  { href: '/canvas', label: '分析画布' },
+  { href: '/stream', label: '动态' },
+  { href: '/projects', label: '我的项目' },
 ]
 
 export default function Navbar() {
@@ -21,8 +21,8 @@ export default function Navbar() {
   const pathname = usePathname()
   const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const [isDark, setIsDark] = useState(true)
-  const [scrolled, setScrolled] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -30,18 +30,10 @@ export default function Navbar() {
 
   useEffect(() => {
     const saved = localStorage.getItem('sparkforge-theme')
-    if (saved) {
-      setIsDark(saved === 'dark')
-      document.documentElement.classList.toggle('light', saved === 'light')
-    }
-  }, [])
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10)
-    }
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
+    const prefersDark = saved ? saved === 'dark' : true
+    setIsDark(prefersDark)
+    document.documentElement.classList.toggle('light', !prefersDark)
+    setMounted(true)
   }, [])
 
   useEffect(() => {
@@ -66,6 +58,18 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [searchOpen])
 
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && mobileMenuOpen) {
+        setMobileMenuOpen(false)
+      }
+    }
+    if (mobileMenuOpen) {
+      document.addEventListener('keydown', handleEsc)
+    }
+    return () => document.removeEventListener('keydown', handleEsc)
+  }, [mobileMenuOpen])
+
   const toggleTheme = () => {
     const newDark = !isDark
     setIsDark(newDark)
@@ -82,17 +86,10 @@ export default function Navbar() {
   }
 
   return (
-    <header
-      className={[
-        'sticky top-0 z-40 w-full border-b transition-all duration-200',
-        scrolled
-          ? 'bg-graphite/80 backdrop-blur-md border-border-line'
-          : 'bg-transparent border-transparent',
-      ].join(' ')}
-    >
-      <div className="flex items-center justify-between h-14 px-4 lg:px-6">
+    <header className="sticky top-0 z-40 w-full bg-graphite/80 backdrop-blur-md border-b border-border-line" role="banner">
+      <div className="max-w-7xl mx-auto flex items-center justify-between h-14 px-4 lg:px-6">
         {/* Left: Brand */}
-        <Link href="/" className="flex items-center gap-3 shrink-0">
+        <Link href="/" className="flex items-center gap-3 shrink-0" aria-label="SparkForge 首页">
           <div className="flex items-center justify-center w-8 h-8 rounded-md bg-spark-blue">
             <Zap className="w-4 h-4 text-white" />
           </div>
@@ -102,13 +99,14 @@ export default function Navbar() {
         </Link>
 
         {/* Center: Nav links (hidden on mobile) */}
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden md:flex items-center gap-1" aria-label="主导航">
           {navLinks.map((link) => {
             const isActive = pathname === link.href
             return (
               <Link
                 key={link.href}
                 href={link.href}
+                aria-current={isActive ? 'page' : undefined}
                 className={[
                   'relative px-3 py-2 text-sm font-medium transition-colors rounded-lg',
                   isActive
@@ -150,13 +148,15 @@ export default function Navbar() {
           </div>
 
           {/* Theme toggle */}
-          <button
-            onClick={toggleTheme}
-            aria-label={isDark ? '切换到亮色模式' : '切换到暗色模式'}
-            className="p-2 rounded-lg text-fog hover:text-ice-white hover:bg-graphite transition-colors"
-          >
-            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
+          {mounted && (
+            <button
+              onClick={toggleTheme}
+              aria-label={isDark ? '切换到亮色模式' : '切换到暗色模式'}
+              className="p-2 rounded-lg text-fog hover:text-ice-white hover:bg-graphite transition-colors"
+            >
+              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+          )}
 
           {/* Auth */}
           {isAuthenticated ? (
@@ -180,7 +180,7 @@ export default function Navbar() {
           <button
             className="md:hidden p-2 rounded-lg text-fog hover:text-ice-white hover:bg-graphite transition-colors"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="打开菜单"
+            aria-label={mobileMenuOpen ? '关闭菜单' : '打开菜单'}
           >
             {mobileMenuOpen ? (
               <X className="w-5 h-5" />
@@ -192,46 +192,41 @@ export default function Navbar() {
       </div>
 
       {/* Mobile dropdown menu */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.nav
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2, ease: 'easeInOut' }}
-            className="md:hidden overflow-hidden border-t border-border-line bg-graphite"
-          >
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block px-6 py-3 text-sm font-medium transition-colors"
-                  style={{
-                    color: isActive
-                      ? 'var(--color-primary)'
-                      : 'var(--color-text-secondary)',
-                  }}
-                >
-                  {link.label}
-                </Link>
-              )
-            })}
-            <button
-              onClick={() => {
-                toggleTheme()
-                setMobileMenuOpen(false)
-              }}
-              className="block w-full text-left px-6 py-3 text-sm font-medium transition-colors"
-              style={{ color: 'var(--color-text-secondary)' }}
+      {mobileMenuOpen && (
+      <div
+        className={[
+          'md:hidden overflow-hidden border-t border-border-line bg-graphite transition-all duration-200 ease-in-out',
+          mobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0 border-t-0',
+        ].join(' ')}
+      >
+        {navLinks.map((link) => {
+          const isActive = pathname === link.href
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              aria-current={isActive ? 'page' : undefined}
+              onClick={() => setMobileMenuOpen(false)}
+              className={[
+                'block px-6 py-4 text-sm font-medium transition-colors min-h-[44px]',
+                isActive ? 'text-spark-blue' : 'text-fog',
+              ].join(' ')}
             >
-              {isDark ? '🌞 亮色模式' : '🌙 暗色模式'}
-            </button>
-          </motion.nav>
-        )}
-      </AnimatePresence>
+              {link.label}
+            </Link>
+          )
+        })}
+        <button
+          onClick={() => {
+            toggleTheme()
+            setMobileMenuOpen(false)
+          }}
+          className="block w-full text-left px-6 py-4 text-sm font-medium text-fog transition-colors min-h-[44px]"
+        >
+          {mounted ? (isDark ? '切换至亮色模式' : '切换至暗色模式') : '切换至暗色模式'}
+        </button>
+      </div>
+      )}
     </header>
   )
 }

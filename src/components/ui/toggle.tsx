@@ -22,17 +22,10 @@ export const Toggle = forwardRef<HTMLButtonElement, ToggleProps>(
           'w-10 h-5',
           checked ? 'bg-ui-primary' : 'bg-[#3A3E48]',
           'disabled:opacity-50 disabled:cursor-not-allowed',
-          'focus:outline-none',
+          'focus:outline-none focus:ring-2 focus:ring-spark-blue',
         ]
           .filter(Boolean)
           .join(' ')}
-        style={{ boxShadow: 'var(--ui-focus-ring)' }}
-        onFocus={(e) => {
-          e.currentTarget.style.boxShadow = 'var(--ui-focus-ring)'
-        }}
-        onBlur={(e) => {
-          e.currentTarget.style.boxShadow = 'none'
-        }}
       >
         <span
           className={[

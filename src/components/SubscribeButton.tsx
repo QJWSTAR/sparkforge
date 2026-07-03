@@ -2,7 +2,9 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Bell, BellOff } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
+import { useToast } from '@/components/ToastProvider'
 
 interface SubscribeButtonProps {
   signalId: string
@@ -12,6 +14,7 @@ interface SubscribeButtonProps {
 export default function SubscribeButton({ signalId, initialSubscribed = false }: SubscribeButtonProps) {
   const router = useRouter()
   const { user, isAuthenticated, getSessionToken } = useAuth()
+  const { showSuccess, showError } = useToast()
   const [subscribed, setSubscribed] = useState(initialSubscribed)
   const [loading, setLoading] = useState(false)
 
@@ -37,7 +40,8 @@ export default function SubscribeButton({ signalId, initialSubscribed = false }:
       })
 
       if (!res.ok) {
-        console.error('Subscribe error:', res.status)
+        const errorData = await res.json().catch(() => ({}))
+        showError(errorData.error || '操作失败，请稍后重试')
         return
       }
 
@@ -45,8 +49,10 @@ export default function SubscribeButton({ signalId, initialSubscribed = false }:
 
       if (data.success) {
         setSubscribed(!subscribed)
+        showSuccess(subscribed ? '已取消订阅' : '订阅成功')
       }
     } catch (error) {
+      showError('网络错误，请稍后重试')
       console.error('Subscribe error:', error)
     } finally {
       setLoading(false)
@@ -57,17 +63,22 @@ export default function SubscribeButton({ signalId, initialSubscribed = false }:
     <button
       onClick={handleClick}
       disabled={loading}
-      className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-colors btn-press"
-      style={{
-        backgroundColor: subscribed ? 'var(--color-primary)' : 'var(--color-bg-hover)',
-        color: subscribed ? 'var(--color-text-inverse)' : 'var(--color-text-secondary)',
-      }}
+      className={[
+        'flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-colors',
+        subscribed
+          ? 'bg-spark-blue text-white'
+          : 'bg-graphite text-fog border border-border-line hover:border-spark-blue hover:text-ice-white',
+      ].join(' ')}
     >
       {loading ? (
-        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
       ) : (
         <>
-          <span>{subscribed ? '🔔' : '🔕'}</span>
+          {subscribed ? (
+            <Bell className="w-4 h-4" />
+          ) : (
+            <BellOff className="w-4 h-4" />
+          )}
           <span>{subscribed ? '已订阅' : '订阅'}</span>
         </>
       )}

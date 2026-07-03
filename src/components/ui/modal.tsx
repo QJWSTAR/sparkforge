@@ -49,6 +49,8 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
 
     if (!mounted || !open) return null
 
+    const titleId = title ? 'modal-title' : undefined
+
     return createPortal(
       <div
         className={[
@@ -61,6 +63,9 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
       >
         <div
           ref={ref}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={titleId}
           className={[
             'bg-ui-surface rounded-lg shadow-2xl max-w-lg w-full max-h-[85vh] overflow-auto',
             'transition-all duration-200 ease-out',
@@ -70,7 +75,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
         >
           {title && (
             <div className="flex items-center justify-between px-6 py-4 border-b border-ui-border">
-              <h2 className="text-lg font-semibold text-ui-text">{title}</h2>
+              <h2 id={titleId} className="text-lg font-semibold text-ui-text">{title}</h2>
               <button
                 onClick={handleClose}
                 className="p-1 rounded-md text-ui-text-secondary hover:text-ui-text hover:bg-ui-border/50 transition-colors"

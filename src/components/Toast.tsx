@@ -96,6 +96,7 @@ export function Toast({ toast, onRemove }: ToastProps) {
 
   return (
     <div
+      role="alert"
       className={`
         flex items-center gap-3 px-4 py-3 rounded-lg border shadow-lg
         ${styles.bg} ${styles.border}
@@ -104,10 +105,11 @@ export function Toast({ toast, onRemove }: ToastProps) {
       `}
     >
       <span className={styles.icon}>{icons[toast.type]}</span>
-      <span className="flex-1 text-sm font-medium text-gray-200">{toast.message}</span>
+      <span className="flex-1 text-sm font-medium text-ice-white">{toast.message}</span>
       <button
         onClick={handleClose}
-        className="text-gray-400 hover:text-gray-200 transition-colors"
+        aria-label="关闭通知"
+        className="text-fog hover:text-ice-white transition-colors"
       >
         <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
           <path

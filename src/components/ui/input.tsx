@@ -12,23 +12,17 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       <input
         ref={ref}
         disabled={disabled}
+        aria-invalid={error || undefined}
         className={[
           'bg-ui-surface border rounded-lg px-3 py-2 text-sm w-full transition-all duration-150 min-h-[44px]',
           'placeholder:text-ui-text-secondary',
-          'focus:outline-none',
+          'focus:outline-none focus:ring-2 focus:ring-spark-blue',
           error ? 'border-ui-error' : 'border-ui-border',
           'disabled:opacity-50 disabled:cursor-not-allowed',
           className,
         ]
           .filter(Boolean)
           .join(' ')}
-        style={{ boxShadow: 'var(--ui-focus-ring)' }}
-        onFocus={(e) => {
-          e.currentTarget.style.boxShadow = 'var(--ui-focus-ring)'
-        }}
-        onBlur={(e) => {
-          e.currentTarget.style.boxShadow = 'none'
-        }}
         {...props}
       />
     )

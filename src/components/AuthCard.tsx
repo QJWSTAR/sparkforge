@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth'
+import { getErrorMessage } from '@/lib/errorMessages'
 import { Button, Input } from '@/components/ui'
-import { Sparkles } from 'lucide-react'
+import { Sparkles, Eye, EyeOff } from 'lucide-react'
 
 interface AuthCardProps {
   mode: 'login' | 'register'
@@ -17,9 +18,15 @@ export default function AuthCard({ mode }: AuthCardProps) {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [name, setName] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [emailTouched, setEmailTouched] = useState(false)
+
+  const emailError = emailTouched && email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    ? '请输入有效的邮箱地址'
+    : ''
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -30,6 +37,12 @@ export default function AuthCard({ mode }: AuthCardProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+
+    if (emailError) {
+      setError(emailError)
+      return
+    }
+
     setLoading(true)
 
     const result =
@@ -40,14 +53,14 @@ export default function AuthCard({ mode }: AuthCardProps) {
     if (result.success) {
       router.push('/radar')
     } else {
-      setError(result.error || '操作失败')
+      setError(getErrorMessage(result.error) || '操作失败')
     }
 
     setLoading(false)
   }
 
   return (
-    <div className="min-h-screen bg-deep-space flex items-center justify-center py-16">
+    <div className="min-h-screen bg-ambient-glow flex items-center justify-center py-16">
       <div className="w-full max-w-md mx-auto px-4">
         <div className="bg-graphite border border-border-line rounded-lg p-8">
           <Sparkles className="w-8 h-8 text-spark-blue mx-auto mb-4" />
@@ -65,20 +78,40 @@ export default function AuthCard({ mode }: AuthCardProps) {
                 placeholder="hello@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                onBlur={() => setEmailTouched(true)}
+                error={!!emailError}
                 required
               />
+              {emailError && (
+                <p className="text-ui-error text-xs mt-1">{emailError}</p>
+              )}
             </div>
 
             <div>
               <label htmlFor="auth-password" className="block text-fog text-sm mb-1">密码</label>
-              <Input
-                id="auth-password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+              <div className="relative">
+                <Input
+                  id="auth-password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-fog hover:text-ice-white transition-colors"
+                  aria-label={showPassword ? '隐藏密码' : '显示密码'}
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
             </div>
 
             {mode === 'register' && (
@@ -102,7 +135,7 @@ export default function AuthCard({ mode }: AuthCardProps) {
               type="submit"
               variant="primary"
               className="w-full mt-4"
-              disabled={loading}
+              isLoading={loading}
             >
               {loading
                 ? mode === 'login'
