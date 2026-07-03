@@ -1,0 +1,16 @@
+{
+  "name": "SparkForge",
+  "short_name": "SparkForge",
+  "description": "AI 驱动的创意信号发现与 MVP 加速平台",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0E14",
+  "theme_color": "#4DA8FF",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
