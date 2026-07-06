@@ -302,9 +302,10 @@ export async function addLogEntry(entry: {
   signalId?: string
   forgeId?: string
   metadata?: any
+  userId?: string
 }) {
   const supabaseAdmin = await getSupabaseAdmin()
-  
+
   if (!supabaseAdmin) {
     console.warn('[Signals] Database unavailable, skipping log entry')
     return
@@ -320,6 +321,8 @@ export async function addLogEntry(entry: {
         signalId: entry.signalId,
         forgeId: entry.forgeId,
         metadata: entry.metadata,
+        userId: entry.userId,
+        updatedAt: new Date().toISOString(),
       })
 
     if (error) {

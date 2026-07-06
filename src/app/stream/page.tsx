@@ -52,18 +52,36 @@ export default function StreamPage() {
   const [publishSuccess, setPublishSuccess] = useState(false)
   const [mounted, setMounted] = useState(false)
 
-  const fetchLogs = async () => {
+  const fetchLogs = async (filterValue?: string) => {
+    const currentFilter = filterValue || filter
     setFetchLoading(true)
     try {
-      const res = await fetch('/api/logs?limit=50')
-      if (!res.ok) {
-        setFetchError(true)
-        return
-      }
-      const data = await res.json()
-      setFetchError(false)
-      if (data.success && data.data?.length > 0) {
-        setLogs(data.data)
+      if (currentFilter === 'mine') {
+        if (!user) {
+          setLogs([])
+          setFetchLoading(false)
+          return
+        }
+        const token = await getSessionToken()
+        const res = await fetch('/api/logs?scope=mine&limit=50', {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        })
+        if (!res.ok) {
+          setFetchError(true)
+          return
+        }
+        const data = await res.json()
+        setFetchError(false)
+        setLogs(data.data || [])
+      } else {
+        const res = await fetch('/api/logs?scope=public&limit=50')
+        if (!res.ok) {
+          setFetchError(true)
+          return
+        }
+        const data = await res.json()
+        setFetchError(false)
+        setLogs(data.data || [])
       }
     } catch {
       setFetchError(true)
@@ -75,24 +93,15 @@ export default function StreamPage() {
   useEffect(() => {
     fetchLogs()
     setMounted(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const displayLogs = logs.filter(log => {
-    if (!log?.type) return false
-    return true
-  })
+  useEffect(() => {
+    fetchLogs(filter)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter])
 
-  const filteredLogs = (() => {
-    if (filter === 'all' || filter === 'hot') {
-      return displayLogs
-    }
-    if (filter === 'mine') {
-      const userId = user?.id
-      if (!userId) return []
-      return displayLogs.filter(log => log.userId === userId)
-    }
-    return displayLogs
-  })()
+  const filteredLogs = logs.filter(log => log?.type)
 
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp)
@@ -137,8 +146,9 @@ export default function StreamPage() {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
-          content: publishTitle.trim(),
-          type: 'SYSTEM',
+          content: publishContent.trim() || publishTitle.trim(),
+          title: publishTitle.trim(),
+          type: 'USER_POST',
           metadata: {
             body: publishContent.trim() || undefined,
             title: publishTitle.trim(),
@@ -246,7 +256,7 @@ export default function StreamPage() {
           <div className="text-center py-12">
             <p className="text-base text-fog">日志加载失败</p>
             <p className="text-sm text-fog mt-2 mb-4">请稍后刷新页面重试</p>
-            <Button variant="secondary" onClick={fetchLogs}>
+            <Button variant="secondary" onClick={() => fetchLogs()}>
               重试
             </Button>
           </div>

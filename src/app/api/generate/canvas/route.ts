@@ -4,7 +4,8 @@ import { verifyAuth } from '@/lib/auth/verify';
 import { apiSuccess, apiError, apiInternalError } from '@/lib/api/response';
 import { callDeepSeek, safeParseJson } from '@/lib/ai/deepseek';
 import { CANVAS_SYSTEM_PROMPT, buildCanvasPrompt } from '@/lib/ai/prompts';
-import { checkRateLimit, getClientId } from '@/lib/api/rate-limit';
+import { checkRateLimitAsync, getClientId } from '@/lib/api/rate-limit';
+import { addLogEntry } from '@/lib/signals';
 
 const CANVAS_FALLBACK = {
   valueProposition: '',
@@ -48,7 +49,7 @@ function validateCanvasOutput(data: Record<string, unknown>): Record<string, unk
 export async function POST(request: NextRequest) {
   // Rate limiting
   const clientId = getClientId(request);
-  const rateCheck = checkRateLimit(clientId, 'ai-generate');
+  const rateCheck = await checkRateLimitAsync(clientId, 'ai-generate');
   if (!rateCheck.allowed) {
     return apiError(`请求过于频繁，请 ${rateCheck.retryAfter} 秒后重试`, 429);
   }
@@ -112,6 +113,14 @@ export async function POST(request: NextRequest) {
         });
         if (insertError) {
           console.error('[Canvas] Failed to persist result:', insertError);
+        } else {
+          await addLogEntry({
+            type: 'CANVAS_GENERATED',
+            title: `商业画布生成完成：${signalTitle}`,
+            content: (parsed as any).valueProposition || '',
+            signalId: signalId || undefined,
+            userId,
+          });
         }
       } catch (err) {
         console.error('[Canvas] Failed to persist result:', err);

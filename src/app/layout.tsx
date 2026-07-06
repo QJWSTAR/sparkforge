@@ -37,11 +37,11 @@ export const metadata: Metadata = {
     title: 'SparkForge - AI 驱动的创意信号雷达与一键复刻工坊',
     description:
       '全网创意信号雷达 + TRAE 自动化落地工坊。从灵感到上线，只需 24 小时。',
-    url: 'https://sparkforge-blush.vercel.app',
+    url: '/',
     siteName: 'SparkForge',
     images: [
       {
-        url: 'https://sparkforge-blush.vercel.app/og-image.png',
+        url: '/og-image.png',
         width: 1200,
         height: 630,
         alt: 'SparkForge - From spark to shipped, in 24 hours.',
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     title: 'SparkForge - AI 驱动的创意信号雷达与一键复刻工坊',
     description:
       '全网创意信号雷达 + TRAE 自动化落地工坊。从灵感到上线，只需 24 小时。',
-    images: ['https://sparkforge-blush.vercel.app/og-image.png'],
+    images: ['/og-image.png'],
   },
   robots: {
     index: true,
@@ -100,7 +100,7 @@ export default function RootLayout({
               name: 'SparkForge',
               description:
                 'AI 驱动的创意信号发现与 MVP 加速平台。7×24 小时监控全球灵感源，AI 评分排序，一键生成商业方案。',
-              url: 'https://sparkforge-blush.vercel.app',
+              url: process.env.NEXT_PUBLIC_SITE_URL || 'https://sparkforge-blush.vercel.app',
               applicationCategory: 'DeveloperApplication',
               operatingSystem: 'Web',
               offers: {

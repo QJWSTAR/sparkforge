@@ -1,11 +1,13 @@
 import { NextRequest } from 'next/server';
 import { crawlAllSources } from '@/lib/signals';
 import { apiSuccess, apiError } from '@/lib/api/response';
-import { checkRateLimit, getClientId } from '@/lib/api/rate-limit';
+import { checkRateLimitAsync, getClientId } from '@/lib/api/rate-limit';
 
 export async function POST(request: NextRequest) {
-  // Accept API key from header or query param (Vercel cron jobs can't set headers)
-  const apiKey = request.headers.get('x-api-key') || request.nextUrl.searchParams.get('key');
+  // Accept API key from Authorization header, x-api-key header, or query param
+  const authHeader = request.headers.get('authorization') || '';
+  const bearerKey = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  const apiKey = bearerKey || request.headers.get('x-api-key') || request.nextUrl.searchParams.get('key');
 
   if (apiKey !== process.env.CRON_API_KEY && process.env.NODE_ENV === 'production') {
     return apiError('无权执行此操作', 401);
@@ -13,7 +15,7 @@ export async function POST(request: NextRequest) {
 
   // Rate limiting (even for authenticated requests, prevent abuse)
   const clientId = getClientId(request);
-  const rateCheck = checkRateLimit(clientId, 'ai-generate');
+  const rateCheck = await checkRateLimitAsync(clientId, 'api');
   if (!rateCheck.allowed) {
     return apiError(`请求过于频繁，请 ${rateCheck.retryAfter} 秒后重试`, 429);
   }

@@ -101,7 +101,9 @@ export default function Navbar() {
         {/* Center: Nav links (hidden on mobile) */}
         <nav className="hidden md:flex items-center gap-1" aria-label="主导航">
           {navLinks.map((link) => {
-            const isActive = pathname === link.href
+            const isActive = !pathname ? false : link.href === '/'
+              ? pathname === '/'
+              : pathname === link.href || pathname.startsWith(link.href + '/')
             return (
               <Link
                 key={link.href}
@@ -200,7 +202,9 @@ export default function Navbar() {
         ].join(' ')}
       >
         {navLinks.map((link) => {
-          const isActive = pathname === link.href
+          const isActive = !pathname ? false : link.href === '/'
+            ? pathname === '/'
+            : pathname === link.href || pathname.startsWith(link.href + '/')
           return (
             <Link
               key={link.href}

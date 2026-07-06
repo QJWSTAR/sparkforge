@@ -22,21 +22,20 @@ export async function GET() {
 
     const [
       { count: totalSignals },
-      { data: todayData },
+      { count: todaySignals },
       { data: avgData },
       { count: top10Count },
       { count: totalForgeProjects },
       { count: totalCanvasReports },
     ] = await Promise.all([
       supabaseAdmin.from('Signal').select('*', { count: 'exact', head: true }),
-      supabaseAdmin.from('Signal').select('id').gte('createdAt', today.toISOString()),
-      supabaseAdmin.from('Signal').select('finalScore').not('finalScore', 'is', null),
+      supabaseAdmin.from('Signal').select('*', { count: 'exact', head: true }).gte('createdAt', today.toISOString()),
+      supabaseAdmin.from('Signal').select('finalScore').not('finalScore', 'is', null).limit(500),
       supabaseAdmin.from('Signal').select('*', { count: 'exact', head: true }).eq('status', 'TOP10'),
       supabaseAdmin.from('ForgeProject').select('*', { count: 'exact', head: true }),
       supabaseAdmin.from('CanvasReport').select('*', { count: 'exact', head: true }),
     ]);
 
-    const todaySignals = todayData?.length || 0;
     const scores = (avgData || []).map((s: { finalScore?: number }) => s.finalScore).filter(Boolean) as number[];
     const avgScore = scores.length > 0
       ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)

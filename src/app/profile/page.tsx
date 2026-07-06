@@ -1,20 +1,44 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth'
 import { Button, ContentCard, Badge } from '@/components/ui'
 import { SkeletonProfile } from '@/components/Skeleton'
+import { Wrench, Layout, TrendingUp, MessageCircle, ArrowRight } from 'lucide-react'
+
+interface ActivityItem {
+  id: string
+  type: string
+  title: string
+  content?: string
+  signalId?: string
+  createdAt: string
+}
+
+const activityConfig: Record<string, { icon: typeof Wrench; label: string; color: string }> = {
+  FORGE_STARTED:    { icon: Wrench,       label: '开始生成方案',  color: 'text-state-warning' },
+  FORGE_COMPLETED:  { icon: Wrench,       label: '方案生成完成',  color: 'text-state-success' },
+  CANVAS_GENERATED: { icon: Layout,       label: '生成商业画布',  color: 'text-state-info' },
+  SIGNAL_TOP10:     { icon: TrendingUp,   label: '信号进入 Top10', color: 'text-state-warning' },
+  USER_POST:        { icon: MessageCircle, label: '发布了动态',   color: 'text-spark-blue' },
+}
 
 export default function ProfilePage() {
   const router = useRouter()
   const { user, signOut, isAuthenticated, loading, getSessionToken } = useAuth()
 
-  const [activeTab, setActiveTab] = useState<'profile' | 'subscriptions' | 'settings'>('profile')
-  const [stats, setStats] = useState({ forgeCount: 0, canvasCount: 0, subscribeCount: 0 })
-  const [activity, setActivity] = useState<Array<{ id: string; action: string; time: string }>>([])
+  const [activeTab, setActiveTab] = useState<'activity' | 'settings'>('activity')
+  const [stats, setStats] = useState({ forgeCount: 0, canvasCount: 0 })
+  const [activities, setActivities] = useState<ActivityItem[]>([])
   const [profileError, setProfileError] = useState(false)
   const [profileLoading, setProfileLoading] = useState(true)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -31,37 +55,61 @@ export default function ProfilePage() {
       const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {}
 
       try {
-        const [forgeRes, canvasRes] = await Promise.all([
+        const [forgeRes, canvasRes, logsRes] = await Promise.all([
           fetch('/api/generate/forge/history', { headers }),
           fetch('/api/generate/canvas/history', { headers }),
+          fetch('/api/logs?scope=mine&limit=20', { headers }),
         ])
 
         const forgeData = forgeRes.ok ? await forgeRes.json() : { data: [] }
         const canvasData = canvasRes.ok ? await canvasRes.json() : { data: [] }
+        const logsData = logsRes.ok ? await logsRes.json() : { data: [] }
 
         setStats({
           forgeCount: forgeData.data?.length || 0,
           canvasCount: canvasData.data?.length || 0,
-          subscribeCount: 0,
         })
 
-        const activities: Array<{ id: string; action: string; time: string }> = []
+        // 合并 forge/canvas 历史和 LogEntry 记录，按时间排序
+        const allActivities: ActivityItem[] = []
+
         ;(forgeData.data || []).forEach((f: any) => {
-          activities.push({
+          allActivities.push({
             id: `forge-${f.id}`,
-            action: `完成了一键复刻：${f.signalTitle || '未知信号'}`,
-            time: formatRelativeTime(f.createdAt),
+            type: 'FORGE_COMPLETED',
+            title: f.signalTitle || '未知信号',
+            content: f.outputSummary || '',
+            signalId: f.signalId,
+            createdAt: f.createdAt,
           })
         })
+
         ;(canvasData.data || []).forEach((c: any) => {
-          activities.push({
+          allActivities.push({
             id: `canvas-${c.id}`,
-            action: `创建了商业画布：${c.signalTitle || '未知信号'}`,
-            time: formatRelativeTime(c.createdAt),
+            type: 'CANVAS_GENERATED',
+            title: c.signalId || '未知信号',
+            createdAt: c.createdAt,
           })
         })
-        activities.sort((a, b) => b.id.localeCompare(a.id))
-        setActivity(activities.slice(0, 10))
+
+        // 补充 LogEntry 中的其他活动（如 SIGNAL_TOP10）
+        ;(logsData.data || []).forEach((log: any) => {
+          if (!allActivities.some(a => a.id.startsWith(log.type) && a.signalId === log.signalId)) {
+            allActivities.push({
+              id: log.id,
+              type: log.type,
+              title: log.title || '',
+              content: log.content || '',
+              signalId: log.signalId,
+              createdAt: log.createdAt,
+            })
+          }
+        })
+
+        // 按 createdAt 降序排列（而非 UUID）
+        allActivities.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        setActivities(allActivities.slice(0, 20))
       } catch {
         setProfileError(true)
       } finally {
@@ -71,20 +119,29 @@ export default function ProfilePage() {
     fetchProfileData()
   }, [isAuthenticated, getSessionToken])
 
+  const formatDateConsistent = (timestamp: string) => {
+    const d = new Date(timestamp)
+    if (isNaN(d.getTime())) return '未知时间'
+    const y = d.getFullYear()
+    const m = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${y}/${m}/${day}`
+  }
+
   const formatRelativeTime = (timestamp: string) => {
+    if (!mounted) return formatDateConsistent(timestamp)
     const date = new Date(timestamp)
     if (isNaN(date.getTime())) return '未知时间'
     const now = new Date()
     const diff = now.getTime() - date.getTime()
+    const minutes = Math.floor(diff / (1000 * 60))
     const hours = Math.floor(diff / (1000 * 60 * 60))
     const days = Math.floor(hours / 24)
-    if (hours < 1) return '刚刚'
+    if (minutes < 1) return '刚刚'
+    if (minutes < 60) return `${minutes} 分钟前`
     if (hours < 24) return `${hours} 小时前`
     if (days < 7) return `${days} 天前`
-    const y = date.getFullYear()
-    const m = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    return `${y}/${m}/${day}`
+    return formatDateConsistent(timestamp)
   }
 
   const handleSignOut = async () => {
@@ -105,8 +162,7 @@ export default function ProfilePage() {
   if (!isAuthenticated) return null
 
   const tabs = [
-    { key: 'profile' as const, label: '个人资料' },
-    { key: 'subscriptions' as const, label: '订阅管理' },
+    { key: 'activity' as const, label: '我的活动' },
     { key: 'settings' as const, label: '账户设置' },
   ]
 
@@ -131,18 +187,14 @@ export default function ProfilePage() {
         </ContentCard>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
-          <div className="text-center">
-            <div className="text-2xl font-mono font-bold text-spark-blue">{stats.subscribeCount}</div>
-            <div className="text-xs text-fog">关注信号</div>
-          </div>
-          <div className="text-center">
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <div className="text-center bg-graphite/50 border border-border-line rounded-lg p-4">
             <div className="text-2xl font-mono font-bold text-state-info">{stats.forgeCount}</div>
-            <div className="text-xs text-fog">复刻项目</div>
+            <div className="text-xs text-fog mt-1">复刻项目</div>
           </div>
-          <div className="text-center">
+          <div className="text-center bg-graphite/50 border border-border-line rounded-lg p-4">
             <div className="text-2xl font-mono font-bold text-state-warning">{stats.canvasCount}</div>
-            <div className="text-xs text-fog">商业画布</div>
+            <div className="text-xs text-fog mt-1">商业画布</div>
           </div>
         </div>
 
@@ -164,16 +216,19 @@ export default function ProfilePage() {
           ))}
         </div>
 
-        {/* Tab Content */}
-        {activeTab === 'profile' && (
+        {/* Activity Tab */}
+        {activeTab === 'activity' && (
           <ContentCard className="p-6">
-            <h3 className="text-base font-bold text-ice-white mb-4">最近活动</h3>
+            <h3 className="text-base font-bold text-ice-white mb-4">我的活动</h3>
             {profileLoading ? (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="animate-pulse flex items-center justify-between py-2">
-                    <div className="h-3 bg-graphite rounded w-48" />
-                    <div className="h-3 bg-graphite rounded w-16" />
+                  <div key={i} className="animate-pulse flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-graphite shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-3 bg-graphite rounded w-48" />
+                      <div className="h-3 bg-graphite rounded w-24" />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -184,28 +239,57 @@ export default function ProfilePage() {
                   重试
                 </Button>
               </div>
-            ) : activity.length > 0 ? (
-              <div className="space-y-3">
-                {activity.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between py-2 border-b border-border-line last:border-0">
-                    <span className="text-sm text-fog">{item.action}</span>
-                    <span className="text-xs text-fog">{item.time}</span>
-                  </div>
-                ))}
+            ) : activities.length > 0 ? (
+              <div className="space-y-4">
+                {activities.map((item) => {
+                  const config = activityConfig[item.type] || activityConfig.FORGE_COMPLETED
+                  const Icon = config.icon
+                  return (
+                    <div key={item.id} className="flex items-start gap-3 py-3 border-b border-border-line last:border-0">
+                      <div className="w-8 h-8 rounded-full bg-spark-blue/10 flex items-center justify-center shrink-0">
+                        <Icon className={`w-4 h-4 ${config.color}`} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Badge variant="default" size="sm">{config.label}</Badge>
+                          <span className="text-xs text-fog">{formatRelativeTime(item.createdAt)}</span>
+                        </div>
+                        <p className="text-sm text-ice-white truncate">{item.title}</p>
+                        {item.content && (
+                          <p className="text-xs text-fog mt-1 line-clamp-1">{item.content}</p>
+                        )}
+                      </div>
+                      {item.signalId && (
+                        <Link
+                          href={`/radar/${item.signalId}`}
+                          className="shrink-0 p-1 rounded text-fog hover:text-spark-blue transition-colors"
+                          aria-label="查看信号详情"
+                        >
+                          <ArrowRight className="w-4 h-4" />
+                        </Link>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             ) : (
-              <p className="text-sm text-fog">暂无活动记录</p>
+              <div className="text-center py-8">
+                <p className="text-sm text-fog mb-2">你还没有生成或保存任何内容</p>
+                <p className="text-xs text-fog mb-4">去发现创意或生成方案，开始你的创作之旅</p>
+                <div className="flex gap-2 justify-center">
+                  <Link href="/radar">
+                    <Button variant="primary" size="md">发现创意</Button>
+                  </Link>
+                  <Link href="/forge">
+                    <Button variant="secondary" size="md">生成方案</Button>
+                  </Link>
+                </div>
+              </div>
             )}
           </ContentCard>
         )}
 
-        {activeTab === 'subscriptions' && (
-          <ContentCard className="p-6">
-            <h3 className="text-base font-bold text-ice-white mb-4">我的订阅</h3>
-            <p className="text-sm text-fog">暂无订阅</p>
-          </ContentCard>
-        )}
-
+        {/* Settings Tab */}
         {activeTab === 'settings' && (
           <ContentCard className="p-6">
             <h3 className="text-base font-bold text-ice-white mb-4">账户设置</h3>
@@ -231,9 +315,9 @@ export default function ProfilePage() {
  * 设计规则遵守情况自查：
  * 1. 无内联 style ✅
  * 2. 组件库 ✅ — 使用 Button、ContentCard、Badge
- * 3. 间距栅格 ✅ — p-4/p-6/py-8/py-2/gap-4/gap-2/mb-1/mb-4/mb-8 等
- * 4. 圆角规则 ✅ — 卡片 rounded-lg、按钮 rounded-md、头像 rounded-full、Tab rounded-lg
+ * 3. 间距栅格 ✅ — p-4/p-6/py-8/py-3/gap-4/gap-3/gap-2/mb-1/mb-2/mb-4/mb-8/mt-1 等
+ * 4. 圆角规则 ✅ — 卡片 rounded-lg、头像 rounded-full、Tab rounded-lg
  * 5. 字体阶梯 ✅ — text-2xl(24px)、text-base(16px)、text-sm(14px)、text-xs(12px)、font-mono
- * 6. 交互状态 ✅ — Tab 按钮 hover 边框变化，Button 组件内置交互
+ * 6. 交互状态 ✅ — Tab hover 边框，Link hover 颜色，Button 内置交互
  * 7. 氛围光 ✅ — bg-ambient-glow
  */

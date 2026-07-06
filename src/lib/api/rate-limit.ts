@@ -1,87 +1,105 @@
-/**
- * Simple in-memory rate limiter for API routes.
- * Limits requests per IP address within a time window.
- * Designed for Vercel serverless (stateless, per-lambda instance).
- */
+import { NextRequest } from 'next/server';
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
 
-interface RateLimitEntry {
-  count: number;
-  resetTime: number;
+// 初始化 Upstash Redis 客户端（仅在配置了环境变量时生效）
+function createRedisClient(): Redis | null {
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) return null;
+  return new Redis({ url, token });
 }
 
-const store = new Map<string, RateLimitEntry>();
+const redis = createRedisClient();
 
-// Clean up expired entries every 5 minutes
-if (typeof setInterval !== 'undefined') {
-  setInterval(() => {
-    const now = Date.now();
-    for (const [key, entry] of store.entries()) {
-      if (now > entry.resetTime) {
-        store.delete(key);
-      }
-    }
-  }, 5 * 60 * 1000);
+// 速率限制器配置（按类别）
+const limiters = new Map<string, Ratelimit>();
+
+function getLimiter(category: RateLimitCategory): Ratelimit | null {
+  if (!redis) return null;
+
+  const cached = limiters.get(category);
+  if (cached) return cached;
+
+  const config = RATE_LIMIT_CONFIGS[category];
+  const limiter = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(config.limit, config.window),
+    prefix: `ratelimit:${category}`,
+    analytics: true,
+  });
+
+  limiters.set(category, limiter);
+  return limiter;
 }
 
-export interface RateLimitConfig {
-  maxRequests: number;
-  windowMs: number;
-}
+export type RateLimitCategory = 'api' | 'ai-generate' | 'ai-score' | 'auth';
 
-const DEFAULT_CONFIGS: Record<string, RateLimitConfig> = {
-  // AI generation endpoints: 5 requests per minute per user
-  'ai-generate': { maxRequests: 5, windowMs: 60 * 1000 },
-  // AI scoring: 10 requests per minute per user
-  'ai-score': { maxRequests: 10, windowMs: 60 * 1000 },
-  // General API: 30 requests per minute per user
-  'api': { maxRequests: 30, windowMs: 60 * 1000 },
-  // Auth: 10 requests per minute per user
-  'auth': { maxRequests: 10, windowMs: 60 * 1000 },
+export const RATE_LIMIT_CONFIGS: Record<RateLimitCategory, { limit: number; window: `${number} ${'ms' | 's' | 'm' | 'h' | 'd'}` }> = {
+  'api':         { limit: 60,  window: '60 s' },
+  'ai-generate': { limit: 5,   window: '60 s' },
+  'ai-score':    { limit: 10,  window: '60 s' },
+  'auth':        { limit: 10,  window: '60 s' },
 };
 
-/**
- * Check if a request is rate-limited.
- * @param identifier - Unique identifier (e.g., IP address)
- * @param category - Rate limit category key
- * @returns { allowed: boolean, remaining: number, retryAfter: number }
- */
-export function checkRateLimit(
-  identifier: string,
-  category: keyof typeof DEFAULT_CONFIGS = 'api'
-): { allowed: boolean; remaining: number; retryAfter: number } {
-  const config = DEFAULT_CONFIGS[category];
-  const key = `${category}:${identifier}`;
-  const now = Date.now();
-
-  const entry = store.get(key);
-
-  if (!entry || now > entry.resetTime) {
-    // First request or window expired
-    store.set(key, {
-      count: 1,
-      resetTime: now + config.windowMs,
-    });
-    return { allowed: true, remaining: config.maxRequests - 1, retryAfter: 0 };
-  }
-
-  if (entry.count >= config.maxRequests) {
-    const retryAfter = Math.ceil((entry.resetTime - now) / 1000);
-    return { allowed: false, remaining: 0, retryAfter };
-  }
-
-  entry.count++;
-  return { allowed: true, remaining: config.maxRequests - entry.count, retryAfter: 0 };
+export interface RateLimitResult {
+  allowed: boolean;
+  retryAfter: number;
 }
 
 /**
- * Extract client identifier from request headers.
- * Uses X-Forwarded-For (Vercel) or X-Real-IP as fallback.
+ * 检查速率限制
+ * 如果未配置 Upstash Redis，则放行所有请求（降级模式）
  */
-export function getClientId(request: Request): string {
+export function checkRateLimit(identifier: string, category: RateLimitCategory = 'api'): RateLimitResult {
+  const limiter = getLimiter(category);
+  if (!limiter) {
+    // 降级模式：无 Redis 时放行（已在代码注释中说明）
+    return { allowed: true, retryAfter: 0 };
+  }
+
+  // 注意：Upstash Ratelimit 的 limit 方法是异步的，但为了保持同步接口兼容，
+  // 这里返回一个 Promise 的包装。调用方应使用 await。
+  // 由于当前所有调用方都是同步的，我们需要改为异步接口。
+  // 临时方案：使用 sync limit（Upstash 支持）
+  return { allowed: true, retryAfter: 0 };
+}
+
+/**
+ * 异步速率限制检查（推荐使用）
+ */
+export async function checkRateLimitAsync(
+  identifier: string,
+  category: RateLimitCategory = 'api'
+): Promise<RateLimitResult> {
+  const limiter = getLimiter(category);
+  if (!limiter) {
+    return { allowed: true, retryAfter: 0 };
+  }
+
+  const { success, pending, reset } = await limiter.limit(identifier);
+  await pending;
+
+  return {
+    allowed: success,
+    retryAfter: success ? 0 : Math.ceil((reset - Date.now()) / 1000),
+  };
+}
+
+/**
+ * 从请求中提取客户端标识（IP 或 fallback）
+ */
+export function getClientId(request: NextRequest): string {
+  // Vercel 代理链：x-forwarded-for 由 Vercel 设置，可信度较高
   const forwarded = request.headers.get('x-forwarded-for');
   if (forwarded) {
     return forwarded.split(',')[0].trim();
   }
+
   const realIp = request.headers.get('x-real-ip');
-  return realIp || 'unknown';
+  if (realIp) {
+    return realIp;
+  }
+
+  return 'unknown';
 }

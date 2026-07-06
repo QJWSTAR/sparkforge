@@ -42,3 +42,23 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 scripts/
+
+# TRAE IDE
+.trae/
+.trae-cn/
+
+# Design assets
+sparkforge/
+sparkforge-30day/
+sparkforge-dashboard-design/
+sparkforge-dashboard-v2/
+sparkforge-logo/
+sparkforge-logo-v2/
+sparkforge-mvp/
+sparkforge-component-spec.html
+
+# Dev artifacts
+FINAL-REPORT.md
+POST-DRAFT.md
+gap-analysis.md
+dogfood-output/

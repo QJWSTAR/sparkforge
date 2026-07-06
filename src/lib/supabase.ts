@@ -92,6 +92,8 @@ export function getSupabase(): SupabaseClient | null {
       headers: { 'Content-Type': 'application/json' },
     },
   })
+
+  // anon 客户端无需验证连接（用于前端 SDK），标记为已初始化即可
   clientValidated = true
 
   return supabaseClient

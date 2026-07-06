@@ -50,7 +50,7 @@ const moduleTooltips: Record<string, string> = {
 const SIMPLE_MODULES = ['价值主张', '客户细分', '收入来源', '行动计划']
 
 export default function CanvasPage() {
-  const { getSessionToken } = useAuth()
+  const { getSessionToken, isAuthenticated } = useAuth()
   const [signals, setSignals] = useState<Signal[]>([])
   const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
@@ -89,6 +89,10 @@ export default function CanvasPage() {
 
   const handleGenerate = async () => {
     if (!selectedSignal) return
+    if (!isAuthenticated) {
+      setError('请先登录后再生成画布')
+      return
+    }
     setIsGenerating(true)
     setError('')
 

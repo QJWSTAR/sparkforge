@@ -1,12 +1,18 @@
 {
   "crons": [
     {
-      "path": "/api/crawl?key=${CRON_API_KEY}",
-      "schedule": "0 0 * * *"
+      "path": "/api/crawl",
+      "schedule": "0 0 * * *",
+      "headers": {
+        "Authorization": "Bearer ${CRON_API_KEY}"
+      }
     },
     {
-      "path": "/api/score/batch?key=${CRON_API_KEY}",
-      "schedule": "0 1 * * *"
+      "path": "/api/score/batch",
+      "schedule": "0 1 * * *",
+      "headers": {
+        "Authorization": "Bearer ${CRON_API_KEY}"
+      }
     }
   ]
 }

@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://sparkforge.app'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://sparkforge-blush.vercel.app'
 
   const staticPages = [
     { path: '/', priority: 1.0, changeFreq: 'daily' as const },
@@ -10,7 +10,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/canvas', priority: 0.8, changeFreq: 'weekly' as const },
     { path: '/projects', priority: 0.7, changeFreq: 'daily' as const },
     { path: '/stream', priority: 0.7, changeFreq: 'daily' as const },
-    { path: '/profile', priority: 0.5, changeFreq: 'weekly' as const },
     { path: '/login', priority: 0.5, changeFreq: 'monthly' as const },
     { path: '/register', priority: 0.5, changeFreq: 'monthly' as const },
     { path: '/about', priority: 0.4, changeFreq: 'monthly' as const },

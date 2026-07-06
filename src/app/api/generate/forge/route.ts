@@ -4,7 +4,8 @@ import { verifyAuth } from '@/lib/auth/verify';
 import { apiSuccess, apiError, apiInternalError } from '@/lib/api/response';
 import { callDeepSeek, safeParseJson } from '@/lib/ai/deepseek';
 import { FORGE_SYSTEM_PROMPT, buildForgePrompt } from '@/lib/ai/prompts';
-import { checkRateLimit, getClientId } from '@/lib/api/rate-limit';
+import { checkRateLimitAsync, getClientId } from '@/lib/api/rate-limit';
+import { addLogEntry } from '@/lib/signals';
 
 const FORGE_FALLBACK = {
   techStack: 'Next.js + React + TypeScript',
@@ -31,7 +32,7 @@ function validateForgeOutput(data: Record<string, unknown>): Record<string, unkn
 export async function POST(request: NextRequest) {
   // Rate limiting
   const clientId = getClientId(request);
-  const rateCheck = checkRateLimit(clientId, 'ai-generate');
+  const rateCheck = await checkRateLimitAsync(clientId, 'ai-generate');
   if (!rateCheck.allowed) {
     return apiError(`请求过于频繁，请 ${rateCheck.retryAfter} 秒后重试`, 429);
   }
@@ -113,6 +114,15 @@ export async function POST(request: NextRequest) {
           console.error('[Forge] Failed to persist result:', insertError);
         } else if (inserted) {
           project = inserted;
+          await addLogEntry({
+            type: 'FORGE_COMPLETED',
+            title: `复刻方案生成完成：${signalTitle}`,
+            content: parsed.summary as string || '',
+            signalId: signalId || undefined,
+            forgeId: inserted.id,
+            userId,
+            metadata: { techStack: parsed.techStack },
+          });
         }
       } catch (err) {
         console.error('[Forge] Failed to persist result:', err);

@@ -2,12 +2,12 @@ import { NextRequest } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { verifyAuth } from '@/lib/auth/verify';
 import { apiSuccess, apiError, apiUnauthorized } from '@/lib/api/response';
-import { checkRateLimit, getClientId } from '@/lib/api/rate-limit';
+import { checkRateLimitAsync, getClientId } from '@/lib/api/rate-limit';
 
 export async function POST(request: NextRequest) {
   // Rate limiting
   const clientId = getClientId(request);
-  const rateCheck = checkRateLimit(clientId, 'api');
+  const rateCheck = await checkRateLimitAsync(clientId, 'api');
   if (!rateCheck.allowed) {
     return apiError(`请求过于频繁，请 ${rateCheck.retryAfter} 秒后重试`, 429);
   }
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   // Rate limiting
   const clientId = getClientId(request);
-  const rateCheck = checkRateLimit(clientId, 'api');
+  const rateCheck = await checkRateLimitAsync(clientId, 'api');
   if (!rateCheck.allowed) {
     return apiError(`请求过于频繁，请 ${rateCheck.retryAfter} 秒后重试`, 429);
   }

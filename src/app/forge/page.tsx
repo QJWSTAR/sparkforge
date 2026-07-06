@@ -26,7 +26,7 @@ const FORGE_FALLBACK = {
 }
 
 export default function ForgePage() {
-  const { getSessionToken } = useAuth()
+  const { getSessionToken, isAuthenticated } = useAuth()
   const [selectedSignal, setSelectedSignal] = useState<{ id: string; title: string; description: string; tags: string[] } | null>(null)
   const [targetLanguage, setTargetLanguage] = useState('zh-CN')
   const [customPrompt, setCustomPrompt] = useState('')
@@ -58,6 +58,10 @@ export default function ForgePage() {
 
   const handleStartForge = async () => {
     if (!selectedSignal) return
+    if (!isAuthenticated) {
+      setForgeError('请先登录后再生成方案')
+      return
+    }
     setIsForging(true)
     setForgeError(null)
     setForgeComplete(false)
