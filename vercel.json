@@ -1,12 +1,8 @@
 {
   "crons": [
     {
-      "path": "/api/crawl",
+      "path": "/api/daily-process",
       "schedule": "0 0 * * *"
-    },
-    {
-      "path": "/api/score/batch",
-      "schedule": "0 1 * * *"
     }
   ]
 }

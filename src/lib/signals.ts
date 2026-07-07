@@ -3,6 +3,9 @@ import { fetchHackerNewsTop, saveHNSignals } from './hackernews'
 import { fetchProductHuntToday, savePHSignals } from './producthunt'
 import { fetchV2EXHot, saveV2EXSignals } from './v2ex'
 import { fetchJikeHot, type RawJikePost } from './jike'
+import { fetchGitHubTrending, saveGHTrendingSignals } from './github-trending'
+import { fetchGitHubReleases, saveGHReleaseSignals } from './github-releases'
+import { fetchIndieHackers, saveIHSignals } from './indiehackers'
 import { batchScoreUnscoredSignals } from './scoring'
 import { mockSignals } from '@/data/mockSignals'
 
@@ -244,36 +247,42 @@ export async function getSignalById(id: string) {
   }
 }
 
-export async function crawlAllSources(): Promise<{ hn: number; ph: number; v2ex: number; jike: number; total: number; dbAvailable: boolean }> {
+export async function crawlAllSources(): Promise<{ hn: number; ph: number; v2ex: number; jike: number; ghTrending: number; ghRelease: number; ih: number; total: number; dbAvailable: boolean }> {
   const supabaseAdmin = await getSupabaseAdmin()
   
   if (!supabaseAdmin) {
     console.warn('[Signals] Database unavailable, skipping crawl')
-    return { hn: 0, ph: 0, v2ex: 0, jike: 0, total: 0, dbAvailable: false }
+    return { hn: 0, ph: 0, v2ex: 0, jike: 0, ghTrending: 0, ghRelease: 0, ih: 0, total: 0, dbAvailable: false }
   }
 
   try {
-    const [hnItems, phPosts, v2exTopics, jikePosts] = await Promise.all([
+    const [hnItems, phPosts, v2exTopics, jikePosts, ghTrendingRepos, ghReleases, ihProducts] = await Promise.all([
       fetchHackerNewsTop(30),
       fetchProductHuntToday(20),
       fetchV2EXHot(20),
       fetchJikeHot(10),
+      fetchGitHubTrending(20),
+      fetchGitHubReleases(10),
+      fetchIndieHackers(10),
     ])
 
-    const [hnSaved, phSaved, v2exSaved, jikeSaved] = await Promise.all([
+    const [hnSaved, phSaved, v2exSaved, jikeSaved, ghTrendingSaved, ghReleaseSaved, ihSaved] = await Promise.all([
       saveHNSignals(hnItems),
       savePHSignals(phPosts),
       saveV2EXSignals(v2exTopics),
       saveJikeSignals(jikePosts),
+      saveGHTrendingSignals(ghTrendingRepos),
+      saveGHReleaseSignals(ghReleases),
+      saveIHSignals(ihProducts),
     ])
 
-    const total = hnSaved + phSaved + v2exSaved + jikeSaved
+    const total = hnSaved + phSaved + v2exSaved + jikeSaved + ghTrendingSaved + ghReleaseSaved + ihSaved
 
     if (total > 0) {
       await addLogEntry({
         type: 'SYSTEM',
         title: `信号抓取完成`,
-        content: `Hacker News: ${hnSaved} | Product Hunt: ${phSaved} | V2EX: ${v2exSaved} | 即刻: ${jikeSaved} | 总计: ${total} 条新信号`,
+        content: `Hacker News: ${hnSaved} | Product Hunt: ${phSaved} | V2EX: ${v2exSaved} | 即刻: ${jikeSaved} | GitHub Trending: ${ghTrendingSaved} | GitHub Releases: ${ghReleaseSaved} | Indie Hackers: ${ihSaved} | 总计: ${total} 条新信号`,
       })
 
       const scored = await batchScoreUnscoredSignals(50)
@@ -286,12 +295,12 @@ export async function crawlAllSources(): Promise<{ hn: number; ph: number; v2ex:
       }
     }
 
-    return { hn: hnSaved, ph: phSaved, v2ex: v2exSaved, jike: jikeSaved, total, dbAvailable: true }
+    return { hn: hnSaved, ph: phSaved, v2ex: v2exSaved, jike: jikeSaved, ghTrending: ghTrendingSaved, ghRelease: ghReleaseSaved, ih: ihSaved, total, dbAvailable: true }
 
   } catch (error) {
     console.error('[Signals] Unexpected error during crawl:', error)
     invalidateDbConnection()
-    return { hn: 0, ph: 0, v2ex: 0, jike: 0, total: 0, dbAvailable: false }
+    return { hn: 0, ph: 0, v2ex: 0, jike: 0, ghTrending: 0, ghRelease: 0, ih: 0, total: 0, dbAvailable: false }
   }
 }
 

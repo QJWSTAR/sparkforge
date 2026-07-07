@@ -14,6 +14,7 @@ const navLinks = [
   { href: '/canvas', label: '分析画布' },
   { href: '/stream', label: '动态' },
   { href: '/projects', label: '我的项目' },
+  { href: '/profile', label: '我的活动' },
 ]
 
 export default function Navbar() {

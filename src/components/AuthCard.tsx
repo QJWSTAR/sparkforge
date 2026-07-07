@@ -23,16 +23,28 @@ export default function AuthCard({ mode }: AuthCardProps) {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [emailTouched, setEmailTouched] = useState(false)
+  const [redirectPath, setRedirectPath] = useState('/radar')
 
   const emailError = emailTouched && email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
     ? '请输入有效的邮箱地址'
     : ''
 
+  // 读取 proxy.ts 传递的 redirect 参数，登录成功后回到原本想访问的页面
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const params = new URLSearchParams(window.location.search)
+    const redirect = params.get('redirect')
+    // 安全验证：只允许站内相对路径，防止开放重定向
+    if (redirect && redirect.startsWith('/') && !redirect.startsWith('//')) {
+      setRedirectPath(redirect)
+    }
+  }, [])
+
   useEffect(() => {
     if (isAuthenticated) {
-      router.push('/radar')
+      router.push(redirectPath)
     }
-  }, [isAuthenticated, router])
+  }, [isAuthenticated, router, redirectPath])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -51,7 +63,7 @@ export default function AuthCard({ mode }: AuthCardProps) {
         : await signUp(email, password, name)
 
     if (result.success) {
-      router.push('/radar')
+      router.push(redirectPath)
     } else {
       setError(getErrorMessage(result.error) || '操作失败')
     }
