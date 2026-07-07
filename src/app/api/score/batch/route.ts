@@ -5,16 +5,36 @@ import { addLogEntry } from '@/lib/signals';
 import { apiSuccess, apiError } from '@/lib/api/response';
 import { checkRateLimitAsync, getClientId } from '@/lib/api/rate-limit';
 
-export async function POST(request: NextRequest) {
-  // Accept API key from Authorization header, x-api-key header, or query param
+function isCronRequest(request: NextRequest): boolean {
+  return request.headers.get('x-vercel-cron') === '1' || (request.headers.get('user-agent')?.includes('vercel-cron') ?? false);
+}
+
+function verifyApiKey(request: NextRequest): boolean {
+  if (process.env.NODE_ENV !== 'production') return true;
   const authHeader = request.headers.get('authorization') || '';
   const bearerKey = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
   const apiKey = bearerKey || request.headers.get('x-api-key') || request.nextUrl.searchParams.get('key');
-  if (apiKey !== process.env.CRON_API_KEY && process.env.NODE_ENV === 'production') {
+  return apiKey === process.env.CRON_API_KEY;
+}
+
+// Vercel cron 发送 GET 请求，手动调用可使用 POST
+export async function GET(request: NextRequest) {
+  if (!isCronRequest(request)) {
     return apiError('无权执行此操作', 401);
   }
 
-  // Rate limiting
+  return handleBatchScore(request);
+}
+
+export async function POST(request: NextRequest) {
+  if (!verifyApiKey(request)) {
+    return apiError('无权执行此操作', 401);
+  }
+
+  return handleBatchScore(request);
+}
+
+async function handleBatchScore(request: NextRequest) {
   const clientId = getClientId(request);
   const rateCheck = await checkRateLimitAsync(clientId, 'ai-score');
   if (!rateCheck.allowed) {
@@ -27,8 +47,17 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { limit: rawLimit = 10 } = await request.json();
-    const limit = Math.min(Math.max(Number(rawLimit) || 10, 1), 100);
+    // GET 请求时使用默认 limit，POST 请求时从 body 读取
+    let limit = 10;
+    if (request.method === 'POST') {
+      try {
+        const body = await request.json();
+        const rawLimit = body.limit ?? 10;
+        limit = Math.min(Math.max(Number(rawLimit) || 10, 1), 100);
+      } catch {
+        // 非 JSON body 时使用默认值
+      }
+    }
 
     const { data: signals, error } = await supabaseAdmin
       .from('Signal')
@@ -81,7 +110,7 @@ export async function POST(request: NextRequest) {
 
     await addLogEntry({
       type: 'SYSTEM',
-      title: `AI 批量评分完成`,
+      title: 'AI 批量评分完成',
       content: `已完成 ${scoredCount}/${signals.length} 条信号的 AI 评分`,
       metadata: { results },
     });
