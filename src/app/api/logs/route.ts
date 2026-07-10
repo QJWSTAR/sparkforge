@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
         .range(offset, offset + limit - 1);
 
       if (error) {
-        return apiError('获取活动失败', 500);
+        return apiError(`获取活动失败: ${error.message}`, 500);
       }
 
       return apiSuccess(logs ?? []);
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
       .range(offset, offset + limit - 1);
 
     if (error) {
-      return apiError('获取动态失败', 500);
+      return apiError(`获取动态失败: ${error.message}`, 500);
     }
 
     return apiSuccess(logs ?? []);
