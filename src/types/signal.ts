@@ -1,6 +1,6 @@
 export interface Signal {
   id: string
-  source: 'producthunt' | 'hackernews' | 'twitter' | 'github' | 'indiehackers' | 'v2ex' | 'xiaohongshu' | 'juejin' | 'medium'
+  source: 'producthunt' | 'hackernews' | 'v2ex' | 'jike' | 'github-trending' | 'github-releases' | 'indiehackers'
   sourceId: string
   title: string
   description?: string

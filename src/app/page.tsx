@@ -23,8 +23,8 @@ function ValueProp() {
           发现下一个爆款创意
         </h1>
         <p className="text-base text-fog max-w-2xl mx-auto mb-8">
-          监控 Product Hunt、Hacker News、小红书等 9+ 灵感源，AI 自动评分排序，
-          一键生成可运行 MVP，从灵感到上线只需 24 小时。
+          监控 Product Hunt、Hacker News、GitHub 等 7 个灵感源，AI 自动评分排序，
+          一键生成技术方案和商业画布，从灵感到落地只需 24 小时。
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link href="/register">

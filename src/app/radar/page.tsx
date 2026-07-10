@@ -15,6 +15,9 @@ const sourceFilters = [
   { key: 'hackernews', label: 'Hacker News' },
   { key: 'v2ex', label: 'V2EX' },
   { key: 'jike', label: '即刻' },
+  { key: 'github-trending', label: 'GitHub Trending' },
+  { key: 'github-releases', label: 'GitHub Releases' },
+  { key: 'indiehackers', label: 'Indie Hackers' },
 ]
 
 /* ── Welcome Guide ── */

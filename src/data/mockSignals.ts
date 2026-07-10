@@ -44,7 +44,7 @@ export const mockSignals: Signal[] = [
   },
   {
     id: '3',
-    source: 'twitter',
+    source: 'github-trending',
     sourceId: 'tw-003',
     title: 'Micro SaaS Boilerplate - SaaS 脚手架',
     description: '开源 SaaS 脚手架，集成支付、认证、邮件、Docker 一键部署，Next.js + Stripe + Postgres 技术栈。',
@@ -64,7 +64,7 @@ export const mockSignals: Signal[] = [
   },
   {
     id: '4',
-    source: 'github',
+    source: 'github-releases',
     sourceId: 'gh-004',
     title: 'Cursor.so 开源替代品 - AI 编辑器',
     description: 'VSCode 插件形式的 AI 编程助手，支持多模型切换、代码补全、重构建议，完全开源可自部署。',
@@ -124,7 +124,7 @@ export const mockSignals: Signal[] = [
   },
   {
     id: '7',
-    source: 'xiaohongshu',
+    source: 'indiehackers',
     sourceId: 'xhs-007',
     title: 'AI 穿搭助手 - 智能搭配推荐',
     description: '上传照片获取个性化穿搭建议，基于身材、风格、场合智能推荐，支持虚拟试穿。',
@@ -144,7 +144,7 @@ export const mockSignals: Signal[] = [
   },
   {
     id: '8',
-    source: 'juejin',
+    source: 'jike',
     sourceId: 'jj-008',
     title: '前端面试刷题平台',
     description: '专为前端工程师打造的面试刷题平台，包含算法、框架、工程化等题目，支持模拟面试。',
@@ -164,7 +164,7 @@ export const mockSignals: Signal[] = [
   },
   {
     id: '9',
-    source: 'medium',
+    source: 'v2ex',
     sourceId: 'md-009',
     title: 'AI 写作助手 SaaS',
     description: '多语言 AI 写作工具，支持博客、营销文案、邮件生成，内置 SEO 优化和风格调整。',
@@ -224,7 +224,7 @@ export const mockSignals: Signal[] = [
   },
   {
     id: '12',
-    source: 'twitter',
+    source: 'github-trending',
     sourceId: 'tw-012',
     title: '远程团队协作工具',
     description: '专为远程团队设计的协作工具，集成视频会议、任务管理、文档协作、异步沟通。',
@@ -247,25 +247,21 @@ export const mockSignals: Signal[] = [
 export const sourceLabels: Record<string, string> = {
   producthunt: 'Product Hunt',
   hackernews: 'Hacker News',
-  twitter: 'Twitter/X',
-  github: 'GitHub',
-  indiehackers: 'Indie Hackers',
   v2ex: 'V2EX',
-  xiaohongshu: '小红书',
-  juejin: '掘金',
-  medium: 'Medium',
+  jike: '即刻',
+  'github-trending': 'GitHub Trending',
+  'github-releases': 'GitHub Releases',
+  indiehackers: 'Indie Hackers',
 }
 
 export const sourceColors: Record<string, string> = {
   producthunt: 'bg-orange-500/20 text-orange-400',
   hackernews: 'bg-yellow-500/20 text-yellow-400',
-  twitter: 'bg-blue-500/20 text-blue-400',
-  github: 'bg-gray-500/20 text-gray-400',
-  indiehackers: 'bg-green-500/20 text-green-400',
   v2ex: 'bg-purple-500/20 text-purple-400',
-  xiaohongshu: 'bg-red-500/20 text-red-400',
-  juejin: 'bg-cyan-500/20 text-cyan-400',
-  medium: 'bg-neutral-500/20 text-neutral-400',
+  jike: 'bg-cyan-500/20 text-cyan-400',
+  'github-trending': 'bg-gray-500/20 text-gray-400',
+  'github-releases': 'bg-blue-500/20 text-blue-400',
+  indiehackers: 'bg-green-500/20 text-green-400',
 }
 
 export const categories = [
