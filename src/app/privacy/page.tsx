@@ -51,7 +51,7 @@ export default function PrivacyPage() {
         <Section title="我们如何使用您的信息">
           <p className="mb-4">我们将收集的信息用于以下目的：</p>
           <ul className="space-y-3 pl-6">
-            <li className="list-disc text-fog"><strong className="text-ice-white">提供和维护服务：</strong>运营和交付我们平台的功能，包括信号追踪、AI评分和MVP生成。</li>
+            <li className="list-disc text-fog"><strong className="text-ice-white">提供和维护服务：</strong>运营和交付我们平台的功能，包括信号追踪、AI评分和方案生成。</li>
             <li className="list-disc text-fog"><strong className="text-ice-white">改善用户体验：</strong>了解用户如何与我们的服务交互并进行改进。</li>
             <li className="list-disc text-fog"><strong className="text-ice-white">个性化：</strong>根据您的偏好定制内容、推荐和功能。</li>
             <li className="list-disc text-fog"><strong className="text-ice-white">沟通：</strong>向您发送关于账户的更新、新闻通讯和重要通知。</li>

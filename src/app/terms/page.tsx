@@ -24,11 +24,11 @@ export default function TermsPage() {
         </Section>
 
         <Section title="服务描述">
-          <p className="mb-4">SparkForge提供一个平台，用于发现创意信号、分析趋势，并使用AI生成MVP（最小可行产品）代码。我们的服务包括但不限于：</p>
+          <p className="mb-4">SparkForge提供一个平台，用于发现创意信号、分析趋势，并使用AI生成技术方案。我们的服务包括但不限于：</p>
           <ul className="space-y-3 pl-6">
             <li className="list-disc text-fog"><strong className="text-ice-white">信号雷达：</strong>一个用于发现和追踪网络上创意信号和趋势的工具。</li>
             <li className="list-disc text-fog"><strong className="text-ice-white">AI评分：</strong>基于热度、新颖性、商业潜力和本地相关性等多个维度对信号进行自动化分析和评分。</li>
-            <li className="list-disc text-fog"><strong className="text-ice-white">锻造：</strong>基于信号分析的AI驱动MVP代码和原型生成。</li>
+            <li className="list-disc text-fog"><strong className="text-ice-white">锻造：</strong>基于信号分析的AI驱动技术方案和商业画布生成。</li>
             <li className="list-disc text-fog"><strong className="text-ice-white">画布：</strong>用于组织和管理信号及生成项目的工作空间。</li>
           </ul>
           <p className="mt-4">我们保留随时修改、暂停或终止我们服务任何部分的权利，恕不另行通知。</p>

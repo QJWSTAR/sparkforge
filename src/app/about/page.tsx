@@ -33,22 +33,22 @@ const features = [
   {
     icon: <Radio className="w-6 h-6 text-spark-blue" />,
     title: '发现创意',
-    description: '7×24 小时实时监控 9+ 灵感源，覆盖 Product Hunt、Hacker News、即刻等平台',
+    description: '7×24 小时监控 7 个灵感源，覆盖 Product Hunt、Hacker News、GitHub 等平台',
   },
   {
     icon: <Flame className="w-6 h-6 text-spark-blue" />,
-    title: '生成方案',
-    description: '一键调用 TRAE IDE 生成 MVP，配置技术栈、自定义提示词，30 秒出结果',
+    title: 'AI 评分',
+    description: '多维度自动评分：新颖度、商业潜力、本地化潜力，智能排序优先展示',
   },
   {
     icon: <ClipboardList className="w-6 h-6 text-spark-blue" />,
-    title: '分析画布',
-    description: '基于信号生成完整商业模型，含 SWOT 分析、竞品分析和 30 天行动清单',
+    title: '生成方案',
+    description: '基于 DeepSeek AI 生成技术方案，含技术栈推荐、核心功能拆解和本地化建议',
   },
   {
     icon: <Tv className="w-6 h-6 text-spark-blue" />,
-    title: '动态广场',
-    description: '公开记录你的创意开发历程，从信号发现到商业化的完整旅程',
+    title: '商业画布',
+    description: '自动生成商业模型分析，帮助评估创意商业化可行性',
   },
 ]
 
@@ -56,47 +56,47 @@ const howItWorks = [
   {
     step: '01',
     title: '发现信号',
-    description: '创意雷达持续扫描全网，捕捉新兴创意和热门产品',
+    description: '创意雷达持续扫描 7 个灵感源，每日自动抓取最新创意信号',
   },
   {
     step: '02',
     title: 'AI 评分',
-    description: '多维度自动评分：热度、新颖度、商业潜力、本地化潜力',
+    description: 'DeepSeek AI 多维度评分：新颖度、商业潜力、本地化潜力',
   },
   {
     step: '03',
-    title: '生成 MVP',
-    description: '选择信号，使用 TRAE IDE 一键生成可运行的原型',
+    title: '生成方案',
+    description: '选择信号，AI 自动生成技术方案和本地化改造建议',
   },
   {
     step: '04',
-    title: '上线迭代',
-    description: '部署到生产环境，基于真实用户反馈持续迭代',
+    title: '商业分析',
+    description: '生成商业画布，评估创意的商业化可行性和市场机会',
   },
 ]
 
 const projectHistory = [
-  { date: '2026 Q1', event: '项目启动，创意信号检测技术调研' },
-  { date: '2026 Q2', event: 'MVP 开发，Next.js + Supabase 技术栈集成' },
-  { date: '2026 Q3', event: 'TRAE IDE 集成，实现自动化 MVP 生成' },
-  { date: '2026 Q4', event: '正式发布，社区建设与用户增长' },
+  { date: '2026 Q2', event: '项目启动，Next.js + Supabase 技术栈搭建' },
+  { date: '2026 Q3', event: '核心功能开发：信号抓取、AI 评分、方案生成' },
+  { date: '2026 Q3 末', event: '7 个信号源接入，DeepSeek AI 评分流水线上线' },
+  { date: '2026 Q4', event: '正式发布，社区功能与用户增长' },
 ]
 
 const roadmap = [
   {
-    phase: '第一阶段',
+    phase: '已完成',
     title: '信号源扩展',
-    items: ['新增 5+ 灵感源', '高级筛选与搜索', '自定义告警规则'],
-    inProgress: true,
-  },
-  {
-    phase: '第二阶段',
-    title: 'AI 能力增强',
-    items: ['趋势预测分析', '自动化竞品研究', '市场规模估算'],
+    items: ['7 个灵感源接入', '高级筛选与搜索', 'AI 自动评分'],
     inProgress: false,
   },
   {
-    phase: '第三阶段',
+    phase: '进行中',
+    title: 'AI 能力增强',
+    items: ['商业画布分析', 'SWOT 分析', '技术方案优化'],
+    inProgress: true,
+  },
+  {
+    phase: '即将推出',
     title: '社区功能',
     items: ['信号分享与讨论', '协作生成', '排行榜'],
     inProgress: false,
@@ -121,7 +121,7 @@ export default function AboutPage() {
             </span>
           </h1>
           <p className="text-base text-fog max-w-2xl mx-auto mb-8">
-            SparkForge 是一个连接创意发现与 MVP 落地的综合平台。
+            SparkForge 是一个连接创意发现与方案落地的综合平台。
             我们的使命是帮助独立开发者以前所未有的速度将创意变为现实。
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
