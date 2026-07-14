@@ -44,7 +44,7 @@ export default function ProjectsPage() {
     fetchHistory()
   }, [isAuthenticated])
 
-  const fetchHistory = async () => {
+  async function fetchHistory() {
     setLoading(true)
     setError('')
     try {
