@@ -1,10 +1,10 @@
 import { NextRequest } from 'next/server';
 import { crawlAllSources, addLogEntry } from '@/lib/signals';
-import { batchScoreUnscoredSignals } from '@/lib/scoring';
 import { apiSuccess, apiError } from '@/lib/api/response';
 
-// 仅 Vercel Pro 计划生效，Hobby 计划上限 10s
-export const maxDuration = 60;
+// Vercel Hobby 计划 Serverless Function 上限 10s，本路由仅做抓取（~5-8s）
+// 评分已分离至 /api/score/batch 按需触发，避免串行 DeepSeek 调用超时
+export const maxDuration = 10;
 
 /**
  * 验证请求是否来自 Vercel Cron Job。
@@ -23,10 +23,8 @@ export async function GET(request: NextRequest) {
   }
 
   let crawledCount = 0;
-  let scoredCount = 0;
-  const errors: string[] = [];
 
-  // 步骤 A：抓取信号（crawlAllSources 已内置自动评分 50 条）
+  // 仅抓取信号入库，不评分（评分由 /api/score/batch 按需触发）
   try {
     const crawlResult = await crawlAllSources();
 
@@ -38,18 +36,7 @@ export async function GET(request: NextRequest) {
   } catch (err) {
     const message = err instanceof Error ? err.message : '未知错误';
     console.error('[DailyProcess] Crawl step failed:', message);
-    return apiError('抓取信号失败，定时任务中止', 500);
-  }
-
-  // 步骤 B：对剩余未评分信号进行补充评分
-  try {
-    // crawlAllSources 已对前 50 条评分，此处补充处理剩余 PENDING 信号
-    scoredCount = await batchScoreUnscoredSignals(50);
-  } catch (err) {
-    const message = err instanceof Error ? err.message : '未知错误';
-    console.error('[DailyProcess] Score step failed:', message);
-    errors.push(`评分步骤异常: ${message}`);
-    // 评分失败不中断，抓取已成功
+    return apiError(`抓取信号失败: ${message}`, 500);
   }
 
   // 记录汇总日志
@@ -57,8 +44,8 @@ export async function GET(request: NextRequest) {
     await addLogEntry({
       type: 'SYSTEM',
       title: '每日定时任务完成',
-      content: `抓取 ${crawledCount} 条信号，补充评分 ${scoredCount} 条`,
-      metadata: { crawledCount, scoredCount, errors },
+      content: `抓取 ${crawledCount} 条信号（评分请通过 /api/score/batch 触发）`,
+      metadata: { crawledCount },
     });
   } catch (err) {
     console.error('[DailyProcess] Failed to write summary log:', err);
@@ -66,8 +53,6 @@ export async function GET(request: NextRequest) {
 
   return apiSuccess({
     crawledCount,
-    scoredCount,
-    errors,
-    message: `抓取 ${crawledCount} 条信号，补充评分 ${scoredCount} 条`,
+    message: `抓取 ${crawledCount} 条信号`,
   });
 }

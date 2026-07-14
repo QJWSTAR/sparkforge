@@ -6,7 +6,6 @@ import { fetchJikeHot, type RawJikePost } from './jike'
 import { fetchGitHubTrending, saveGHTrendingSignals } from './github-trending'
 import { fetchGitHubReleases, saveGHReleaseSignals } from './github-releases'
 import { fetchIndieHackers, saveIHSignals } from './indiehackers'
-import { batchScoreUnscoredSignals } from './scoring'
 import { mockSignals } from '@/data/mockSignals'
 
 export async function saveJikeSignals(posts: RawJikePost[]): Promise<number> {
@@ -284,15 +283,7 @@ export async function crawlAllSources(): Promise<{ hn: number; ph: number; v2ex:
         title: `信号抓取完成`,
         content: `Hacker News: ${hnSaved} | Product Hunt: ${phSaved} | V2EX: ${v2exSaved} | 即刻: ${jikeSaved} | GitHub Trending: ${ghTrendingSaved} | GitHub Releases: ${ghReleaseSaved} | Indie Hackers: ${ihSaved} | 总计: ${total} 条新信号`,
       })
-
-      const scored = await batchScoreUnscoredSignals(50)
-      if (scored > 0) {
-        await addLogEntry({
-          type: 'SIGNAL_SCORED',
-          title: `自动评分完成`,
-          content: `对新抓取的信号进行了评分，共评分 ${scored} 条`,
-        })
-      }
+      // 评分已移至 /api/score/batch 按需触发，避免 Cron 串行 DeepSeek 调用超时
     }
 
     return { hn: hnSaved, ph: phSaved, v2ex: v2exSaved, jike: jikeSaved, ghTrending: ghTrendingSaved, ghRelease: ghReleaseSaved, ih: ihSaved, total, dbAvailable: true }
